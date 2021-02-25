@@ -1,3 +1,12 @@
-.idea
-.gradle
+# Don't include the macOS .DS_Store files
+**/.DS_Store
+
+# Ignore the .idea folder (I'm not sure if this is necessary)
+.idea/
+
+# Ignore files that are used for local configurations
+.gradle/
 local.properties
+
+# Ignore the built files since they may be large
+app/build/
