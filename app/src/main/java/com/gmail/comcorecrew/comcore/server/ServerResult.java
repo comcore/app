@@ -49,6 +49,10 @@ public final class ServerResult<T> {
         return new ServerResult<>(null, error);
     }
 
+    static<T> ServerResult<T> invalidResponse() {
+        return ServerResult.failure("invalid server response");
+    }
+
     /**
      * Check if the request was successful.
      *
@@ -64,7 +68,7 @@ public final class ServerResult<T> {
      * @param defaultValue the value to return if the request failed
      * @return the result if successful, otherwise defaultValue
      */
-    public T otherwise(T defaultValue) {
+    public T or(T defaultValue) {
         if (isSuccess()) {
             return value;
         } else {
@@ -89,17 +93,55 @@ public final class ServerResult<T> {
     }
 
     /**
-     * Transforms the value stored inside the ServerResult if it was successful.
+     * Transform the value stored inside the ServerResult, allowing new errors to be added.
      *
      * @param function the transformation to apply to the value
      * @param <U> the new type after the transformation
-     * @return a ServerResult containing a transformed value, or an unmodified error message
+     * @return a ServerResult containing a transformed value or an error message
      */
-    public<U> ServerResult<U> map(Function<T, U> function) {
+    public<U> ServerResult<U> then(Function<T, ServerResult<U>> function) {
         if (isSuccess()) {
-            return ServerResult.success(function.apply(value));
+            return function.apply(value);
         } else {
             return ServerResult.failure(error);
+        }
+    }
+
+    /**
+     * Transform the value stored inside the ServerResult if it was successful.
+     *
+     * @param function the transformation to apply to the value
+     * @param <U> the new type after the transformation
+     * @return a ServerResult containing a transformed value or an unmodified error message
+     */
+    public<U> ServerResult<U> map(Function<T, U> function) {
+        return then(value -> ServerResult.success(function.apply(value)));
+    }
+
+    /**
+     * Transform the value stored inside the ServerResult if it was successful. If a
+     * RuntimeException occurs, return invalidResponse.
+     *
+     * @param function the transformation to apply to the value
+     * @param <U> the new type after the transformation
+     * @return a ServerResult containing a transformed value or an error message
+     */
+    public<U> ServerResult<U> tryMap(Function<T, U> function) {
+        return then(value -> {
+            try {
+                return ServerResult.success(function.apply(value));
+            } catch (RuntimeException e) {
+                return ServerResult.invalidResponse();
+            }
+        });
+    }
+
+    @Override
+    public String toString() {
+        if (isSuccess()) {
+            return "success(" + value + ")";
+        } else {
+            return "failure(" + error + ")";
         }
     }
 }
