@@ -34,7 +34,7 @@ public final class ServerResult<T> {
      * @param <T>   the type of the result
      * @return a ServerResult containing the value
      */
-    public static<T> ServerResult<T> success(T value) {
+    public static <T> ServerResult<T> success(T value) {
         return new ServerResult<>(value, null);
     }
 
@@ -45,11 +45,11 @@ public final class ServerResult<T> {
      * @param <T>   the type of the expected result
      * @return a ServerResult containing the error message
      */
-    public static<T> ServerResult<T> failure(String error) {
+    public static <T> ServerResult<T> failure(String error) {
         return new ServerResult<>(null, error);
     }
 
-    static<T> ServerResult<T> invalidResponse() {
+    public static <T> ServerResult<T> invalidResponse() {
         return ServerResult.failure("invalid server response");
     }
 
@@ -60,6 +60,15 @@ public final class ServerResult<T> {
      */
     public boolean isSuccess() {
         return error == null;
+    }
+
+    /**
+     * Check if the request failed.
+     *
+     * @return true if the request failed, false otherwise
+     */
+    public boolean isFailure() {
+        return error != null;
     }
 
     /**
@@ -99,7 +108,7 @@ public final class ServerResult<T> {
      * @param <U> the new type after the transformation
      * @return a ServerResult containing a transformed value or an error message
      */
-    public<U> ServerResult<U> then(Function<T, ServerResult<U>> function) {
+    public <U> ServerResult<U> then(Function<T, ServerResult<U>> function) {
         if (isSuccess()) {
             return function.apply(value);
         } else {
@@ -114,7 +123,7 @@ public final class ServerResult<T> {
      * @param <U> the new type after the transformation
      * @return a ServerResult containing a transformed value or an unmodified error message
      */
-    public<U> ServerResult<U> map(Function<T, U> function) {
+    public <U> ServerResult<U> map(Function<T, U> function) {
         return then(value -> ServerResult.success(function.apply(value)));
     }
 
@@ -126,7 +135,7 @@ public final class ServerResult<T> {
      * @param <U> the new type after the transformation
      * @return a ServerResult containing a transformed value or an error message
      */
-    public<U> ServerResult<U> tryMap(Function<T, U> function) {
+    public <U> ServerResult<U> tryMap(Function<T, U> function) {
         return then(value -> {
             try {
                 return ServerResult.success(function.apply(value));

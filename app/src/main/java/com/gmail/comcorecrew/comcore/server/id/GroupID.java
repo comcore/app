@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore.server;
+package com.gmail.comcorecrew.comcore.server.id;
 
 import java.util.UUID;
 
