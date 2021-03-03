@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.server;
 
+import com.gmail.comcorecrew.comcore.server.connection.Function;
+
 /**
  * Represents the result of a request to the server which may either be success or failure.
  *
@@ -7,35 +9,35 @@ package com.gmail.comcorecrew.comcore.server;
  */
 public final class ServerResult<T> {
     /**
-     * The value returned by the request, if it was successful.
+     * The data returned by the request, if it was successful.
      */
-    public final T value;
+    public final T data;
 
     /**
-     * The error message returned by the request, if it failed
+     * The error message returned by the request, if it failed.
      */
-    public final String error;
+    public final String errorMessage;
 
     /**
-     * Construct a ServerResult with a value and an error.
+     * Construct a ServerResult with data or an error.
      *
-     * @param value the value if successful
-     * @param error the error message if failed
+     * @param data the value if successful
+     * @param errorMessage the error message if failed
      */
-    private ServerResult(T value, String error) {
-        this.value = value;
-        this.error = error;
+    private ServerResult(T data, String errorMessage) {
+        this.data = data;
+        this.errorMessage = errorMessage;
     }
 
     /**
      * Construct a successful ServerResult from a value.
      *
-     * @param value the result of the request
-     * @param <T>   the type of the result
+     * @param data the result of the request
+     * @param <T>  the type of the result
      * @return a ServerResult containing the value
      */
-    public static <T> ServerResult<T> success(T value) {
-        return new ServerResult<>(value, null);
+    public static <T> ServerResult<T> success(T data) {
+        return new ServerResult<>(data, null);
     }
 
     /**
@@ -49,8 +51,24 @@ public final class ServerResult<T> {
         return new ServerResult<>(null, error);
     }
 
+    /**
+     * Construct a failed ServerResult with an invalid response error message.
+     *
+     * @param <T> the type of the expected result
+     * @return a ServerResult containing the error message
+     */
     public static <T> ServerResult<T> invalidResponse() {
         return ServerResult.failure("invalid server response");
+    }
+
+    /**
+     * Construct a failed ServerResult with an disconnected from server error message.
+     *
+     * @param <T> the type of the expected result
+     * @return a ServerResult containing the error message
+     */
+    public static <T> ServerResult<T> disconnected() {
+        return ServerResult.failure("disconnected from server");
     }
 
     /**
@@ -59,7 +77,7 @@ public final class ServerResult<T> {
      * @return true if the request was successful, false otherwise
      */
     public boolean isSuccess() {
-        return error == null;
+        return errorMessage == null;
     }
 
     /**
@@ -68,7 +86,7 @@ public final class ServerResult<T> {
      * @return true if the request failed, false otherwise
      */
     public boolean isFailure() {
-        return error != null;
+        return errorMessage != null;
     }
 
     /**
@@ -79,67 +97,52 @@ public final class ServerResult<T> {
      */
     public T or(T defaultValue) {
         if (isSuccess()) {
-            return value;
+            return data;
         } else {
             return defaultValue;
         }
     }
 
     /**
-     * Represents a transformation which can be applied to the result of a request.
+     * Transform the data stored inside the ServerResult, allowing new errors to be added.
      *
-     * @param <T> the original type
+     * @param function the transformation to apply to the data
      * @param <U> the new type after the transformation
-     */
-    public interface Function<T, U> {
-        /**
-         * Apply a transformation to the result of a request.
-         *
-         * @param result the result of the request
-         * @return the new value to replace it with
-         */
-        U apply(T result);
-    }
-
-    /**
-     * Transform the value stored inside the ServerResult, allowing new errors to be added.
-     *
-     * @param function the transformation to apply to the value
-     * @param <U> the new type after the transformation
-     * @return a ServerResult containing a transformed value or an error message
+     * @return a ServerResult containing the transformed data or an error message
      */
     public <U> ServerResult<U> then(Function<T, ServerResult<U>> function) {
         if (isSuccess()) {
-            return function.apply(value);
+            return function.apply(data);
         } else {
-            return ServerResult.failure(error);
+            return ServerResult.failure(errorMessage);
         }
     }
 
     /**
-     * Transform the value stored inside the ServerResult if it was successful.
+     * Transform the data stored inside the ServerResult if it was successful.
      *
-     * @param function the transformation to apply to the value
+     * @param function the transformation to apply to the data
      * @param <U> the new type after the transformation
-     * @return a ServerResult containing a transformed value or an unmodified error message
+     * @return a ServerResult containing the transformed data or an unmodified error message
      */
     public <U> ServerResult<U> map(Function<T, U> function) {
         return then(value -> ServerResult.success(function.apply(value)));
     }
 
     /**
-     * Transform the value stored inside the ServerResult if it was successful. If a
+     * Transform the data stored inside the ServerResult if it was successful. If a
      * RuntimeException occurs, return invalidResponse.
      *
-     * @param function the transformation to apply to the value
+     * @param function the transformation to apply to the data
      * @param <U> the new type after the transformation
-     * @return a ServerResult containing a transformed value or an error message
+     * @return a ServerResult containing the transformed data or an error message
      */
     public <U> ServerResult<U> tryMap(Function<T, U> function) {
         return then(value -> {
             try {
                 return ServerResult.success(function.apply(value));
             } catch (RuntimeException e) {
+                e.printStackTrace();
                 return ServerResult.invalidResponse();
             }
         });
@@ -148,9 +151,9 @@ public final class ServerResult<T> {
     @Override
     public String toString() {
         if (isSuccess()) {
-            return "success(" + value + ")";
+            return "success(" + data + ")";
         } else {
-            return "failure(" + error + ")";
+            return "failure(" + errorMessage + ")";
         }
     }
 }

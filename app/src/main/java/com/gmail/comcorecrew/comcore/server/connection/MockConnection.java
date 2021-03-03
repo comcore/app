@@ -1,14 +1,13 @@
-package com.gmail.comcorecrew.comcore.server.connector;
+package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.google.gson.JsonObject;
 
 /**
  * A ServerConnector which always returns the same result for testing purposes.
  */
-public final class MockConnector extends ServerConnector {
+public final class MockConnection implements Connection {
     private final ServerResult<JsonObject> result;
 
     /**
@@ -16,20 +15,23 @@ public final class MockConnector extends ServerConnector {
      *
      * @param result the result which will always be returned
      */
-    public MockConnector(ServerResult<JsonObject> result) {
+    public MockConnection(ServerResult<JsonObject> result) {
         this.result = result;
     }
 
     @Override
-    protected void authenticate(String email, String pass, ResultHandler<Void> handler) {
+    public void stop() {}
+
+    @Override
+    public void authenticate(String email, String pass, ResultHandler<Void> handler) {
         if (handler != null) {
             handler.handleResult(ServerResult.success(null));
         }
     }
 
     @Override
-    protected <T> void send(String kind, JsonObject data, ResultHandler<T> handler,
-                            ServerResult.Function<JsonObject, T> function) {
+    public <T> void send(Message message, ResultHandler<T> handler,
+                         Function<JsonObject, T> function) {
         if (handler != null) {
             handler.handleResult(result.tryMap(function));
         }
