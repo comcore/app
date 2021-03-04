@@ -3,8 +3,10 @@ package com.gmail.comcorecrew.comcore.server.connection;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
+import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerReader;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerWriter;
+import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -169,10 +171,38 @@ public final class ServerConnection implements Connection {
             return;
         }
 
-        JsonObject message = new JsonObject();
-        message.addProperty("email", email);
-        message.addProperty("pass", pass);
-        startTask(new Task(new Message("login", message), null));
+        JsonObject data = new JsonObject();
+        data.addProperty("email", email);
+        data.addProperty("pass", pass);
+        data.addProperty("create", false);
+        startTask(new Task(new Message("login", data), result -> {
+            try {
+                if (result.isSuccess()) {
+                    String status = result.data.get("status").getAsString();
+                    if (status.equals("SUCCESS")) {
+                        // The login was successful, so do nothing
+                        return;
+                    }
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+            // For some reason, the login failed so log the user out
+            loggedOut();
+        }));
+    }
+
+    /**
+     * Record that the user was logged out from the server and that their email and password must
+     * be entered again to continue. This could happen if their password was changed or if the
+     * client wasn't able to log in after being automatically reconnected.
+     */
+    public void loggedOut() {
+        synchronized (this) {
+            email = null;
+            pass = null;
+        }
     }
 
     /**
@@ -186,7 +216,7 @@ public final class ServerConnection implements Connection {
         }
 
         if (!start()) {
-            task.fail("cannot connect to server");
+            task.handleResult(ServerResult.failure("cannot connect to server"));
             return;
         }
 
@@ -194,7 +224,7 @@ public final class ServerConnection implements Connection {
 
         if (out.checkError()) {
             close();
-            task.fail("failed to send message");
+            task.handleResult(ServerResult.failure("failed to send message"));
             return;
         }
 
@@ -259,11 +289,8 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
-    public void authenticate(String email, String pass, ResultHandler<Void> handler) {
-        if (email == null || pass == null) {
-            throw new IllegalArgumentException("email address and password cannot be null");
-        }
-
+    public void authenticate(String email, String pass, boolean createAccount,
+                             ResultHandler<LoginStatus> handler) {
         synchronized (this) {
             this.email = null;
             this.pass = null;
@@ -272,15 +299,36 @@ public final class ServerConnection implements Connection {
         JsonObject data = new JsonObject();
         data.addProperty("email", email);
         data.addProperty("pass", pass);
+        data.addProperty("create", createAccount);
         addTask(new Task(new Message("login", data), result -> {
-            if (result.isSuccess()) {
+            ServerResult<LoginStatus> resultStatus = result.then(response -> {
+                try {
+                    switch (response.get("status").getAsString()) {
+                        case "SUCCESS":
+                            return ServerResult.success(LoginStatus.SUCCESS);
+                        case "ENTER_CODE":
+                            return ServerResult.success(LoginStatus.ENTER_CODE);
+                        case "DOES_NOT_EXIST":
+                            return ServerResult.success(LoginStatus.DOES_NOT_EXIST);
+                        case "INVALID_PASSWORD":
+                            return ServerResult.success(LoginStatus.INVALID_PASSWORD);
+                    }
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+
+                return ServerResult.invalidResponse();
+            });
+
+            if (resultStatus.isSuccess()) {
                 synchronized (this) {
                     this.email = email;
                     this.pass = pass;
                 }
             }
+
             if (handler != null) {
-                handler.handleResult(result.map(response -> null));
+                handler.handleResult(resultStatus);
             }
         }));
     }
@@ -288,8 +336,7 @@ public final class ServerConnection implements Connection {
     @Override
     public <T> void send(Message message, ResultHandler<T> handler,
                          Function<JsonObject, T> function) {
-        addTask(new Task(message, handler == null ? null : result -> {
-            handler.handleResult(result.tryMap(function));
-        }));
+        addTask(new Task(message, handler == null ? null : result ->
+                handler.handleResult(result.tryMap(function))));
     }
 }

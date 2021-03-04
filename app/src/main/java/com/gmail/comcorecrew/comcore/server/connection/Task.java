@@ -32,24 +32,6 @@ public class Task implements ResultHandler<JsonObject> {
         this.handler = handler;
     }
 
-    /**
-     * Pass a successful result to the handler.
-     *
-     * @param data the data returned by the server
-     */
-    public void succeed(JsonObject data) {
-        handleResult(ServerResult.success(data));
-    }
-
-    /**
-     * Pass a failed result to the handler.
-     *
-     * @param message the error message returned by the server
-     */
-    public void fail(String message) {
-        handleResult(ServerResult.failure(message));
-    }
-
     @Override
     public void handleResult(ServerResult<JsonObject> result) {
         // Handle the result on the main thread instead of the server thread

@@ -11,7 +11,7 @@ import java.util.ArrayDeque;
  */
 public abstract class ServerThread {
     private final Thread thread;
-    private ArrayDeque<Task> currentTasks = new ArrayDeque<>();
+    private final ArrayDeque<Task> currentTasks = new ArrayDeque<>();
     private boolean running = true;
 
     /**
@@ -61,7 +61,7 @@ public abstract class ServerThread {
     protected final synchronized Task getTask() {
         while (running && currentTasks.isEmpty()) {
             try {
-                wait(500);
+                wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -98,14 +98,5 @@ public abstract class ServerThread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Checks if the thread is still running.
-     *
-     * @return true if the thread is running, false otherwise
-     */
-    public final boolean isRunning() {
-        return running;
     }
 }

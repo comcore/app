@@ -1,34 +1,27 @@
 package com.gmail.comcorecrew.comcore.server.id;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Represents a unique identifier for a type of item.
  */
 public abstract class AbstractID {
     /**
-     * The UUID corresponding to this item.
+     * The ID string corresponding to this item.
      */
-    public final UUID uuid;
+    public final String id;
 
     /**
-     * Create an AbstractID from a UUID.
+     * Create an AbstractID from an ID string.
      *
-     * @param uuid the UUID
+     * @param id the ID string
      */
-    public AbstractID(UUID uuid) {
-        this.uuid = uuid;
-    }
+    public AbstractID(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("ID cannot be null or empty");
+        }
 
-    /**
-     * Create an AbstractID from a UUID represented as a String.
-     *
-     * @param uuid the UUID String
-     * @throws IllegalArgumentException if the UUID String is invalid
-     */
-    public AbstractID(String uuid) {
-        this(UUID.fromString(uuid));
+        this.id = id;
     }
 
     @Override
@@ -36,11 +29,11 @@ public abstract class AbstractID {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractID that = (AbstractID) o;
-        return uuid.equals(that.uuid);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        return Objects.hash(id);
     }
 }

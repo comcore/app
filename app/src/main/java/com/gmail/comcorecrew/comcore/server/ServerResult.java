@@ -25,6 +25,10 @@ public final class ServerResult<T> {
      * @param errorMessage the error message if failed
      */
     private ServerResult(T data, String errorMessage) {
+        if (data != null && errorMessage != null) {
+            throw new IllegalArgumentException("both data and errorMessage cannot be defined");
+        }
+
         this.data = data;
         this.errorMessage = errorMessage;
     }
