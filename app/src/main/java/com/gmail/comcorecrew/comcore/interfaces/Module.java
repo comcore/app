@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.interfaces;
 
+import android.content.Context;
+
 /*
  * Basic interface for the module class.
  */
@@ -12,7 +14,7 @@ public interface Module {
     int getMnum();
 
     //Caches the data of the module and returns true if successful.
-    boolean toCache();
+    boolean toCache(Context context);
 
     //Returns the id of the group that the module is in.
     int getGroupId();

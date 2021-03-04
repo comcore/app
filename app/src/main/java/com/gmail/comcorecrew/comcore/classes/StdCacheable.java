@@ -1,19 +1,19 @@
 package com.gmail.comcorecrew.comcore.classes;
 
-import com.gmail.comcorecrew.comcore.interfaces.cacheable;
+import com.gmail.comcorecrew.comcore.interfaces.Cacheable;
 
 /*
  * Class for the standard cacheable format. Supports the caching of an int,
  * a long, and a string up to 4 MB long.
  */
-public class StdCacheable implements cacheable {
+public class StdCacheable implements Cacheable {
 
     private int id; //Preferably user id of the message.
     private long meta; //Meta data for any use.
     private String data; //Data contained in the message.
 
     public StdCacheable(int id, long meta, String data) {
-        if (data.length() > 0x001E8480) { //4 MB of data
+        if (data.length() > 0x001E8483) { //4 MB of data + 6 bytes
             throw new IllegalArgumentException();
         }
         this.id = id;

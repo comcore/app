@@ -3,7 +3,7 @@ package com.gmail.comcorecrew.comcore.classes;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.interfaces.Module;
-import com.gmail.comcorecrew.comcore.interfaces.cacheable;
+import com.gmail.comcorecrew.comcore.interfaces.Cacheable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,11 +16,15 @@ import java.util.ArrayList;
 public class Cacher {
 
     //Caches the given data in the modules cache file.
-    static boolean cacheData(ArrayList<cacheable> data, Module module, Context context) {
+    static boolean cacheData(ArrayList<Cacheable> data, Module module, Context context) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
-            String filename = module.getGroupId() + '/' + module.getMdid() + module.getMnum();
-            File cacheFile = new File(context.getCacheDir(), filename);
+            File cacheDir = new File(context.getCacheDir(), String.valueOf(module.getGroupId()));
+            if (!cacheDir.exists()) {
+                cacheDir.mkdir();
+            }
+            String filename = module.getMdid() + module.getMnum();
+            File cacheFile = new File(cacheDir, filename);
             cacheFile.createNewFile();
             PrintWriter pw = new PrintWriter(new FileWriter(cacheFile));
 
@@ -29,9 +33,12 @@ public class Cacher {
             int size = data.size();
             pw.print((char) (size >> 16));
             pw.print((char) size);
-            for (cacheable group : data) {
+            for (Cacheable group : data) {
                 char[] line = group.toCache();
                 int lineLength = line.length;
+                if (lineLength > 0x001E8483) { //4MB of data + 6 bytes
+                    throw new IllegalArgumentException();
+                }
                 pw.print((char) (lineLength >> 16));
                 pw.print((char) lineLength);
                 pw.print(line);
@@ -49,7 +56,7 @@ public class Cacher {
     static char[][] uncacheData(Module module, Context context) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
-            String filename = module.getGroupId() + '/' + module.getMdid() + module.getMnum();
+            String filename = module.getGroupId() + "/" + module.getMdid() + module.getMnum();
             File cacheFile = new File(context.getCacheDir(), filename);
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
@@ -60,6 +67,9 @@ public class Cacher {
             for (int i = 0; i < size; i++) {
                 int lineSize = br.read();
                 lineSize = (lineSize << 16) | br.read();
+                if (lineSize > 0x001E8483) { //4MB of data + 6 bytes
+                    throw new IllegalArgumentException();
+                }
                 data[i] = new char[lineSize];
 
                 //If there is an error in the formatting, returns null to indicate an empty cache.
