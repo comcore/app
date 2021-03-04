@@ -1,16 +1,26 @@
 package com.gmail.comcorecrew.comcore.server;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
+import com.gmail.comcorecrew.comcore.server.connection.Function;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Utility class representing a connection with the server.
  */
 public final class ServerConnector {
+    private static final List<NotificationListener> notificationListeners =
+            Collections.synchronizedList(new ArrayList<>());
     private static Connection serverConnection;
 
     /**
@@ -37,6 +47,38 @@ public final class ServerConnector {
         }
 
         return serverConnection;
+    }
+
+    /**
+     * Add a NotificationListener to the ServerConnector.
+     *
+     * @param listener the NotificationListener to add
+     */
+    public static void addNotificationListener(NotificationListener listener) {
+        notificationListeners.add(listener);
+    }
+
+    /**
+     * Call a function for all notification listeners attached to the ServerConnector. The listeners
+     * are called in the order they are added, and if the function returns true, iteration will
+     * stop immediately. The notification listeners are always called on the main thread.
+     *
+     * @param function the function to call
+     */
+    public static void foreachListener(Function<NotificationListener, Boolean> function) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            synchronized (notificationListeners) {
+                for (NotificationListener listener : notificationListeners) {
+                    try {
+                        if (function.apply(listener)) {
+                            break;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -237,7 +279,7 @@ public final class ServerConnector {
             JsonArray messagesJson = response.get("messages").getAsJsonArray();
             MessageEntry[] messages = new MessageEntry[messagesJson.size()];
             for (int i = 0; i < messages.length; i++) {
-                messages[i] = MessageEntry.fromJson(messagesJson.get(i).getAsJsonObject());
+                messages[i] = MessageEntry.fromJson(chat, messagesJson.get(i).getAsJsonObject());
             }
             return messages;
         });

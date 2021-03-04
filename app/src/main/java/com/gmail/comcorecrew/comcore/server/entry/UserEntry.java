@@ -37,9 +37,10 @@ public final class UserEntry {
     }
 
     /**
-     * Create a UserEntry from a JSON object.
+     * Parse a UserEntry from a JsonObject.
      *
      * @param json the data sent by the server
+     * @return the UserEntry
      */
     public static UserEntry fromJson(JsonObject json) {
         UserID id = new UserID(json.get("id").getAsString());

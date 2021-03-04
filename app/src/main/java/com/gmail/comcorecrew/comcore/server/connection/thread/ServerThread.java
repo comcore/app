@@ -54,20 +54,28 @@ public abstract class ServerThread {
     }
 
     /**
-     * Get a task from the queue.
+     * Get a task from the queue. If there is no task in the queue, it may either block until a
+     * task is available or return null.
      *
      * @return the next task from the queue
      */
     protected final synchronized Task getTask() {
-        while (running && currentTasks.isEmpty()) {
+        if (!running) {
+            return null;
+        }
+
+        // Wait for a task to be added. If there is no task added after 30 seconds, return so that
+        // the connection can be refreshed if necessary. This ensures that the server reconnects
+        // even if the application is idle.
+        if (currentTasks.isEmpty()) {
             try {
-                wait();
+                wait(30_000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        if (!running) {
+        if (!running || currentTasks.isEmpty()) {
             return null;
         }
 

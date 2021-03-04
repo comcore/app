@@ -56,13 +56,18 @@ public final class MessageEntry {
     }
 
     /**
-     * Create a MessageEntry from a JSON object.
+     * Create a MessageEntry from a JsonObject. If specified, the given ChatID is used. Otherwise,
+     * it is taken from the message data.
      *
+     * @param chat the chat which the message was retrieved from or null
      * @param json the data sent by the server
+     * @return the MessageEntry
      */
-    public static MessageEntry fromJson(JsonObject json) {
-        GroupID group = new GroupID(json.get("group").getAsString());
-        ChatID chat = new ChatID(group, json.get("chat").getAsString());
+    public static MessageEntry fromJson(ChatID chat, JsonObject json) {
+        if (chat == null) {
+            GroupID group = new GroupID(json.get("group").getAsString());
+            chat = new ChatID(group, json.get("chat").getAsString());
+        }
         UserEntry sender = UserEntry.fromJson(json.get("sender").getAsJsonObject());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();

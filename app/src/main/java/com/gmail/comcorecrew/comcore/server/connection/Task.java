@@ -28,6 +28,10 @@ public class Task implements ResultHandler<JsonObject> {
      * @param handler the handler for the response of the server
      */
     public Task(Message message, ResultHandler<JsonObject> handler) {
+        if (message == null) {
+            throw new IllegalArgumentException("task message cannot be null");
+        }
+
         this.message = message;
         this.handler = handler;
     }

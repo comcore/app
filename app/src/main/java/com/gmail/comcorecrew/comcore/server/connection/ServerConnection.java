@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.server.connection;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerReader;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerWriter;
@@ -176,19 +177,21 @@ public final class ServerConnection implements Connection {
         data.addProperty("pass", pass);
         data.addProperty("create", false);
         startTask(new Task(new Message("login", data), result -> {
+            if (result.isFailure()) {
+                // A failure doesn't necessarily mean the information was wrong
+                return;
+            }
+
             try {
-                if (result.isSuccess()) {
-                    String status = result.data.get("status").getAsString();
-                    if (status.equals("SUCCESS")) {
-                        // The login was successful, so do nothing
-                        return;
-                    }
+                if (LoginStatus.fromJson(result.data) == LoginStatus.SUCCESS) {
+                    // The login was successful, so do nothing
+                    return;
                 }
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
 
-            // For some reason, the login failed so log the user out
+            // The login failed, so log the user out so they can enter new information
             loggedOut();
         }));
     }
@@ -203,10 +206,17 @@ public final class ServerConnection implements Connection {
             email = null;
             pass = null;
         }
+
+        ServerConnector.foreachListener(listener -> {
+            listener.onLoggedOut();
+            return false;
+        });
     }
 
     /**
-     * Start a task on the current thread and add it to the reader thread pending a response.
+     * Start a task on the current thread and add it to the reader thread pending a response. This
+     * should only be called from the WriterThread as it is an error to connect a socket from the
+     * main thread.
      *
      * @param task the task to start
      */
@@ -224,6 +234,7 @@ public final class ServerConnection implements Connection {
 
         if (out.checkError()) {
             close();
+            connect();
             task.handleResult(ServerResult.failure("failed to send message"));
             return;
         }
@@ -232,7 +243,16 @@ public final class ServerConnection implements Connection {
     }
 
     /**
-     * Receive a message from the server on the current thread.
+     * Try to connect to the server if not already connected. This should only be called from the
+     * WriterThread, as it is an error to try to connect a socket from the main thread.
+     */
+    public void connect() {
+        start();
+    }
+
+    /**
+     * Receive a message from the server on the current thread. This should only be called from the
+     * ReaderThread, as doing otherwise might lead to a message reply being dropped.
      *
      * @return the next message from the server or null on failure
      */
@@ -253,28 +273,28 @@ public final class ServerConnection implements Connection {
 
         try {
             String line = in.readLine();
-            if (line == null) {
-                // The server finished sending data, so close the connection
-                close();
-                return null;
+            if (line != null && !line.isEmpty()) {
+                JsonObject json = JsonParser.parseString(line).getAsJsonObject();
+                return Message.fromJson(json);
             }
-
-            JsonObject json = JsonParser.parseString(line).getAsJsonObject();
-            return Message.fromJson(json);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        // There was no valid message sent, which is an invalid state so restart the connection
+        close();
+        connect();
+        return null;
     }
 
     @Override
     public void stop() {
         synchronized (this) {
-            close();
-
             email = null;
             pass = null;
             sslContext = null;
+
+            close();
 
             notifyAll();
         }
@@ -301,26 +321,8 @@ public final class ServerConnection implements Connection {
         data.addProperty("pass", pass);
         data.addProperty("create", createAccount);
         addTask(new Task(new Message("login", data), result -> {
-            ServerResult<LoginStatus> resultStatus = result.then(response -> {
-                try {
-                    switch (response.get("status").getAsString()) {
-                        case "SUCCESS":
-                            return ServerResult.success(LoginStatus.SUCCESS);
-                        case "ENTER_CODE":
-                            return ServerResult.success(LoginStatus.ENTER_CODE);
-                        case "DOES_NOT_EXIST":
-                            return ServerResult.success(LoginStatus.DOES_NOT_EXIST);
-                        case "INVALID_PASSWORD":
-                            return ServerResult.success(LoginStatus.INVALID_PASSWORD);
-                    }
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
-
-                return ServerResult.invalidResponse();
-            });
-
-            if (resultStatus.isSuccess()) {
+            ServerResult<LoginStatus> resultStatus = result.tryMap(LoginStatus::fromJson);
+            if (resultStatus.isSuccess() && resultStatus.data.isValid) {
                 synchronized (this) {
                     this.email = email;
                     this.pass = pass;

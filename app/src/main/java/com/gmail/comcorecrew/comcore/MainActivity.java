@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 public class MainActivity extends AppCompatActivity {
     @Override

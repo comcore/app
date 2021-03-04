@@ -32,6 +32,12 @@ public class Message {
      * @param data the data of the message
      */
     public Message(String kind, JsonObject data) {
+        if (kind == null || kind.isEmpty()) {
+            throw new IllegalArgumentException("message kind cannot be null or empty");
+        } else if (data == null) {
+            throw new IllegalArgumentException("message data cannot be null");
+        }
+
         this.kind = kind;
         this.data = data;
     }
@@ -49,10 +55,10 @@ public class Message {
     }
 
     /**
-     * Parse a message from a JsonObject.
+     * Parse a Message from a JsonObject.
      *
-     * @param json the json containing the message
-     * @return the parsed message
+     * @param json the data sent by the server
+     * @return the Message
      */
     public static Message fromJson(JsonObject json) {
         String kind = json.get("kind").getAsString();

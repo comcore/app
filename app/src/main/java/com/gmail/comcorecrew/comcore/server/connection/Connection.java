@@ -4,6 +4,9 @@ import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.google.gson.JsonObject;
 
+/**
+ * Interface for classes which manage connections to a server.
+ */
 public interface Connection {
     /**
      * Close the connection to the server.
