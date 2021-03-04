@@ -12,9 +12,15 @@ public enum LoginStatus {
     SUCCESS(true),
 
     /**
-     * The login was successful, but the user must enter a code sent to their email address.
+     * The login was successful, but the user must enter a code sent to their email address. The
+     * code can be sent with ServerConnector.enterCode().
      */
     ENTER_CODE(true),
+
+    /**
+     * The login failed because the account already existed (when creating an account).
+     */
+    ALREADY_EXISTS(false),
 
     /**
      * The login failed because the account did not exist.
@@ -48,6 +54,8 @@ public enum LoginStatus {
                 return LoginStatus.SUCCESS;
             case "ENTER_CODE":
                 return LoginStatus.ENTER_CODE;
+            case "ALREADY_EXISTS":
+                return LoginStatus.ALREADY_EXISTS;
             case "DOES_NOT_EXIST":
                 return LoginStatus.DOES_NOT_EXIST;
             case "INVALID_PASSWORD":

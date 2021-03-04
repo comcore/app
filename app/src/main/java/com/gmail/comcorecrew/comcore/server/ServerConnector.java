@@ -27,6 +27,7 @@ public final class ServerConnector {
      * Set the connection which will be used for all server requests.
      *
      * @param connection the connection to use for requests
+     * @see Connection
      */
     public static void setConnection(Connection connection) {
         if (serverConnection != null) {
@@ -53,6 +54,7 @@ public final class ServerConnector {
      * Add a NotificationListener to the ServerConnector.
      *
      * @param listener the NotificationListener to add
+     * @see NotificationListener
      */
     public static void addNotificationListener(NotificationListener listener) {
         notificationListeners.add(listener);
@@ -85,10 +87,20 @@ public final class ServerConnector {
      * Request the server to authenticate the user. This should be called before making any requests
      * from the server. If this method is not called, all requests will likely fail.
      *
+     * If createAccount is true, an account will be created for the user. LoginStatus.ENTER_CODE
+     * will be returned if successful, otherwise LoginStatus.ALREADY_EXISTS will be returned if the
+     * email address is already in use.
+     *
+     * If requestReset() and enterCode() have been successfully called, the user's password will be
+     * reset to the provided password and they will be signed in.
+     *
+     * Otherwise, the password will be checked against the account on the server.
+     *
      * @param email         the user's email address
      * @param pass          the user's password
      * @param createAccount true if creating an account, false if logging into an existing account
      * @param handler       the handler for the response of the server
+     * @see LoginStatus
      */
     public static void authenticate(String email, String pass, boolean createAccount,
                                     ResultHandler<LoginStatus> handler) {
@@ -100,8 +112,27 @@ public final class ServerConnector {
     }
 
     /**
-     * Enter a code to confirm an email address after receiving LoginStatus.ENTER.CODE. Returns
-     * true if the code was correct, false otherwise.
+     * Request a code to be sent to the user's email address so they can reset their password.
+     * Yields true if the code was sent and false if the account does not exist.
+     *
+     * @param email   the user's email address
+     * @param handler the handler for the response of the server
+     */
+    public static void requestReset(String email, ResultHandler<Boolean> handler) {
+        if (email == null) {
+            throw new IllegalArgumentException("email address cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("email", email);
+        getConnection().send(new Message("requestReset", data), handler, response ->
+                response.get("sent").getAsBoolean());
+    }
+
+    /**
+     * Enter a code to confirm an email address after receiving LoginStatus.ENTER_CODE from
+     * authenticate() or to reset a password after calling requestCode(). Returns true if the code
+     * was correct and false otherwise.
      *
      * @param code    the code the user entered
      * @param handler the handler for the response of the server
@@ -138,6 +169,7 @@ public final class ServerConnector {
      * Get a list of all groups that the user is in.
      *
      * @param handler the handler for the response of the server
+     * @see GroupEntry
      */
     public static void getGroups(ResultHandler<GroupEntry[]> handler) {
         getConnection().send(new Message("getGroups"), handler, response -> {
@@ -180,6 +212,7 @@ public final class ServerConnector {
      *
      * @param group   the group to list the users of
      * @param handler the handler for the response of the server
+     * @see UserEntry
      */
     public static void getUsers(GroupID group, ResultHandler<UserEntry[]> handler) {
         if (group == null) {
@@ -203,6 +236,7 @@ public final class ServerConnector {
      *
      * @param group   the group to list the chats of
      * @param handler the handler for the response of the server
+     * @see ChatEntry
      */
     public static void getChats(GroupID group, ResultHandler<ChatEntry[]> handler) {
         if (group == null) {
@@ -247,13 +281,13 @@ public final class ServerConnector {
 
     /**
      * Get messages in a chat. The server will return the most recent messages which were sent after
-     * timestampAfter but before timestampBefore. If either bound is 0, it is ignored, so (0, X)
-     * returns messages before X while (X, 0) returns messages after X, where X is some timestamp.
+     * timestampAfter but before timestampBefore. If either bound is 0, it is ignored, so (0, T)
+     * returns messages before T while (T, 0) returns messages after T, where T is some timestamp.
      *
      * This interface allows the app to fetch only messages which have arrived since it was last
      * refreshed by passing (lastRefreshTime, 0), or to fetch an older set of messages when
-     * scrolling backwards by passing (0, oldestCachedMessageTimestamp). Passing (0, 0) will place
-     * no limits on the times the messages were received.
+     * scrolling backwards by passing (0, oldestCachedMessageTime). Passing (0, 0) will place no
+     * limits on the times the messages were received.
      *
      * The server places a limit on how many messages it will return per request, so it is not
      * guaranteed to be an exhaustive list of the messages between the timestamps. The lower bound
@@ -263,6 +297,7 @@ public final class ServerConnector {
      * @param timestampAfter  a lower bound on the timestamp, or 0 if no lower bound
      * @param timestampBefore an upper bound on the timestamp, or 0 if no upper bound
      * @param handler         the handler for the response of the server
+     * @see MessageEntry
      */
     public static void getMessages(ChatID chat, long timestampAfter, long timestampBefore,
                                    ResultHandler<MessageEntry[]> handler) {
