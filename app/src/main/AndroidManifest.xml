@@ -3,7 +3,6 @@
     package="com.gmail.comcorecrew.comcore">
 
     <application
-        android:name="com.gmail.comcorecrew.comcore.classes.Comcore"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
