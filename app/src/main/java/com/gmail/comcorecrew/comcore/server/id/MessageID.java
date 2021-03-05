@@ -38,6 +38,17 @@ public class MessageID {
         this.id = id;
     }
 
+    /**
+     * Helper function to check if this message comes immediately after a previous message with no
+     * gap in between them.
+     *
+     * @param previousMessage a previous message
+     * @return true if this message immediately follows the previous one, false otherwise
+     */
+    public boolean immediatelyAfter(MessageID previousMessage) {
+        return id == previousMessage.id + 1;
+    }
+
     @Override
     @NonNull
     public String toString() {

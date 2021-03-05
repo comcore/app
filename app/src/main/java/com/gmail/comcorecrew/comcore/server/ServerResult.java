@@ -9,19 +9,21 @@ import com.gmail.comcorecrew.comcore.server.connection.Function;
  */
 public final class ServerResult<T> {
     /**
-     * The data returned by the request, if it was successful.
+     * The data returned by the request (if it was successful). Note that a null value doesn't
+     * necessarily mean the request failed, since null is a valid data value. Specifically, if the
+     * generic type is Void, the data will always be null since there are no other valid values.
      */
     public final T data;
 
     /**
-     * The error message returned by the request, if it failed.
+     * The error message returned by the request if it failed, null otherwise.
      */
     public final String errorMessage;
 
     /**
      * Construct a ServerResult with data or an error.
      *
-     * @param data the value if successful
+     * @param data         the value if successful
      * @param errorMessage the error message if failed
      */
     private ServerResult(T data, String errorMessage) {
@@ -94,24 +96,10 @@ public final class ServerResult<T> {
     }
 
     /**
-     * Extract the result of the request, or return a default value if it failed.
-     *
-     * @param defaultValue the value to return if the request failed
-     * @return the result if successful, otherwise defaultValue
-     */
-    public T or(T defaultValue) {
-        if (isSuccess()) {
-            return data;
-        } else {
-            return defaultValue;
-        }
-    }
-
-    /**
      * Transform the data stored inside the ServerResult, allowing new errors to be added.
      *
      * @param function the transformation to apply to the data
-     * @param <U> the new type after the transformation
+     * @param <U>      the new type after the transformation
      * @return a ServerResult containing the transformed data or an error message
      */
     public <U> ServerResult<U> then(Function<T, ServerResult<U>> function) {
@@ -123,25 +111,14 @@ public final class ServerResult<T> {
     }
 
     /**
-     * Transform the data stored inside the ServerResult if it was successful.
-     *
-     * @param function the transformation to apply to the data
-     * @param <U> the new type after the transformation
-     * @return a ServerResult containing the transformed data or an unmodified error message
-     */
-    public <U> ServerResult<U> map(Function<T, U> function) {
-        return then(value -> ServerResult.success(function.apply(value)));
-    }
-
-    /**
      * Transform the data stored inside the ServerResult if it was successful. If a
      * RuntimeException occurs, return invalidResponse.
      *
      * @param function the transformation to apply to the data
-     * @param <U> the new type after the transformation
+     * @param <U>      the new type after the transformation
      * @return a ServerResult containing the transformed data or an error message
      */
-    public <U> ServerResult<U> tryMap(Function<T, U> function) {
+    public <U> ServerResult<U> map(Function<T, U> function) {
         return then(value -> {
             try {
                 return ServerResult.success(function.apply(value));

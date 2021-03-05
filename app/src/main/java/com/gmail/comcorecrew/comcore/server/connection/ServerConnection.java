@@ -321,7 +321,7 @@ public final class ServerConnection implements Connection {
         data.addProperty("pass", pass);
         data.addProperty("create", createAccount);
         addTask(new Task(new Message("login", data), result -> {
-            ServerResult<LoginStatus> resultStatus = result.tryMap(LoginStatus::fromJson);
+            ServerResult<LoginStatus> resultStatus = result.map(LoginStatus::fromJson);
             if (resultStatus.isSuccess() && resultStatus.data.isValid) {
                 synchronized (this) {
                     this.email = email;
@@ -339,6 +339,6 @@ public final class ServerConnection implements Connection {
     public <T> void send(Message message, ResultHandler<T> handler,
                          Function<JsonObject, T> function) {
         addTask(new Task(message, handler == null ? null : result ->
-                handler.handleResult(result.tryMap(function))));
+                handler.handleResult(result.map(function))));
     }
 }

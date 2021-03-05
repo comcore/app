@@ -35,7 +35,7 @@ public final class MockConnection implements Connection {
     public <T> void send(Message message, ResultHandler<T> handler,
                          Function<JsonObject, T> function) {
         if (handler != null) {
-            handler.handleResult(result.tryMap(function));
+            handler.handleResult(result.map(function));
         }
     }
 }

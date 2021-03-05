@@ -113,7 +113,7 @@ public final class ServerConnector {
 
     /**
      * Request a code to be sent to the user's email address so they can reset their password.
-     * Yields true if the code was sent and false if the account does not exist.
+     * Returns true if the code was sent and false if the account does not exist.
      *
      * @param email   the user's email address
      * @param handler the handler for the response of the server
