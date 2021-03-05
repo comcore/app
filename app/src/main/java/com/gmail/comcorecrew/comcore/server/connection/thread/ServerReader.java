@@ -27,8 +27,8 @@ public class ServerReader extends ServerThread {
             return;
         }
 
+        Task task = null;
         try {
-            Task task;
             switch (message.kind) {
                 case "REPLY":
                     task = getTask();
@@ -60,6 +60,10 @@ public class ServerReader extends ServerThread {
                     System.err.println("Unknown message kind: " + message.kind);
             }
         } catch (Exception e) {
+            if (task != null) {
+                // If there was a task reply, but the structure was invalid, send invalid response
+                task.handleResult(ServerResult.invalidResponse());
+            }
             e.printStackTrace();
         }
     }

@@ -275,31 +275,21 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", chat.group.id);
         data.addProperty("chat", chat.id);
-        data.addProperty("message", message);
+        data.addProperty("contents", message);
         getConnection().send(new Message("sendMessage", data), handler, response -> null);
     }
 
     /**
-     * Get messages in a chat. The server will return the most recent messages which were sent after
-     * timestampAfter but before timestampBefore. If either bound is 0, it is ignored, so (0, T)
-     * returns messages before T while (T, 0) returns messages after T, where T is some timestamp.
+     * Get messages in a chat. The server will only return a limited number of messages, and the
+     * messages will always be the most recent messages in the requested interval of message IDs.
      *
-     * This interface allows the app to fetch only messages which have arrived since it was last
-     * refreshed by passing (lastRefreshTime, 0), or to fetch an older set of messages when
-     * scrolling backwards by passing (0, oldestCachedMessageTime). Passing (0, 0) will place no
-     * limits on the times the messages were received.
-     *
-     * The server places a limit on how many messages it will return per request, so it is not
-     * guaranteed to be an exhaustive list of the messages between the timestamps. The lower bound
-     * is inclusive and the upper bound is exclusive.
-     *
-     * @param chat            the chat to request messages from
-     * @param timestampAfter  a lower bound on the timestamp, or 0 if no lower bound
-     * @param timestampBefore an upper bound on the timestamp, or 0 if no upper bound
-     * @param handler         the handler for the response of the server
+     * @param chat    the chat to request messages from
+     * @param after   if not null, only request messages sent after this message
+     * @param before  if not null, only request messages sent before this message
+     * @param handler the handler for the response of the server
      * @see MessageEntry
      */
-    public static void getMessages(ChatID chat, long timestampAfter, long timestampBefore,
+    public static void getMessages(ChatID chat, MessageID after, MessageID before,
                                    ResultHandler<MessageEntry[]> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
@@ -308,8 +298,8 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", chat.group.id);
         data.addProperty("chat", chat.id);
-        data.addProperty("timestampAfter", timestampAfter);
-        data.addProperty("timestampBefore", timestampBefore);
+        data.addProperty("after", after == null ? 0 : after.id);
+        data.addProperty("before", before == null ? 0 : before.id);
         getConnection().send(new Message("getMessages", data), handler, response -> {
             JsonArray messagesJson = response.get("messages").getAsJsonArray();
             MessageEntry[] messages = new MessageEntry[messagesJson.size()];

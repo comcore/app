@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -11,9 +12,9 @@ import java.util.Objects;
  */
 public final class MessageEntry {
     /**
-     * The chat that the message was sent in.
+     * The message's identifier.
      */
-    public final ChatID chat;
+    public final MessageID id;
 
     /**
      * The user that sent the message.
@@ -33,24 +34,24 @@ public final class MessageEntry {
     /**
      * Create a MessageEntry with information about who sent it and when.
      *
-     * @param chat      the chat that the message was sent in
+     * @param id        the MessageID of the message
      * @param sender    the user that sent the message
      * @param timestamp the timestamp from when the message was sent
      * @param contents  the contents of the message
      */
-    public MessageEntry(ChatID chat, UserEntry sender, long timestamp, String contents) {
-        if (chat == null) {
-            throw new IllegalArgumentException("ChatID cannot be null");
+    public MessageEntry(MessageID id, UserEntry sender, long timestamp, String contents) {
+        if (id == null) {
+            throw new IllegalArgumentException("MessageID cannot be null");
         } else if (sender == null) {
             throw new IllegalArgumentException("message sender cannot be null");
-        } else if (timestamp == 0) {
-            throw new IllegalArgumentException("message timestamp cannot be 0");
+        } else if (timestamp < 1) {
+            throw new IllegalArgumentException("message timestamp cannot be less than 1");
         } else if (contents == null || contents.isEmpty()) {
             throw new IllegalArgumentException("message contents cannot be null or empty");
         }
 
+        this.id = id;
         this.sender = sender;
-        this.chat = chat;
         this.timestamp = timestamp;
         this.contents = contents;
     }
@@ -68,10 +69,12 @@ public final class MessageEntry {
             GroupID group = new GroupID(json.get("group").getAsString());
             chat = new ChatID(group, json.get("chat").getAsString());
         }
+
+        long id = json.get("id").getAsLong();
         UserEntry sender = UserEntry.fromJson(json.get("sender").getAsJsonObject());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
-        return new MessageEntry(chat, sender, timestamp, contents);
+        return new MessageEntry(new MessageID(chat, id), sender, timestamp, contents);
     }
 
     @Override
@@ -80,13 +83,13 @@ public final class MessageEntry {
         if (o == null || getClass() != o.getClass()) return false;
         MessageEntry that = (MessageEntry) o;
         return timestamp == that.timestamp &&
-                chat.equals(that.chat) &&
+                id.equals(that.id) &&
                 sender.equals(that.sender) &&
                 contents.equals(that.contents);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chat, sender, timestamp, contents);
+        return Objects.hash(id, sender, timestamp, contents);
     }
 }

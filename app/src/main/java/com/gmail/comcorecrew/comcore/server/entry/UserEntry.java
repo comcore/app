@@ -22,8 +22,8 @@ public final class UserEntry {
     /**
      * Create a UserEntry from a UserID and a name
      *
-     * @param id   the UserID of the group
-     * @param name the name of the group
+     * @param id   the UserID of the user
+     * @param name the name of the user
      */
     public UserEntry(UserID id, String name) {
         if (id == null) {

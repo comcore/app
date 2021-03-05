@@ -3,7 +3,7 @@ package com.gmail.comcorecrew.comcore.server.id;
 /**
  * Represents a unique identifier for a group.
  */
-public class GroupID extends AbstractID {
+public class GroupID extends ItemID {
     /**
      * Create a GroupID from an ID string.
      *
