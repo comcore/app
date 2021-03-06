@@ -309,6 +309,16 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
+    public void logout()  {
+        synchronized (this) {
+            this.email = null;
+            this.pass = null;
+        }
+
+        addTask(new Task(new Message("logout"), null));
+    }
+
+    @Override
     public void authenticate(String email, String pass, boolean createAccount,
                              ResultHandler<LoginStatus> handler) {
         synchronized (this) {

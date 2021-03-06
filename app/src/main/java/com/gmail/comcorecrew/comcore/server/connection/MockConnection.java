@@ -24,6 +24,9 @@ public final class MockConnection implements Connection {
     public void stop() {}
 
     @Override
+    public void logout() {}
+
+    @Override
     public void authenticate(String email, String pass, boolean createAccount,
                              ResultHandler<LoginStatus> handler) {
         if (handler != null) {

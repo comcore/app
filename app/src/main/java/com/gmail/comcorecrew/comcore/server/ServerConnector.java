@@ -30,9 +30,15 @@ public final class ServerConnector {
      * @see Connection
      */
     public static void setConnection(Connection connection) {
-        if (serverConnection != null) {
-            serverConnection.stop();
+        if (connection == serverConnection) {
+            return;
         }
+
+        if (serverConnection != null) {
+            // Stop the connection using a different thread
+            new Thread(serverConnection::stop, "ServerConnection.stop()").start();
+        }
+
         serverConnection = connection;
     }
 
@@ -81,6 +87,13 @@ public final class ServerConnector {
                 }
             }
         });
+    }
+
+    /**
+     * Log out if logged in. It will be necessary to call authenticate() again.
+     */
+    public static void logout() {
+        getConnection().logout();
     }
 
     /**

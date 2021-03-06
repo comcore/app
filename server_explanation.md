@@ -207,7 +207,7 @@ This code will only get messages that arrived after `lastReceivedMessageId`, but
 an exhaustive list if a large number of messages were sent since the chat was last refreshed. If
 this is the case, it will only return the most recently sent messages (older messages will be
 missing). Therefore, it is important to discard the cached data if the messages being added aren't
-immediately after the cached data. This can be checked with `MessageID::immediatelyAfter`. To
+immediately after the cached data. This can be checked with `MessageID.immediatelyAfter()`. To
 handle new messages received without refreshing the chat window, see the section below about
 notification listeners. See the documentation on `ServerConnector.getMessages()` for a description
 of the arguments it accepts.
