@@ -18,12 +18,7 @@ public enum LoginStatus {
     ENTER_CODE(true),
 
     /**
-     * The login failed because the account already existed (when creating an account).
-     */
-    ALREADY_EXISTS(false),
-
-    /**
-     * The login failed because the account did not exist.
+     * The login failed because the account does not exist.
      */
     DOES_NOT_EXIST(false),
 
@@ -54,8 +49,6 @@ public enum LoginStatus {
                 return LoginStatus.SUCCESS;
             case "ENTER_CODE":
                 return LoginStatus.ENTER_CODE;
-            case "ALREADY_EXISTS":
-                return LoginStatus.ALREADY_EXISTS;
             case "DOES_NOT_EXIST":
                 return LoginStatus.DOES_NOT_EXIST;
             case "INVALID_PASSWORD":

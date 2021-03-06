@@ -35,10 +35,10 @@ whether the request was successful or failed, use `result.isSuccess()` or `resul
 
 ## Authentication
 
-#### Logging in or creating an account
+#### Logging in
 
 ```java
-ServerConnector.authenticate(email, password, isCreatingAccount, result -> {
+ServerConnector.login(email, password, result -> {
     if (result.isFailure()) {
         // Handle connection failure
         return;
@@ -50,22 +50,46 @@ ServerConnector.authenticate(email, password, isCreatingAccount, result -> {
             // Handle successful login
             break;
         case LoginStatus.ENTER_CODE:
-            // Handle entering code sent to email
-            break;
-        case LoginStatus.ALREADY_EXISTS:
-            // Handle if account already exists when creating an account
+            // Confirm email address
             break;
         case LoginStatus.DOES_NOT_EXIST:
-            // Handle if account doesn't exist when logging in
+            // Handle account doesn't exist
             break;
         case LoginStatus.INVALID_PASSWORD:
-            // Handle invalid password when logging in
+            // Handle invalid password
             break;
     }
 });
 ```
 
+#### Logging out
+
+```java
+ServerConnector.logout();
+```
+
+#### Creating an account
+
+```java
+ServerConnector.createAccount(name, email, password, result -> {
+    if (result.isFailure()) {
+        // Handle connection failure
+        return;
+    }
+
+    boolean created = result.data;
+    if (created) {
+        // Confirm email address
+    } else {
+        // Handle account already exists
+    }
+});
+```
+
 #### Confirming an email address
+
+When a user creates an account or resets their password, they will have to enter a code that was
+sent to their email address before they can log in.
 
 ```java
 ServerConnector.enterCode(code, result -> {
@@ -74,8 +98,8 @@ ServerConnector.enterCode(code, result -> {
         return;
     }
 
-    boolean codeCorrect = result.data;
-    if (codeCorrect) {
+    boolean correct = result.data;
+    if (correct) {
         // Open next menu
     } else {
         // Handle incorrect code
@@ -85,7 +109,7 @@ ServerConnector.enterCode(code, result -> {
 
 #### Resetting a password
 
-When the user clicks the `Reset Password` button:
+Resetting a password involves 3 steps. First, you must request a password reset:
 
 ```java
 ServerConnector.requestReset(email, result -> {
@@ -94,18 +118,30 @@ ServerConnector.requestReset(email, result -> {
         return;
     }
 
-    boolean codeSent = result.data;
-    if (codeSent) {
-        // Handle entering code sent to email
+    boolean sent = result.data;
+    if (sent) {
+        // Confirm email address
     } else {
         // Handle incorrect email address
     }
 });
 ```
 
-Once the user enters a code, use `ServerConnector.enterCode()` to check it, and once they pick
-a new password, call `ServerConnector.authenticate()` with their email address and the new password
-as if the user were just logging in normally, and the server will update the password.
+Next, you have to confirm the code sent to the email address with `ServerConnector.enterCode()`
+just like after creating a new account.
+
+Finally, you need to send the server the new password:
+
+```java
+ServerConnector.requestReset(password, result -> {
+    if (result.isFailure()) {
+        // Handle connection failure
+        return;
+    }
+
+    // Handle successful login
+});
+```
 
 ## Creating groups and chats
 

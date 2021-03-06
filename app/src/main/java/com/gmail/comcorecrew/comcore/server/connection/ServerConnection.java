@@ -113,7 +113,7 @@ public final class ServerConnection implements Connection {
         }
 
         // Resend login details if possible
-        reauthenticate();
+        authenticate();
 
         // Wake up any waiting threads
         notifyAll();
@@ -159,7 +159,7 @@ public final class ServerConnection implements Connection {
     /**
      * Resend login information when a connection is restarted but the user already logged in.
      */
-    private void reauthenticate() {
+    private void authenticate() {
         String email;
         String pass;
 
@@ -175,7 +175,6 @@ public final class ServerConnection implements Connection {
         JsonObject data = new JsonObject();
         data.addProperty("email", email);
         data.addProperty("pass", pass);
-        data.addProperty("create", false);
         startTask(new Task(new Message("login", data), result -> {
             if (result.isFailure()) {
                 // A failure doesn't necessarily mean the information was wrong
@@ -202,10 +201,7 @@ public final class ServerConnection implements Connection {
      * client wasn't able to log in after being automatically reconnected.
      */
     public void loggedOut() {
-        synchronized (this) {
-            email = null;
-            pass = null;
-        }
+        setInformation(null, null);
 
         ServerConnector.foreachListener(listener -> {
             listener.onLoggedOut();
@@ -290,8 +286,7 @@ public final class ServerConnection implements Connection {
     @Override
     public void stop() {
         synchronized (this) {
-            email = null;
-            pass = null;
+            setInformation(null, null);
             sslContext = null;
 
             close();
@@ -310,39 +305,17 @@ public final class ServerConnection implements Connection {
 
     @Override
     public void logout()  {
-        synchronized (this) {
-            this.email = null;
-            this.pass = null;
-        }
+        setInformation(null, null);
 
         addTask(new Task(new Message("logout"), null));
     }
 
     @Override
-    public void authenticate(String email, String pass, boolean createAccount,
-                             ResultHandler<LoginStatus> handler) {
-        synchronized (this) {
-            this.email = null;
-            this.pass = null;
+    public synchronized void setInformation(String email, String pass) {
+        if (email != null || pass == null) {
+            this.email = email;
         }
-
-        JsonObject data = new JsonObject();
-        data.addProperty("email", email);
-        data.addProperty("pass", pass);
-        data.addProperty("create", createAccount);
-        addTask(new Task(new Message("login", data), result -> {
-            ServerResult<LoginStatus> resultStatus = result.map(LoginStatus::fromJson);
-            if (resultStatus.isSuccess() && resultStatus.data.isValid) {
-                synchronized (this) {
-                    this.email = email;
-                    this.pass = pass;
-                }
-            }
-
-            if (handler != null) {
-                handler.handleResult(resultStatus);
-            }
-        }));
+        this.pass = pass;
     }
 
     @Override

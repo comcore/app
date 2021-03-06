@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
-import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.google.gson.JsonObject;
 
 /**
@@ -20,26 +19,14 @@ public interface Connection {
     void logout();
 
     /**
-     * Request the server to authenticate the user. This should be called before making any requests
-     * from the server. If this method is not called, all requests will likely fail.
+     * Set the login information to use for connecting to the server. Note that this doesn't
+     * actually start the login process, it just stores the credentials in case the client is
+     * disconnected and needs to try to log in automatically.
      *
-     * If createAccount is true, an account will be created for the user. LoginStatus.ENTER_CODE
-     * will be returned if successful, otherwise LoginStatus.ALREADY_EXISTS will be returned if the
-     * email address is already in use.
-     *
-     * If requestReset() and enterCode() have been successfully called, the user's password will be
-     * reset to the provided password and they will be signed in.
-     *
-     * Otherwise, the password will be checked against the account on the server.
-     *
-     * @param email         the user's email address
-     * @param pass          the user's password
-     * @param createAccount true if creating an account, false if logging into an existing account
-     * @param handler       the handler for the response of the server
-     * @see LoginStatus
+     * @param email the user's email address
+     * @param pass  the user's password
      */
-    void authenticate(String email, String pass, boolean createAccount,
-                      ResultHandler<LoginStatus> handler);
+    void setInformation(String email, String pass);
 
     /**
      * Send a message to the server and handle the result asynchronously when it arrives.

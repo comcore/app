@@ -97,31 +97,62 @@ public final class ServerConnector {
     }
 
     /**
-     * Request the server to authenticate the user. This should be called before making any requests
-     * from the server. If this method is not called, all requests will likely fail.
+     * Log into the server using the user's information. This should be called before making any
+     * requests from the server. If this method is not called, all requests will likely fail.
      *
-     * If createAccount is true, an account will be created for the user. LoginStatus.ENTER_CODE
-     * will be returned if successful, otherwise LoginStatus.ALREADY_EXISTS will be returned if the
-     * email address is already in use.
-     *
-     * If requestReset() and enterCode() have been successfully called, the user's password will be
-     * reset to the provided password and they will be signed in.
-     *
-     * Otherwise, the password will be checked against the account on the server.
-     *
-     * @param email         the user's email address
-     * @param pass          the user's password
-     * @param createAccount true if creating an account, false if logging into an existing account
-     * @param handler       the handler for the response of the server
+     * @param email   the user's email address
+     * @param pass    the user's password
+     * @param handler the handler for the response of the server
      * @see LoginStatus
      */
-    public static void authenticate(String email, String pass, boolean createAccount,
-                                    ResultHandler<LoginStatus> handler) {
+    public static void login(String email, String pass, ResultHandler<LoginStatus> handler) {
         if (email == null || pass == null) {
             throw new IllegalArgumentException("email address and password cannot be null");
         }
 
-        getConnection().authenticate(email, pass, createAccount, handler);
+        JsonObject data = new JsonObject();
+        data.addProperty("email", email);
+        data.addProperty("pass", pass);
+        Connection connection = getConnection();
+        connection.send(new Message("login", data), handler, response -> {
+            LoginStatus status = LoginStatus.fromJson(response);
+            if (status.isValid) {
+                connection.setInformation(email, pass);
+            }
+            return status;
+        });
+    }
+
+    /**
+     * Create a new account with the specified details. Returns true if the account was created
+     * and false if an account with the email already exists. After creating an account, it will
+     * be necessary to enter a code sent to the user's email address.
+     *
+     * @param name    the user's name
+     * @param email   the user's email address
+     * @param pass    the user's password
+     * @param handler the handler for the response of the server
+     */
+    public static void createAccount(String name, String email, String pass,
+                                     ResultHandler<Boolean> handler) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        } else if (email == null || pass == null) {
+            throw new IllegalArgumentException("email address and password cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("name", name);
+        data.addProperty("email", email);
+        data.addProperty("pass", pass);
+        Connection connection = getConnection();
+        connection.send(new Message("createAccount", data), handler, response -> {
+            boolean created = response.get("created").getAsBoolean();
+            if (created) {
+                connection.setInformation(email, pass);
+            }
+            return created;
+        });
     }
 
     /**
@@ -138,14 +169,20 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("email", email);
-        getConnection().send(new Message("requestReset", data), handler, response ->
-                response.get("sent").getAsBoolean());
+        Connection connection = getConnection();
+        connection.send(new Message("requestReset", data), handler, response -> {
+            boolean sent = response.get("sent").getAsBoolean();
+            if (sent) {
+                connection.setInformation(email, null);
+            }
+            return sent;
+        });
     }
 
     /**
-     * Enter a code to confirm an email address after receiving LoginStatus.ENTER_CODE from
-     * authenticate() or to reset a password after calling requestCode(). Returns true if the code
-     * was correct and false otherwise.
+     * Enter a code to confirm an email address. This request is used for creating an account,
+     * resetting a password, and two-factor authentication. Returns true if the code was correct
+     * and false otherwise.
      *
      * @param code    the code the user entered
      * @param handler the handler for the response of the server
@@ -159,6 +196,27 @@ public final class ServerConnector {
         data.addProperty("code", code);
         getConnection().send(new Message("enterCode", data), handler, response ->
             response.get("correct").getAsBoolean());
+    }
+
+    /**
+     * Finish resetting the user's password. The user must have entered the code sent to their email
+     * before this method is called.
+     *
+     * @param pass    the user's new password
+     * @param handler the handler for the response of the server
+     */
+    public static void finishReset(String pass, ResultHandler<Void> handler) {
+        if (pass == null) {
+            throw new IllegalArgumentException("password cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("pass", pass);
+        Connection connection = getConnection();
+        connection.send(new Message("finishReset", data), handler, response -> {
+            connection.setInformation(null, pass);
+            return null;
+        });
     }
 
     /**

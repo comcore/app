@@ -2,7 +2,6 @@ package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
-import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.google.gson.JsonObject;
 
 /**
@@ -27,12 +26,7 @@ public final class MockConnection implements Connection {
     public void logout() {}
 
     @Override
-    public void authenticate(String email, String pass, boolean createAccount,
-                             ResultHandler<LoginStatus> handler) {
-        if (handler != null) {
-            handler.handleResult(ServerResult.success(LoginStatus.SUCCESS));
-        }
-    }
+    public void setInformation(String email, String pass) {}
 
     @Override
     public <T> void send(Message message, ResultHandler<T> handler,
