@@ -14,9 +14,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize the connection to the server using the application context
         ServerConnector.setConnection(new ServerConnection(this.getBaseContext()));
-        ServerConnector.authenticate("a", "b", false, result -> {
-            ServerConnector.setConnection(null);
-        });
 
         setContentView(R.layout.activity_main);
     }
