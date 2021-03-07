@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Main Screen -->
+    <!-- The icon is a placeholder that should be replaced with a custom icon -->
+
+    <item
+        android:id="@+id/action_main_activity"
+        android:icon="?attr/homeAsUpIndicator"
+        android:title="@string/action_main_activity"
+        app:showAsAction="ifRoom" />
+
+    <!-- Create Group -->
+    <!-- The icon is a placeholder that should be replaced with a custom icon -->
+
+    <item
+        android:id="@+id/action_create_group"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="@string/action_create_group"
+        app:showAsAction="ifRoom" />
+
+    <!-- Settings -->
+    <!-- The icon is a placeholder that should be replaced with a custom icon -->
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="@string/action_settings"
+        app:showAsAction="ifRoom" />
+
+</menu>
