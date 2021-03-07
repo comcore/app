@@ -7,6 +7,13 @@
     <!-- Create Group -->
     <string name="title_create_group">Create A New Group</string>
     <string name="submit">Submit</string>
+    <string name="check_list">Add A Group Task List</string>
+    <string name="check_chat">Add A Group Chat</string>
+    <string name="check_calendar">Add a Group Calendar</string>
+    <string name="label_add_m">Add Members To Your Group</string>
+    <string name="label_add_f">Add Features To Your Group</string>
+    <string name="add_m_contacts">Add From Contacts</string>
+    <string name="add_m_email">Add From Email</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
