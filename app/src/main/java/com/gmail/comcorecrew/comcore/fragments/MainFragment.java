@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore;
+package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
 
@@ -10,8 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.gmail.comcorecrew.comcore.R;
 
 /**
  * A simple {@link Fragment} subclass.

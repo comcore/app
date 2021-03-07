@@ -9,6 +9,6 @@
         android:id="@+id/settingsFragment"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="@string/action_settings"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 </menu>

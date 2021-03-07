@@ -1,12 +1,17 @@
-package com.gmail.comcorecrew.comcore;
+package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.dialogs.MemberEmailDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,5 +43,18 @@ public class CreateGroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create_group, container, false);
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        view.findViewById(R.id.m_email_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MemberEmailDialog emailDialog = new MemberEmailDialog();
+                emailDialog.show(getParentFragmentManager(), "member_email");
+            }
+        });
+
     }
 }

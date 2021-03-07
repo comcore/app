@@ -4,9 +4,13 @@
     <string name="action_create_group">New Group</string>
     <string name="action_main_activity">Main Screen</string>
 
+    <!-- General Buttons -->
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="confirm">Confirm</string>
+
     <!-- Create Group -->
     <string name="title_create_group">Create A New Group</string>
-    <string name="submit">Submit</string>
     <string name="check_list">Add A Group Task List</string>
     <string name="check_chat">Add A Group Chat</string>
     <string name="check_calendar">Add a Group Calendar</string>
