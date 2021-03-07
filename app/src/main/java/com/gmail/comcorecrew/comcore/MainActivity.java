@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+
     }
 
     @Override
@@ -30,19 +33,5 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    /** The current menu only shows layouts
-     *  This is for testing purposes only **/
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_main_activity:
-                return true;
-            case R.id.action_create_group:
-                return true;
-            case R.id.action_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+
 }
