@@ -16,6 +16,9 @@ public interface Module {
     //Caches the data of the module and returns true if successful.
     boolean toCache(Context context);
 
+    //Loads the data from the cache into the module and returns true if successful.
+    boolean fromCache(Context context);
+
     //Returns the id of the group that the module is in.
     int getGroupId();
 }

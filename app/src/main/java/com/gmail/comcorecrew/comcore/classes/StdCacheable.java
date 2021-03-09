@@ -13,7 +13,7 @@ public class StdCacheable implements Cacheable {
     private String data; //Data contained in the message.
 
     public StdCacheable(int id, long meta, String data) {
-        if (data.length() > 0x001E8483) { //4 MB of data + 6 bytes
+        if (data.length() > (Helper.maxData - 3)) {
             throw new IllegalArgumentException();
         }
         this.id = id;
@@ -68,6 +68,10 @@ public class StdCacheable implements Cacheable {
         meta = (meta << 16) | cache[4];
         meta = (meta << 16) | cache[5];
         data = new String(cache, 6, cache.length - 6);
+    }
+
+    public long getBytes() {
+        return 2 + 2 + 4 + (data.length() * 2);
     }
 
     //Get and Set methods.

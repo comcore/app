@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Cacher {
 
     //Caches the given data in the modules cache file.
-    static boolean cacheData(ArrayList<Cacheable> data, Module module, Context context) {
+    public static boolean cacheData(ArrayList<Cacheable> data, Module module, Context context) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
             File cacheDir = new File(context.getCacheDir(), String.valueOf(module.getGroupId()));
@@ -36,7 +36,7 @@ public class Cacher {
             for (Cacheable group : data) {
                 char[] line = group.toCache();
                 int lineLength = line.length;
-                if (lineLength > 0x001E8483) { //4MB of data + 6 bytes
+                if (lineLength > Helper.maxData) {
                     throw new IllegalArgumentException();
                 }
                 pw.print((char) (lineLength >> 16));
@@ -53,7 +53,7 @@ public class Cacher {
         }
     }
 
-    static char[][] uncacheData(Module module, Context context) {
+    public static char[][] uncacheData(Module module, Context context) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
             String filename = module.getGroupId() + "/" + module.getMdid() + module.getMnum();
@@ -67,7 +67,7 @@ public class Cacher {
             for (int i = 0; i < size; i++) {
                 int lineSize = br.read();
                 lineSize = (lineSize << 16) | br.read();
-                if (lineSize > 0x001E8483) { //4MB of data + 6 bytes
+                if (lineSize > Helper.maxData) {
                     throw new IllegalArgumentException();
                 }
                 data[i] = new char[lineSize];
