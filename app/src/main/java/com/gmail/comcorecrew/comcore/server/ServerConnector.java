@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.server;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.gmail.comcorecrew.comcore.GroupRole;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
@@ -247,10 +248,7 @@ public final class ServerConnector {
             JsonArray groupsJson = response.get("groups").getAsJsonArray();
             GroupEntry[] groups = new GroupEntry[groupsJson.size()];
             for (int i = 0; i < groups.length; i++) {
-                JsonObject group = groupsJson.get(i).getAsJsonObject();
-                GroupID id = new GroupID(group.get("id").getAsString());
-                String name = group.get("name").getAsString();
-                groups[i] = new GroupEntry(id, name);
+                groups[i] = GroupEntry.fromJson(groupsJson.get(i).getAsJsonObject());
             }
             return groups;
         });
@@ -279,7 +277,7 @@ public final class ServerConnector {
     }
 
     /**
-     * Get a list of all users in a group.
+     * Get a list of all users in a group, including the current user.
      *
      * @param group   the group to list the users of
      * @param handler the handler for the response of the server
@@ -330,6 +328,138 @@ public final class ServerConnector {
     }
 
     /**
+     * Send an invite to a user with the corresponding email address to join the group. The request
+     * will fail if the user doesn't have the ability to send invites in a group. Returns true if
+     * the invite was sent and false if there was no user with the email address.
+     *
+     * @param group   the group to send the invite for
+     * @param email   the email address of the target user
+     * @param handler the handler for the response of the server
+     */
+    public static void sendInvite(GroupID group, String email, ResultHandler<Boolean> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (email == null) {
+            throw new IllegalArgumentException("email address cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("email", email);
+        getConnection().send(new Message("sendInvite", data), handler, response ->
+                response.get("sent").getAsBoolean());
+    }
+
+    /**
+     * Get a list of groups that the user has been invited to join.
+     *
+     * @param handler the handler for the response of the server
+     * @see GroupInviteEntry
+     */
+    public static void getInvites(ResultHandler<GroupInviteEntry[]> handler) {
+        getConnection().send(new Message("getInvites"), handler, response -> {
+            JsonArray invitesJson = response.get("invites").getAsJsonArray();
+            GroupInviteEntry[] invites = new GroupInviteEntry[invitesJson.size()];
+            for (int i = 0; i < invites.length; i++) {
+                invites[i] = GroupInviteEntry.fromJson(invitesJson.get(i).getAsJsonObject());
+            }
+            return invites;
+        });
+    }
+
+    /**
+     * Reply to an invitation to join a group, removing it from the list of pending invites.
+     *
+     * @param group   the group to accept/decline the invitation for
+     * @param accept  whether the user wants to accept or decline the invitation
+     * @param handler the handler for the response of the server
+     */
+    public static void replyToInvite(GroupID group, boolean accept, ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("accept", accept);
+        getConnection().send(new Message("replyToInvite", data), handler, response -> null);
+    }
+
+    /**
+     * Kick the target user from a group that the user is a moderator or the owner of. The request
+     * will fail if the user doesn't have the ability to kick people.
+     *
+     * @param group   the group to kick someone from
+     * @param target  the user to kick from the group
+     * @param handler the handler for the response of the server
+     */
+    public static void kick(GroupID group, UserID target, ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (target == null) {
+            throw new IllegalArgumentException("UserID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("target", target.id);
+        getConnection().send(new Message("kick", data), handler, response -> null);
+    }
+
+    /**
+     * Set the role of a target user in a group that the user is a moderator or the owner of. The
+     * request will fail if the user doesn't have the ability to change the role. If the owner sets
+     * another user to be the owner, they will no longer be the owner afterwards since a group can
+     * only have one owner.
+     *
+     * @param group   the group to set the role in
+     * @param target  the user to set the role of
+     * @param role    the role
+     * @param handler the handler for the response of the server
+     * @see GroupRole
+     */
+    public static void setRole(GroupID group, UserID target, GroupRole role,
+                               ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (target == null) {
+            throw new IllegalArgumentException("UserID cannot be null");
+        } else if (role == null) {
+            throw new IllegalArgumentException("GroupRole cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("target", target.id);
+        data.addProperty("role", role.toString());
+        getConnection().send(new Message("setRole", data), handler, response -> null);
+    }
+
+    /**
+     * Set the muted status of a target user in a group that the user is a moderator or the owner
+     * of. The request will fail if the user doesn't have the ability to mute the user.
+     *
+     * @param group   the group to set the role in
+     * @param target  the user to set the role of
+     * @param muted   whether the target user should be muted
+     * @param handler the handler for the response of the server
+     */
+    public static void setMuted(GroupID group, UserID target, boolean muted,
+                                ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (target == null) {
+            throw new IllegalArgumentException("UserID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("target", target.id);
+        data.addProperty("muted", muted);
+        getConnection().send(new Message("setMuted", data), handler, response -> null);
+    }
+
+    /**
      * Send a message in a chat.
      *
      * @param chat    the chat to send the message in
@@ -364,6 +494,10 @@ public final class ServerConnector {
                                    ResultHandler<MessageEntry[]> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
+        } else if (after != null && after.chat != chat) {
+            throw new IllegalArgumentException("'after' message must be in the same chat");
+        } else if (before != null && before.chat != chat) {
+            throw new IllegalArgumentException("'before' message must be in the same chat");
         }
 
         JsonObject data = new JsonObject();

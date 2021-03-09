@@ -306,3 +306,7 @@ class ExampleListener implements NotificationListener {
     }
 }
 ```
+
+## Other requests
+
+See the documentation on the static methods of `ServerConnector` for all supported request types.

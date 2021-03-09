@@ -31,6 +31,8 @@ public final class ServerConnection implements Connection {
     private static final String SERVER_URL = "ec2-18-188-151-48.us-east-2.compute.amazonaws.com";
     private static final int SERVER_PORT = 443;
 
+    private final String url;
+
     private SSLContext sslContext;
     private ServerWriter writerThread;
     private ServerReader readerThread;
@@ -48,6 +50,18 @@ public final class ServerConnection implements Connection {
      * @param context the application context to create the ServerConnector in
      */
     public ServerConnection(Context context) {
+        this(context, SERVER_URL);
+    }
+
+    /**
+     * Create a new ServerConnector in the given context attached to a certain URL.
+     *
+     * @param context the application context to create the ServerConnector in
+     * @param url     the URL to connect to
+     */
+    public ServerConnection(Context context, String url) {
+        this.url = url;
+
         try {
             // Load the server's certificate from the assets folder
             Certificate certificate = CertificateFactory.getInstance("X.509")
@@ -94,20 +108,19 @@ public final class ServerConnection implements Connection {
 
         try {
             // Create a Socket connected to the server
-            InetSocketAddress endPoint = new InetSocketAddress(SERVER_URL, SERVER_PORT);
+            InetSocketAddress endPoint = new InetSocketAddress(url, SERVER_PORT);
             socket = new Socket();
             socket.connect(endPoint, 5_000);
 
             // Add SSL to the socket
             socket = sslContext.getSocketFactory()
-                    .createSocket(socket, SERVER_URL, SERVER_PORT, true);
+                    .createSocket(socket, url, SERVER_PORT, true);
 
             // Initialize input and output streams
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             // If there was an error connecting, clean up and fail
-            e.printStackTrace();
             close();
             return false;
         }

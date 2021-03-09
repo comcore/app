@@ -2,7 +2,6 @@ package com.gmail.comcorecrew.comcore;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import com.gmail.comcorecrew.comcore.server.ServerConnector;

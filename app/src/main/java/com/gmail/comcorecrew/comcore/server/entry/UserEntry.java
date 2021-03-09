@@ -20,7 +20,7 @@ public final class UserEntry {
     public final String name;
 
     /**
-     * Create a UserEntry from a UserID and a name
+     * Create a UserEntry from a UserID and a name.
      *
      * @param id   the UserID of the user
      * @param name the name of the user

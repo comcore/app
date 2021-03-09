@@ -19,7 +19,7 @@ public final class ChatEntry {
     public final String name;
 
     /**
-     * Create a ChatEntry from a ChatID and a name
+     * Create a ChatEntry from a ChatID and a name.
      *
      * @param id   the ChatID of the chat
      * @param name the name of the chat
