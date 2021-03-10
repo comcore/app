@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +22,8 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MainFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MainFragment extends Fragment {
 
     // The ID of the user currently viewing the main page
@@ -46,6 +45,7 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UsersGroups = new ArrayList<Group>();
+
     }
 
     @Override
@@ -65,6 +65,13 @@ public class MainFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        /** Creates a new UserID based on the string passed by the Login Fragment **/
+        currentUser = new UserID(MainFragmentArgs.fromBundle(getArguments()).getCurrentUser());
+
+        /** Creates a welcome message based on the user's name **/
+        TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
+        welcomeText.setText("Welcome " + currentUser.toString());
 
         view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
             @Override
