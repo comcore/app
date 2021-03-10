@@ -2,10 +2,10 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 
 import android.content.Context;
 
-import com.gmail.comcorecrew.comcore.classes.Cacher;
+import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.StdCacheable;
-import com.gmail.comcorecrew.comcore.interfaces.Cacheable;
+import com.gmail.comcorecrew.comcore.caching.StdCacheable;
+import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 
 import java.util.ArrayList;

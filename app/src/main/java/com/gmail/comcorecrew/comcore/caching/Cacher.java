@@ -1,9 +1,9 @@
-package com.gmail.comcorecrew.comcore.classes;
+package com.gmail.comcorecrew.comcore.caching;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.classes.Helper;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
-import com.gmail.comcorecrew.comcore.interfaces.Cacheable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,12 +20,14 @@ public class Cacher {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
             File cacheDir = new File(context.getCacheDir(), String.valueOf(module.getGroupId()));
-            if (!cacheDir.exists()) {
-                cacheDir.mkdir();
+            if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
+                return false;
             }
             String filename = module.getMdid() + module.getMnum();
             File cacheFile = new File(cacheDir, filename);
-            cacheFile.createNewFile();
+            if ((!cacheFile.exists()) && (!cacheDir.createNewFile())) {
+                return false;
+            }
             PrintWriter pw = new PrintWriter(new FileWriter(cacheFile));
 
             //Adds number of lines to file, and for each cacheable, adds the length

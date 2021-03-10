@@ -1,6 +1,6 @@
-package com.gmail.comcorecrew.comcore.classes;
+package com.gmail.comcorecrew.comcore.caching;
 
-import com.gmail.comcorecrew.comcore.interfaces.Cacheable;
+import com.gmail.comcorecrew.comcore.classes.Helper;
 
 /*
  * Class for the standard cacheable format. Supports the caching of an int,
