@@ -27,6 +27,9 @@ public class Group {
         this.owner = owner;
         this.externalId = externalId;
         this.name = name;
+        modules = new ArrayList<Module>();
+        users = new ArrayList<UserID>();
+        moderators = new ArrayList<UserID>();
         File cacheDir = new File(context.getCacheDir(), "gr" + groupId);
         cacheDir.mkdir();
     }

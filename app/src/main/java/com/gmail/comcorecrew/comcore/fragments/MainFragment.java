@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.fragments;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
@@ -28,6 +30,7 @@ public class MainFragment extends Fragment {
 
     // The ID of the user currently viewing the main page
     private static UserID currentUser;
+    private UserID otherUser;
 
     // An ArrayList of groups the current user is a member of
     private ArrayList<Group> UsersGroups;
@@ -46,6 +49,14 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UsersGroups = new ArrayList<Group>();
 
+        /** TODO Create placeholder groups
+         * These changes aren't implemented in this commit */
+        /**otherUser = new UserID("Other User");
+        UsersGroups.add(new Group("Owned Group", currentUser));
+        UsersGroups.add(new Group("Moderated Group", otherUser));
+        UsersGroups.get(1).testsetModerator(currentUser);
+        UsersGroups.add(new Group("Member Group", otherUser));*/
+
     }
 
     @Override
@@ -56,7 +67,7 @@ public class MainFragment extends Fragment {
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomAdapter groupAdapter = new CustomAdapter(UsersGroups);
+        CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
@@ -69,7 +80,8 @@ public class MainFragment extends Fragment {
         /** Creates a new UserID based on the string passed by the Login Fragment **/
         currentUser = new UserID(MainFragmentArgs.fromBundle(getArguments()).getCurrentUser());
 
-        /** Creates a welcome message based on the user's name **/
+        /** Creates a welcome message based on the user's id
+         * This currently prints the user's id, but later should print their name **/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
         welcomeText.setText("Welcome " + currentUser.toString());
 
@@ -89,6 +101,7 @@ public class MainFragment extends Fragment {
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
         private ArrayList<Group> UserGroups;
+        private UserID user;
 
         /**
          * Provide a reference to the type of views that you are using
@@ -96,12 +109,15 @@ public class MainFragment extends Fragment {
          */
         public class ViewHolder extends RecyclerView.ViewHolder {
             private final TextView textView;
+            private ImageView viewTag;
 
             public ViewHolder(View view) {
                 super(view);
                 // Define click listener for the ViewHolder's View
 
                 textView = (TextView) view.findViewById(R.id.group_row_text);
+                viewTag = (ImageView) view.findViewById(R.id.group_row_tag);
+
             }
 
             public TextView getTextView() {
@@ -112,7 +128,8 @@ public class MainFragment extends Fragment {
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(ArrayList<Group> dataSet) {
+        public CustomAdapter(UserID user, ArrayList<Group> dataSet) {
+            this.user = user;
             UserGroups = dataSet;
         }
 
@@ -133,6 +150,22 @@ public class MainFragment extends Fragment {
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
             viewHolder.getTextView().setText(UserGroups.get(position).getName());
+
+            /** Changes or removes the image on each group list item based on whether
+             * the user is the owner, moderator, or neither. If the user is both owner and moderator,
+             * the owner tag will take preference.
+             *
+             * These changes aren't implemented in this commit
+             *
+            *if (UserGroups.get(position).getOwner().equals(user)) {
+                viewHolder.viewTag.setColorFilter(Color.BLUE);
+            }
+            else if (UserGroups.get(position).getModerators().contains(user)) {
+                viewHolder.viewTag.setColorFilter(Color.MAGENTA);
+            }
+            else {
+                viewHolder.viewTag.setVisibility(View.INVISIBLE);
+            }*/
         }
 
         // Return the size of your dataset (invoked by the layout manager)
