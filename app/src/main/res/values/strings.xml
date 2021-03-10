@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">Comcore</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_create_group">New Group</string>
+    <string name="action_main_activity">Main Screen</string>
+
+    <!-- General Buttons -->
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Create Group -->
+    <string name="title_create_group">Create A New Group</string>
+    <string name="check_list">Add A Group Task List</string>
+    <string name="check_chat">Add A Group Chat</string>
+    <string name="check_calendar">Add a Group Calendar</string>
+    <string name="label_add_m">Add Members To Your Group</string>
+    <string name="label_add_f">Add Features To Your Group</string>
+    <string name="add_m_contacts">Add From Contacts</string>
+    <string name="add_m_email">Add From Email</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+
+    <!-- Login -->
+    <string name="title_login">Login To Your Account</string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+    <string name="create_user">Create an Account</string>
+
+    <!-- Create User -->
+    <string name="label_cu_name">Enter Your Name</string>
+    <string name="label_cu_password">Enter Your Password</string>
+    <string name="label_cu_email">Enter Your Email</string>
+    <string name="label_cu_dob">Enter Your Date of Birth</string>
+
+    <!-- Group Menu -->
+    <string name="view_members">View Members</string>
+    <string name="group_settings">Group Settings</string>
+
 </resources>
