@@ -4,6 +4,7 @@
     <string name="action_create_group">New Group</string>
     <string name="action_main_activity">Main Screen</string>
 
+    <string name="error_unknown">**Unknown**</string>
     <!-- General Buttons -->
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
@@ -37,5 +38,7 @@
     <!-- Group Menu -->
     <string name="view_members">View Members</string>
     <string name="group_settings">Group Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

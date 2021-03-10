@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.classes;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,11 +17,11 @@ public class Group {
     private String name;
     private int groupId;
     private ArrayList<Module> modules;
-    private ArrayList<Integer> users;
-    private ArrayList<Integer> moderators;
-    private int owner;
+    private ArrayList<UserID> users;
+    private ArrayList<UserID> moderators;
+    private UserID owner;
 
-    public Group(Context context, UUID externalId, String name, int owner) {
+    public Group(Context context, UUID externalId, String name, UserID owner) {
         numGroups++;
         groupId = numGroups;
         this.owner = owner;
@@ -42,15 +43,15 @@ public class Group {
         return groupId;
     }
 
-    public ArrayList<Integer> getUsers() {
+    public ArrayList<UserID> getUsers() {
         return users;
     }
 
-    public ArrayList<Integer> getModerators() {
+    public ArrayList<UserID> getModerators() {
         return moderators;
     }
 
-    public int getOwner() {
+    public UserID getOwner() {
         return owner;
     }
 
