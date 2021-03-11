@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore.server.id;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 /**
  * Represents a sequential identifier for a message in a chat.
  */
@@ -47,6 +49,20 @@ public class MessageID {
      */
     public boolean immediatelyAfter(MessageID previousMessage) {
         return id == previousMessage.id + 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MessageID messageID = (MessageID) o;
+        return id == messageID.id &&
+                chat.equals(messageID.chat);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(chat, id);
     }
 
     @Override
