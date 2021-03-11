@@ -46,16 +46,16 @@ ServerConnector.login(email, password, result -> {
 
     LoginStatus status = result.data;
     switch (status) {
-        case LoginStatus.SUCCESS:
+        case SUCCESS:
             // Handle successful login
             break;
-        case LoginStatus.ENTER_CODE:
+        case ENTER_CODE:
             // Confirm email address
             break;
-        case LoginStatus.DOES_NOT_EXIST:
+        case DOES_NOT_EXIST:
             // Handle account doesn't exist
             break;
-        case LoginStatus.INVALID_PASSWORD:
+        case INVALID_PASSWORD:
             // Handle invalid password
             break;
     }

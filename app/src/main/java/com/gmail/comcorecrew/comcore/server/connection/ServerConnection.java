@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerReader;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerWriter;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
+import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -39,6 +40,7 @@ public final class ServerConnection implements Connection {
 
     private String email;
     private String pass;
+    private UserEntry userData;
 
     private Socket socket;
     private BufferedReader in;
@@ -181,7 +183,14 @@ public final class ServerConnection implements Connection {
             pass = this.pass;
         }
 
-        if (email == null || pass == null) {
+        if (email == null) {
+            return;
+        }
+
+        if (pass == null) {
+            // They were trying to do a password reset and got disconnected
+
+            loggedOut();
             return;
         }
 
@@ -220,6 +229,15 @@ public final class ServerConnection implements Connection {
             listener.onLoggedOut();
             return false;
         });
+    }
+
+    /**
+     * Set the information of the user when the server sends it.
+     *
+     * @param userData the user data
+     */
+    public synchronized void setUser(UserEntry userData) {
+        this.userData = userData;
     }
 
     /**
@@ -324,10 +342,20 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
+    public synchronized UserEntry getUser() {
+        return userData;
+    }
+
+    @Override
     public synchronized void setInformation(String email, String pass) {
+        if (pass == null) {
+            this.userData = null;
+        }
+
         if (email != null || pass == null) {
             this.email = email;
         }
+
         this.pass = pass;
     }
 

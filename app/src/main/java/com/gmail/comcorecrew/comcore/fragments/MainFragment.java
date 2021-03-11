@@ -23,6 +23,8 @@ import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import java.util.UUID;
 public class MainFragment extends Fragment {
 
     // The ID of the user currently viewing the main page
-    private static UserID currentUser;
+    private static UserEntry currentUser;
     private UserID otherUser;
 
     // An ArrayList of groups the current user is a member of
@@ -57,7 +59,7 @@ public class MainFragment extends Fragment {
          * This is for client testing only
          * The app should retrieve a user's information using the user id string given
          * to it by LoginFragment **/
-        currentUser = new UserID(MainFragmentArgs.fromBundle(getArguments()).getCurrentUser());
+        currentUser = ServerConnector.getUser();
 
         /** TODO Create placeholder groups
          * This is for client testing only and should be removed later
@@ -79,7 +81,7 @@ public class MainFragment extends Fragment {
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
+        CustomAdapter groupAdapter = new CustomAdapter(currentUser.id, UsersGroups);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
