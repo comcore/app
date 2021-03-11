@@ -85,7 +85,7 @@ public class MsgCacheable implements Cacheable {
     }
 
     public long getBytes() {
-        return 2 + 2 + 4 + (data.length() * 2);
+        return 2 + 2 + 4 + 4 + (data.length() * 2);
     }
 
     //Get and Set methods.
