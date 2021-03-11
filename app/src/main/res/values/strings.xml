@@ -37,8 +37,13 @@
 
     <!-- Group Menu -->
     <string name="view_members">View Members</string>
+    <string name="invite_member">Invite Member</string>
+    <string name="transfer_ownership">Transfer Ownership</string>
+    <string name="kick_member">Kick Member</string>
+    <string name="dis_enable_chat">Disable/Enable Chat</string>
+    <string name="add_moderator">Add Moderator</string>
+    <string name="remove_moderator">Remove Moderator</string>
+    <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

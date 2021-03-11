@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -47,6 +49,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         UsersGroups = new ArrayList<Group>();
 
         /** TODO
@@ -62,7 +65,7 @@ public class MainFragment extends Fragment {
         otherUser = new UserID("Other User");
         UsersGroups.add(new Group("Owned Group", currentUser));
         UsersGroups.add(new Group("Moderated Group", otherUser));
-        UsersGroups.get(1).testsetModerator(currentUser);
+        //UsersGroups.get(1).testsetModerator(currentUser);
         UsersGroups.add(new Group("Member Group", otherUser));*/
 
     }
