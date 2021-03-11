@@ -9,10 +9,21 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.dialogs.EmptyTextErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.MemberEmailDialog;
 
 public class CreateUserFragment extends Fragment {
+
+    private EditText userNameBox;
+    private EditText userPasswordBox;
+    private EditText userEmailBox;
+
+    private String userName;
+    private String userEmail;
+    private String userPassword;
 
     public CreateUserFragment() {
         // Required empty public constructor
@@ -27,6 +38,7 @@ public class CreateUserFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -39,6 +51,10 @@ public class CreateUserFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        userNameBox = (EditText) view.findViewById(R.id.editCUName);
+        userEmailBox = (EditText) view.findViewById(R.id.editCUEmail);
+        userPasswordBox = (EditText) view.findViewById(R.id.editCUPassword);
+
         view.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,5 +62,21 @@ public class CreateUserFragment extends Fragment {
                         .navigate(R.id.action_createUserFragment_to_loginFragment);
             }
         });
+
+        view.findViewById(R.id.submitButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                userName = userNameBox.getText().toString();
+                userEmail = userEmailBox.getText().toString();
+                userPassword = userPasswordBox.getText().toString();
+
+                if (userName.equals("") || userEmail.equals("") || userPassword.equals("")) {
+                    EmptyTextErrorDialog errorDialog = new EmptyTextErrorDialog();
+                    errorDialog.show(getParentFragmentManager(), "create_user_error");
+                }
+            }
+        });
+
     }
 }
