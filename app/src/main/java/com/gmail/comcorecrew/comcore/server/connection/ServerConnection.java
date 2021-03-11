@@ -348,10 +348,14 @@ public final class ServerConnection implements Connection {
 
     @Override
     public synchronized void setInformation(String email, String pass) {
-        if (email != null || pass == null) {
-            this.email = email;
+        if (pass == null) {
             this.userData = null;
         }
+
+        if (email != null || pass == null) {
+            this.email = email;
+        }
+
         this.pass = pass;
     }
 
