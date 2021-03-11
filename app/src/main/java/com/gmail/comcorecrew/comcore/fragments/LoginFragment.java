@@ -11,12 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LoginFragment extends Fragment {
 
     public LoginFragment() {
@@ -48,8 +44,21 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loginButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /** Here, the user's information should be verified to ensure that they are correct.
+                 *
+                 * Currently, the app moves to the main page regardless of what information is entered.
+                 * A placeholder user name is created here for testing purposes, but the server should
+                 * return a UserEntry which is parsed into user information.
+                 *
+                 * The placeholder string is used to create a UserID in MainFragment
+                 */
+                String placeholderUserID = "Placeholder User";
+
+                LoginFragmentDirections.ActionLoginFragmentToMainFragment action = LoginFragmentDirections.actionLoginFragmentToMainFragment();
+                action.setCurrentUser(placeholderUserID);
                 NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_loginFragment_to_mainFragment);
+                        .navigate(action);
             }
         });
 

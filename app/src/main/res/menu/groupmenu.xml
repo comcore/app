@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- This menu item is only showed to group moderators and the owner -->
+    <group android:id="@+id/menu_group_moderator_actions">
+        <item
+            android:id="@+id/invite_member"
+            android:title="@string/invite_member"
+            app:showAsAction="never"
+            />
+    </group>
+
+    <!-- These menu items are only showed to the group owner -->
+    <group android:id="@+id/menu_group_owner_actions">
+
+        <item
+            android:id="@+id/transfer_ownership"
+            android:title="@string/transfer_ownership"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/kick_member"
+            android:title="@string/kick_member"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/dis_enable_chat"
+            android:title="@string/dis_enable_chat"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/add_moderator"
+            android:title="@string/add_moderator"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/remove_moderator"
+            android:title="@string/remove_moderator"
+            app:showAsAction="never"
+            />
+
+    </group>
+
+    <!-- These menu items are only showed in a group fragment -->
+    <group android:id="@+id/menu_group_actions">
+        <item
+            android:id="@+id/view_members"
+            android:title="@string/view_members"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/leave_group"
+            android:title="@string/leave_group"
+            app:showAsAction="never"
+            />
+    </group>
+
+</menu>

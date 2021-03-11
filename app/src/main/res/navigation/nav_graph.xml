@@ -24,6 +24,13 @@
         <action
             android:id="@+id/action_mainFragment_to_createGroupFragment"
             app:destination="@id/createGroupFragment" />
+        <argument
+            android:name="currentUser"
+            app:argType="string"
+            android:defaultValue='"Unknown_User"' />
+        <action
+            android:id="@+id/action_mainFragment_to_groupFragment"
+            app:destination="@id/groupFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -45,5 +52,14 @@
         <action
             android:id="@+id/action_createUserFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.GroupFragment"
+        android:label="fragment_group"
+        tools:layout="@layout/fragment_group" >
+        <argument
+            android:name="groupID"
+            app:argType="integer" />
     </fragment>
 </navigation>
