@@ -29,7 +29,7 @@ import javax.net.ssl.TrustManagerFactory;
  */
 public final class ServerConnection implements Connection {
     private static final String SERVER_URL = "ec2-18-188-151-48.us-east-2.compute.amazonaws.com";
-    private static final int SERVER_PORT = 443;
+    private static final int SERVER_PORT = 4433;
 
     private final String url;
 

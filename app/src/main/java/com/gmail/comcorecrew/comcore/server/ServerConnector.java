@@ -386,6 +386,22 @@ public final class ServerConnector {
     }
 
     /**
+     * Leave a group.
+     *
+     * @param group   the group to leave
+     * @param handler the handler for the response of the server
+     */
+    public static void leaveGroup(GroupID group, ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        getConnection().send(new Message("leaveGroup", data), handler, response -> null);
+    }
+
+    /**
      * Kick the target user from a group that the user is a moderator or the owner of. The request
      * will fail if the user doesn't have the ability to kick people.
      *
