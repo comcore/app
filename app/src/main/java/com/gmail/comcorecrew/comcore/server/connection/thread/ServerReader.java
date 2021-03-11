@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 import com.gmail.comcorecrew.comcore.server.connection.Task;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 /**
@@ -46,6 +47,11 @@ public class ServerReader extends ServerThread {
                         String errorMessage = message.data.get("message").getAsString();
                         task.handleResult(ServerResult.failure(errorMessage));
                     }
+                    break;
+                }
+                case "setUser": {
+                    UserEntry userData = UserEntry.fromJson(message.data);
+                    connection.setUser(userData);
                     break;
                 }
                 case "message": {

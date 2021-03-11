@@ -56,8 +56,8 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="64dp"
             android:ems="10"
+            android:hint="@string/label_username"
             android:inputType="textPersonName"
-            android:text="Username"
             app:layout_constraintBottom_toTopOf="@+id/textView6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

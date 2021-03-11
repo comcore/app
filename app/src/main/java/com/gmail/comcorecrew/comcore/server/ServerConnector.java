@@ -98,6 +98,15 @@ public final class ServerConnector {
     }
 
     /**
+     * Get the information of the currently logged in user.
+     *
+     * @return the user data or null if there is no logged in user
+     */
+    public static UserEntry getUser() {
+        return getConnection().getUser();
+    }
+
+    /**
      * Log into the server using the user's information. This should be called before making any
      * requests from the server. If this method is not called, all requests will likely fail.
      *

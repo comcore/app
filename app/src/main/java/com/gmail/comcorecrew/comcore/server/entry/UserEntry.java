@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
+import androidx.annotation.NonNull;
+
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.google.gson.JsonObject;
 
@@ -60,5 +62,11 @@ public final class UserEntry {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return name;
     }
 }

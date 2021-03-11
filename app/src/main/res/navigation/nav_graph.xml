@@ -24,10 +24,6 @@
         <action
             android:id="@+id/action_mainFragment_to_createGroupFragment"
             app:destination="@id/createGroupFragment" />
-        <argument
-            android:name="currentUser"
-            app:argType="string"
-            android:defaultValue='"Unknown_User"' />
         <action
             android:id="@+id/action_mainFragment_to_groupFragment"
             app:destination="@id/groupFragment" />

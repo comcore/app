@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
+import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.google.gson.JsonObject;
 
 /**
@@ -17,6 +18,13 @@ public interface Connection {
      * Log out if logged in. It will be necessary to call authenticate() again.
      */
     void logout();
+
+    /**
+     * Get the information of the currently logged in user.
+     *
+     * @return the user data or null if there is no logged in user
+     */
+    UserEntry getUser();
 
     /**
      * Set the login information to use for connecting to the server. Note that this doesn't
