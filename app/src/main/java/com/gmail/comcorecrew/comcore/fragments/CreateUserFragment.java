@@ -13,18 +13,11 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 
+import com.gmail.comcorecrew.comcore.dialogs.EmptyTextErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
 
 public class CreateUserFragment extends Fragment {
-
-    private EditText userNameBox;
-    private EditText userPasswordBox;
-    private EditText userEmailBox;
-
-    private String userName;
-    private String userEmail;
-    private String userPassword;
 
     public CreateUserFragment() {
         // Required empty public constructor
@@ -52,6 +45,12 @@ public class CreateUserFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        view.findViewById(R.id.cancelButton).setOnClickListener(view1 -> {
+            NavHostFragment.findNavController(CreateUserFragment.this)
+                    .navigate(R.id.action_createUserFragment_to_loginFragment);
+
+        });
+
         view.findViewById(R.id.submitButton).setOnClickListener(clickedView -> {
             EditText nameView = view.findViewById(R.id.editCUName);
             EditText emailView = view.findViewById(R.id.editCUEmail);
@@ -60,6 +59,12 @@ public class CreateUserFragment extends Fragment {
             String name = nameView.getText().toString();
             String email = emailView.getText().toString();
             String pass = passwordView.getText().toString();
+
+            if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
+                EmptyTextErrorDialog errorDialog = new EmptyTextErrorDialog();
+                errorDialog.show(getParentFragmentManager(), "create_user_error");
+                return;
+            }
 
             ServerConnector.createAccount(name, email, pass, result -> {
                 if (result.isFailure()) {
@@ -75,27 +80,5 @@ public class CreateUserFragment extends Fragment {
                 }
             });
         });
-
-        view.findViewById(R.id.cancelButton).setOnClickListener(view1 -> {
-            NavHostFragment.findNavController(CreateUserFragment.this)
-                    .navigate(R.id.action_createUserFragment_to_loginFragment);
-
-        });
-
-        view.findViewById(R.id.submitButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                userName = userNameBox.getText().toString();
-                userEmail = userEmailBox.getText().toString();
-                userPassword = userPasswordBox.getText().toString();
-
-                if (userName.equals("") || userEmail.equals("") || userPassword.equals("")) {
-                    EmptyTextErrorDialog errorDialog = new EmptyTextErrorDialog();
-                    errorDialog.show(getParentFragmentManager(), "create_user_error");
-                }
-            }
-        });
-
     }
 }
