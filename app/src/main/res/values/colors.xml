@@ -17,4 +17,6 @@
     <color name="primary_l2">#586E59</color>
     <color name="secondary">#D6D6D6</color>
     <color name="secondary_d1">#AAAAAA</color>
+    <color name="owner_color">#313C7A</color>
+    <color name="moderator_color">#60647E</color>
 </resources>

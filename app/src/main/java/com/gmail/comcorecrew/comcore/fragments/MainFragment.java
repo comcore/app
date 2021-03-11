@@ -49,13 +49,20 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UsersGroups = new ArrayList<Group>();
 
+        /** TODO
+         * Creates a new UserID based on the string passed by the Login Fragment.
+         * This is for client testing only
+         * The app should retrieve a user's information using the user id string given
+         * to it by LoginFragment **/
+        currentUser = new UserID(MainFragmentArgs.fromBundle(getArguments()).getCurrentUser());
+
         /** TODO Create placeholder groups
          * This is for client testing only and should be removed later
          * These changes aren't implemented in this commit *
         otherUser = new UserID("Other User");
         UsersGroups.add(new Group("Owned Group", currentUser));
         UsersGroups.add(new Group("Moderated Group", otherUser));
-        //UsersGroups.get(1).testsetModerator(currentUser);
+        UsersGroups.get(1).testsetModerator(currentUser);
         UsersGroups.add(new Group("Member Group", otherUser));*/
 
     }
@@ -65,6 +72,7 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -77,9 +85,6 @@ public class MainFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        /** Creates a new UserID based on the string passed by the Login Fragment **/
-        currentUser = new UserID(MainFragmentArgs.fromBundle(getArguments()).getCurrentUser());
 
         /** Creates a welcome message based on the user's id
          * This currently prints the user's id, but later should print their name **/
@@ -170,17 +175,18 @@ public class MainFragment extends Fragment {
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
              * the owner tag will take preference.
              *
-             * These changes aren't implemented in this commit
-             *
-            *if (UserGroups.get(position).getOwner().equals(user)) {
-                viewHolder.viewTag.setColorFilter(Color.BLUE);
+             * The shape of the image tag can be changed in group_row_item.xml
+             * The colors can be changed in colors.xml
+             */
+            if (UserGroups.get(position).getOwner().equals(user)) {
+                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
             }
             else if (UserGroups.get(position).getModerators().contains(user)) {
-                viewHolder.viewTag.setColorFilter(Color.MAGENTA);
+                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
             }
             else {
                 viewHolder.viewTag.setVisibility(View.INVISIBLE);
-            }*/
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)

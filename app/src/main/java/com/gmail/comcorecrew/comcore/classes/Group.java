@@ -21,7 +21,7 @@ public class Group {
     private ArrayList<UserID> moderators;
     private UserID owner;
 
-    public Group(Context context, UUID externalId, String name, UserID owner) {
+    public Group(Context context, UUID externalID, String name, UserID owner) {
         numGroups++;
         groupId = numGroups;
         this.owner = owner;
