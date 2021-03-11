@@ -50,11 +50,12 @@ public class MainFragment extends Fragment {
         UsersGroups = new ArrayList<Group>();
 
         /** TODO Create placeholder groups
-         * These changes aren't implemented in this commit */
-        /**otherUser = new UserID("Other User");
+         * This is for client testing only and should be removed later
+         * These changes aren't implemented in this commit *
+        otherUser = new UserID("Other User");
         UsersGroups.add(new Group("Owned Group", currentUser));
         UsersGroups.add(new Group("Moderated Group", otherUser));
-        UsersGroups.get(1).testsetModerator(currentUser);
+        //UsersGroups.get(1).testsetModerator(currentUser);
         UsersGroups.add(new Group("Member Group", otherUser));*/
 
     }
@@ -107,12 +108,14 @@ public class MainFragment extends Fragment {
          * Provide a reference to the type of views that you are using
          * (custom ViewHolder).
          */
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private ImageView viewTag;
+            private Group groupLink;
 
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
                 // Define click listener for the ViewHolder's View
 
                 textView = (TextView) view.findViewById(R.id.group_row_text);
@@ -122,6 +125,17 @@ public class MainFragment extends Fragment {
 
             public TextView getTextView() {
                 return textView;
+            }
+
+            public void setGroup(Group currentGroup) {
+                groupLink = currentGroup;
+            }
+
+            @Override
+            public void onClick(View view) {
+                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(0);
+                action.setGroupID(groupLink.getGroupId());
+                NavHostFragment.findNavController(MainFragment.this).navigate(action);
             }
         }
 
@@ -150,6 +164,7 @@ public class MainFragment extends Fragment {
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
             viewHolder.getTextView().setText(UserGroups.get(position).getName());
+            viewHolder.setGroup(UserGroups.get(position));
 
             /** Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
