@@ -2,7 +2,7 @@ package com.gmail.comcorecrew.comcore.server.entry;
 
 import androidx.annotation.NonNull;
 
-import com.gmail.comcorecrew.comcore.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.google.gson.JsonObject;
 

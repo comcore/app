@@ -1,6 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.connection.thread;
 
-import com.gmail.comcorecrew.comcore.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.Message;

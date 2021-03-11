@@ -1,6 +1,6 @@
 package com.gmail.comcorecrew.comcore.server;
 
-import com.gmail.comcorecrew.comcore.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;

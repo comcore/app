@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore;
+package com.gmail.comcorecrew.comcore.enums;
 
 import androidx.annotation.NonNull;
 

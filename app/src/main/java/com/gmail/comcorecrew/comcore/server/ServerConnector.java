@@ -3,7 +3,7 @@ package com.gmail.comcorecrew.comcore.server;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.gmail.comcorecrew.comcore.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
