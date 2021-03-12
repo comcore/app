@@ -2,10 +2,12 @@ package com.gmail.comcorecrew.comcore.interfaces;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
+
 /*
  * Basic interface for the module class.
  */
-public interface Module {
+public interface Module extends NotificationListener {
 
     //Returns the id unique to the module type.
     String getMdid();

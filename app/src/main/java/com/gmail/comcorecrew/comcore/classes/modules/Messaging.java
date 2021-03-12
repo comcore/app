@@ -7,18 +7,23 @@ import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class Messaging implements Module {
-
+    private Context context;
     private String name; //Name of chat
     private final Group group; //Group that the chat is in
     private final int mnum; //Module number
@@ -27,7 +32,8 @@ public class Messaging implements Module {
 
     private ArrayList<UserEntry> users;
 
-    public Messaging(Group group, String name, ChatID id) {
+    public Messaging(Context context, Group group, String name, ChatID id) {
+        this.context = context;
         this.group = group;
         this.name = name;
         this.id = id;
@@ -141,15 +147,21 @@ public class Messaging implements Module {
     }
 
     /*
+     * Get the MessageID of the latest message
+     */
+    private MessageID latestMessageId() {
+        if (messages.isEmpty()) {
+            return null;
+        } else {
+            return new MessageID(id, messages.get(messages.size() - 1).getMessageid());
+        }
+    }
+
+    /*
      * Gets messages from the server and caches them
      */
-    public void refreshMessages(Context context) {
-        MessageID lastMessageId;
-        if (messages.isEmpty()) {
-            lastMessageId = null;
-        } else {
-            lastMessageId = new MessageID(id, messages.get(messages.size() - 1).getMessageid());
-        }
+    public void refreshMessages() {
+        MessageID lastMessageId = latestMessageId();
         ServerConnector.getMessages(id, lastMessageId, null, result -> {
             if (result.isFailure()) {
                 return;
@@ -165,5 +177,35 @@ public class Messaging implements Module {
             }
         });
         this.toCache(context);
+    }
+
+    @Override
+    public void onReceiveMessage(MessageEntry message) {
+        MessageID lastMessageId = latestMessageId();
+        if (!message.id.immediatelyAfter(lastMessageId)) {
+            messages.clear();
+        }
+        addMessage(message);
+        this.toCache(context);
+    }
+
+    @Override
+    public void onInvitedToGroup(GroupInviteEntry invite) {}
+
+    @Override
+    public void onRoleChanged(GroupID group, GroupRole role) {}
+
+    @Override
+    public void onMuteChanged(GroupID group, boolean muted) {}
+
+    @Override
+    public void onKicked(GroupID group) {}
+
+    @Override
+    public void onLoggedOut() {}
+
+    @Override
+    public Collection<? extends NotificationListener> getChildren() {
+        return null;
     }
 }
