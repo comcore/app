@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -57,8 +56,8 @@ public class CreateGroupFragment extends Fragment {
          * If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.create_group_back_button).setOnClickListener(clickedView -> {
-            NavHostFragment.findNavController(CreateGroupFragment.this)
-                    .navigate(R.id.action_createGroupFragment_to_mainFragment);
+            NavHostFragment.findNavController(this)
+                    .popBackStack();
         });
 
         /**
@@ -81,14 +80,11 @@ public class CreateGroupFragment extends Fragment {
                             .show(getParentFragmentManager(), null);
                     return;
                 }
-                else if (result.isSuccess()) {
-                    //TextView text = (TextView) view.findViewById(R.id.label_create_group);
-                    //text.setText(result.data.toString());
-                    NavHostFragment.findNavController(CreateGroupFragment.this)
-                            .navigate(R.id.action_createGroupFragment_to_mainFragment);
-                    return;
-                }
 
+                //TextView text = (TextView) view.findViewById(R.id.label_create_group);
+                //text.setText(result.data.toString());
+                NavHostFragment.findNavController(this)
+                        .popBackStack();
             });
 
         });

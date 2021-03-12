@@ -80,8 +80,8 @@ public class GroupFragment extends Fragment {
          * If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.group_back_button).setOnClickListener(clickedView -> {
-            NavHostFragment.findNavController(GroupFragment.this)
-                    .navigate(R.id.action_groupFragment_to_mainFragment);
+            NavHostFragment.findNavController(this)
+                    .popBackStack();
         });
 
     }
@@ -131,9 +131,9 @@ public class GroupFragment extends Fragment {
                 ServerConnector.leaveGroup(currentGroup.getGroupId(), result -> {
                     if (result.isSuccess()) {
                         NavHostFragment.findNavController(GroupFragment.this)
-                                .navigate(R.id.action_groupFragment_to_mainFragment);
+                                .popBackStack();
                     }
-                    else if (result.isFailure()) {
+                    else {
                         new StringErrorDialog(result.errorMessage)
                                 .show(getParentFragmentManager(), null);
                     }

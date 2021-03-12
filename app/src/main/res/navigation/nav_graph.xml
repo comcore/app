@@ -7,11 +7,7 @@
         android:id="@+id/createGroupFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CreateGroupFragment"
         android:label="fragment_create_group"
-        tools:layout="@layout/fragment_create_group" >
-        <action
-            android:id="@+id/action_createGroupFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_create_group" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.SettingsFragment"
@@ -50,9 +46,6 @@
         android:label="fragment_create_user"
         tools:layout="@layout/fragment_create_user" >
         <action
-            android:id="@+id/action_createUserFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-        <action
             android:id="@+id/action_createUserFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
@@ -60,9 +53,5 @@
         android:id="@+id/groupFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.GroupFragment"
         android:label="fragment_group"
-        tools:layout="@layout/fragment_group" >
-        <action
-            android:id="@+id/action_groupFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_group" />
 </navigation>

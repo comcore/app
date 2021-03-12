@@ -77,8 +77,7 @@ public class LoginFragment extends Fragment {
                     case ENTER_CODE:
                         // Show the confirmation code dialog
                         new EnterCodeDialog(this,
-                                R.id.action_loginFragment_to_mainFragment,
-                                0
+                                R.id.action_loginFragment_to_mainFragment
                         ).show(getParentFragmentManager(), null);
                         break;
                     case DOES_NOT_EXIST:

@@ -46,8 +46,8 @@ public class CreateUserFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         view.findViewById(R.id.cancelButton).setOnClickListener(view1 -> {
-            NavHostFragment.findNavController(CreateUserFragment.this)
-                    .navigate(R.id.action_createUserFragment_to_loginFragment);
+            NavHostFragment.findNavController(this)
+                    .popBackStack();
         });
 
         view.findViewById(R.id.submitButton).setOnClickListener(clickedView -> {
@@ -77,8 +77,7 @@ public class CreateUserFragment extends Fragment {
                 if (created) {
                     // Show the confirmation code dialog
                     new EnterCodeDialog(this,
-                            R.id.action_createUserFragment_to_mainFragment,
-                            R.id.action_createUserFragment_to_loginFragment
+                            R.id.action_createUserFragment_to_mainFragment
                     ).show(getParentFragmentManager(), null);
                 } else {
                     new ErrorDialog(R.string.error_already_exists)
