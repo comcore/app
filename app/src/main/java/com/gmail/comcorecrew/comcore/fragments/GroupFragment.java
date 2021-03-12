@@ -33,7 +33,7 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
 import java.util.ArrayList;
 
 public class GroupFragment extends Fragment {
-
+    private MainFragment fragment;
     private Group currentGroup;
 
     public GroupFragment() {

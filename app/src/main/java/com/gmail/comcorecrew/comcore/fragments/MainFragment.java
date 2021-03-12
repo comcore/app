@@ -1,8 +1,5 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,7 +9,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,20 +22,13 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class MainFragment extends Fragment {
-
-    private UserEntry currentUser;
-    // An ArrayList of groups the current user is a member of
-    private ArrayList<Group> UsersGroups;
 
     private CustomAdapter groupAdapter;
 
@@ -56,8 +45,6 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        UsersGroups = new ArrayList<Group>();
-        currentUser = ServerConnector.getUser();
 
     }
 
@@ -67,41 +54,25 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ServerConnector.getGroups( result -> {
-
-            if (result.isSuccess()) {
-                for (int i = 0; i < result.data.length; i++) {
-                    Group nextGroup = new Group(this.getContext(), result.data[i].name,
-                            result.data[i].id, result.data[i].role, result.data[i].muted);
-                    UsersGroups.add(nextGroup);
-                }
-
-                // Create the RecyclerView
-                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
-                rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-                groupAdapter = new CustomAdapter(currentUser, UsersGroups);
-                rvGroups.setAdapter(groupAdapter);
-                rvGroups.setItemAnimator(new DefaultItemAnimator());
-
-                return;
-            }
-            else if (result.isFailure()) {
-                new ErrorDialog(R.string.error_unknown)
-                        .show(getParentFragmentManager(), null);
-                return;
-            }
-        });
+        // Create the RecyclerView
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+        groupAdapter = new CustomAdapter();
+        rvGroups.setAdapter(groupAdapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
 
         return rootView;
+    }
+
+    public void refresh() {
+        groupAdapter.refresh();
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Creates a welcome message based on the user's id
-         * This currently prints the user's id, but later should print their name **/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
-        welcomeText.setText("Welcome " + currentUser.toString());
+        welcomeText.setText("Welcome " + ServerConnector.getUser().name);
 
         view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,13 +81,11 @@ public class MainFragment extends Fragment {
                         .navigate(R.id.action_mainFragment_to_createGroupFragment);
             }
         });
-
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.mainmenu, menu);
-
     }
 
     /**
@@ -131,7 +100,7 @@ public class MainFragment extends Fragment {
             case R.id.invitesFragment:
                 /** Handle viewing list of members **/
 
-                new ViewInvitesDialog()
+                new ViewInvitesDialog(this)
                         .show(getParentFragmentManager(), null);
                 return true;
             default:
@@ -144,8 +113,7 @@ public class MainFragment extends Fragment {
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        private ArrayList<Group> UserGroups;
-        private UserID user;
+        private ArrayList<Group> userGroups = new ArrayList<>();
 
         /**
          * Provide a reference to the type of views that you are using
@@ -187,9 +155,27 @@ public class MainFragment extends Fragment {
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(UserEntry user, ArrayList<Group> dataSet) {
-            this.user = user.id;
-            UserGroups = dataSet;
+        public CustomAdapter() {
+            refresh();
+        }
+
+        private void refresh() {
+            ServerConnector.getGroups(result -> {
+                if (result.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                    return;
+                }
+
+                ArrayList<Group> userGroups = new ArrayList<>();
+                for (int i = 0; i < result.data.length; i++) {
+                    Group nextGroup = new Group(getContext(), result.data[i].name,
+                            result.data[i].id, result.data[i].role, result.data[i].muted);
+                    userGroups.add(nextGroup);
+                }
+                this.userGroups = userGroups;
+                notifyDataSetChanged();
+            });
         }
 
         // Create new views (invoked by the layout manager)
@@ -208,8 +194,8 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(UserGroups.get(position).getName());
-            viewHolder.setGroup(UserGroups.get(position));
+            viewHolder.getTextView().setText(userGroups.get(position).getName());
+            viewHolder.setGroup(userGroups.get(position));
 
             /** Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
@@ -218,10 +204,10 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            if (UserGroups.get(position).getGroupRole() == GroupRole.OWNER) {
+            if (userGroups.get(position).getGroupRole() == GroupRole.OWNER) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
             }
-            else if (UserGroups.get(position).getGroupRole() == GroupRole.MODERATOR) {
+            else if (userGroups.get(position).getGroupRole() == GroupRole.MODERATOR) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
             }
             else {
@@ -232,7 +218,7 @@ public class MainFragment extends Fragment {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return UserGroups.size();
+            return userGroups.size();
         }
     }
 

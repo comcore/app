@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
@@ -26,9 +27,10 @@ public class ViewInvitesDialog extends DialogFragment {
     private RecyclerView recycleView;
     private CustomAdapter adapter;
     private ArrayList<GroupInviteEntry> inviteList;
+    private MainFragment fragment;
 
-    public ViewInvitesDialog () {
-
+    public ViewInvitesDialog (MainFragment fragment) {
+        this.fragment = fragment;
     }
 
     @Override
@@ -38,28 +40,23 @@ public class ViewInvitesDialog extends DialogFragment {
         inviteList = new ArrayList<>();
 
         ServerConnector.getInvites(result -> {
-
-            if (result.isSuccess()) {
-                for (int i = 0; i < result.data.length; i++) {
-                    GroupInviteEntry groupInvite = result.data[i];
-                    inviteList.add(groupInvite);
-                }
-
-                // Create the RecyclerView
-                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
-                rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-                adapter = new CustomAdapter(inviteList);
-                rvGroups.setAdapter(adapter);
-                rvGroups.setItemAnimator(new DefaultItemAnimator());
-
-                return;
-            }
-            else if (result.isFailure()) {
-
+            if (result.isFailure()) {
                 // TODO display error message
                 this.dismiss();
                 return;
             }
+
+            for (int i = 0; i < result.data.length; i++) {
+                GroupInviteEntry groupInvite = result.data[i];
+                inviteList.add(groupInvite);
+            }
+
+            // Create the RecyclerView
+            RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
+            rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+            adapter = new CustomAdapter(inviteList);
+            rvGroups.setAdapter(adapter);
+            rvGroups.setItemAnimator(new DefaultItemAnimator());
         });
 
         return rootView;
@@ -98,6 +95,33 @@ public class ViewInvitesDialog extends DialogFragment {
                 super(view);
 
                 textView = (TextView) view.findViewById(R.id.label_invite);
+
+                view.findViewById(R.id.accept_invite_button).setOnClickListener(clickedView -> {
+                    ServerConnector.replyToInvite(currentInviteEntry.id, true, result -> {
+                        if (result.isFailure()) {
+                            new ErrorDialog(R.string.error_cannot_connect)
+                                    .show(getParentFragmentManager(), null);
+                            return;
+                        }
+
+                        inviteList.remove(currentInviteEntry);
+                        notifyDataSetChanged();
+                        fragment.refresh();
+                    });
+                });
+
+                view.findViewById(R.id.reject_invite_button).setOnClickListener(clickedView -> {
+                    ServerConnector.replyToInvite(currentInviteEntry.id, false, result -> {
+                        if (result.isFailure()) {
+                            new ErrorDialog(R.string.error_cannot_connect)
+                                    .show(getParentFragmentManager(), null);
+                            return;
+                        }
+
+                        inviteList.remove(currentInviteEntry);
+                        notifyDataSetChanged();
+                    });
+                });
             }
 
             public TextView getTextView() {

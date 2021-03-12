@@ -60,6 +60,7 @@ public class LoginFragment extends Fragment {
             }
 
             // Attempt to log into the server
+            passwordView.setText("");
             ServerConnector.login(email, pass, result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
@@ -86,7 +87,6 @@ public class LoginFragment extends Fragment {
                         break;
                     case INVALID_PASSWORD:
                         // Show a dialog with an option to reset the password
-                        passwordView.setText("");
                         new InvalidPasswordDialog(this, email)
                                 .show(getParentFragmentManager(), null);
                         break;

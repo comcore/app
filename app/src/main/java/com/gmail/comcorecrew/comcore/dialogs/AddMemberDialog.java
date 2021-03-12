@@ -41,12 +41,13 @@ public class AddMemberDialog extends DialogFragment {
                     else {
                         String userEmail = text.getText().toString();
                         ServerConnector.sendInvite(groupID, userEmail, result -> {
-                            if (result.isSuccess()) {
-                                // TODO Show success message
+                            if (result.isFailure()) {
+                                new ErrorDialog(R.string.error_cannot_connect)
+                                        .show(getParentFragmentManager(), null);
+                                return;
                             }
-                            else if (result.isFailure()) {
-                                // TODO Show failure message
-                            }
+
+                            // TODO Show success message
                         });
                     }
                 })

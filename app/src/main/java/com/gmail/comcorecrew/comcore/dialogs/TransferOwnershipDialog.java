@@ -42,12 +42,13 @@ public class TransferOwnershipDialog extends DialogFragment {
                     else {
                         UserID userEmail = new UserID(text.getText().toString());
                         ServerConnector.setRole(groupID, userEmail, targetRole, result -> {
-                            if (result.isSuccess()) {
-                                // TODO Show success message
+                            if (result.isFailure()) {
+                                new ErrorDialog(R.string.error_cannot_connect)
+                                        .show(getParentFragmentManager(), null);
+                                return;
                             }
-                            else if (result.isFailure()) {
-                                // TODO Show failure message
-                            }
+
+                            // TODO Show success message
                         });
                     }
                 })
