@@ -33,13 +33,13 @@ public class Messaging implements Module {
 
     private ArrayList<UserEntry> users;
 
-    public Messaging(Context context, GroupID groupID, String name, ChatID id) {
+    public Messaging(Context context, String name, ChatID id) {
         this.context = context;
         //this.group = group;
         this.name = name;
         this.id = id;
         this.mnum = 0; //temp
-        this.groupID = groupID; //temp
+        this.groupID = id.group; //temp
         //this.mnum = group.addModule(this);
         messages = new ArrayList<>();
         users = new ArrayList<>();
