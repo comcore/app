@@ -146,9 +146,13 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.add_moderator:
                 /** Handle adding moderator **/
+                TransferOwnershipDialog addModeratorDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.MODERATOR, R.string.add_moderator);
+                addModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.remove_moderator:
                 /** Handle removing moderator **/
+                TransferOwnershipDialog removeModeratorDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.USER, R.string.remove_moderator);
+                removeModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.kick_member:
                 /** Handle kicking member **/
