@@ -89,8 +89,9 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groupmenu, menu);
+        inflater.inflate(R.menu.mainmenu, menu);
 
-        /** TODO
+        /**
          * If the current user is a moderator, display R.id.menu_group_moderator_actions
          * If the current user is an owner, display R.id.menu_group_owner_actions
          * and R.id.menu_group_moderator_actions

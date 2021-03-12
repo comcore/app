@@ -2,12 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- View Invitations -->
+    <item
+        android:id="@+id/invitesFragment"
+        android:title="@string/view_invites"
+        app:showAsAction="never" />
+
     <!-- Settings -->
-    <!-- The icon is a placeholder that should be replaced with a custom icon -->
 
     <item
         android:id="@+id/settingsFragment"
-        android:icon="@android:drawable/ic_menu_manage"
         android:title="@string/action_settings"
         app:showAsAction="never" />
 

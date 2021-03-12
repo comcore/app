@@ -60,10 +60,15 @@
     <string name="error_send_invite">The invitation could not be sent.</string>
 
 
-    <!-- Confirm/Cancel Messages -->
+
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
+    <!-- Success Messages -->
     <string name="success_set_role">The role of the user was successfully changed.</string>
     <string name="success_send_invite">The invitation was sent!</string>
+
+
+    <!-- Invitation Messages -->
+    <string name="view_invites">View Invitations</string>
 
 </resources>
