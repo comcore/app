@@ -140,11 +140,9 @@ public class ViewMembersDialog extends DialogFragment {
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.owner_color);
 
-
-                            // TODO Success Message
                         }
                         else {
-                            // TODO Failure Message
+
                         }
                     });
 
@@ -153,12 +151,12 @@ public class ViewMembersDialog extends DialogFragment {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.MODERATOR, result -> {
                         if (result.isSuccess()) {
 
-                            // TODO Success Message
+
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
                         }
                         else {
-                            // TODO Failure Message
+
                         }
                     });
                 }
@@ -166,12 +164,11 @@ public class ViewMembersDialog extends DialogFragment {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.USER, result -> {
                         if (result.isSuccess()) {
 
-                            // TODO Success Message
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
 
                         }
                         else {
-                            // TODO Failure Message
+
                         }
                     });
                 }
