@@ -18,8 +18,6 @@ import java.util.UUID;
 public class Group implements Parcelable {
     private static int numGroups = 0;
 
-    private UUID externalId;
-
     private GroupID groupID;
     private String groupName;
     private GroupRole groupRole;

@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
@@ -137,5 +138,23 @@ public class Messaging implements Module {
                     msg.getTimestamp(), msg.getData()));
         }
         return entries;
+    }
+
+    /*
+     * Gets messages from the server and caches them
+     */
+    public void refreshMessages(Context context) {
+        ServerConnector.getMessages(id,
+                new MessageID(id, messages.get(messages.size() - 1).getMessageid()),
+                null, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            for (MessageEntry entry : result.data) {
+                addMessage(entry);
+            }
+                });
+        this.toCache(context);
     }
 }
