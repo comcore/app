@@ -23,6 +23,8 @@ import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -32,10 +34,7 @@ import java.util.UUID;
 
 public class MainFragment extends Fragment {
 
-    // The ID of the user currently viewing the main page
-    private static UserEntry currentUser;
-    private UserID otherUser;
-
+    private UserEntry currentUser;
     // An ArrayList of groups the current user is a member of
     private ArrayList<Group> UsersGroups;
 
@@ -53,22 +52,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         UsersGroups = new ArrayList<Group>();
-
-        /** TODO
-         * Creates a new UserID based on the string passed by the Login Fragment.
-         * This is for client testing only
-         * The app should retrieve a user's information using the user id string given
-         * to it by LoginFragment **/
         currentUser = ServerConnector.getUser();
-
-        /** TODO Create placeholder groups
-         * This is for client testing only and should be removed later
-         * These changes aren't implemented in this commit *
-        otherUser = new UserID("Other User");
-        UsersGroups.add(new Group("Owned Group", currentUser));
-        UsersGroups.add(new Group("Moderated Group", otherUser));
-        //UsersGroups.get(1).testsetModerator(currentUser);
-        UsersGroups.add(new Group("Member Group", otherUser));*/
 
     }
 
@@ -81,9 +65,28 @@ public class MainFragment extends Fragment {
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomAdapter groupAdapter = new CustomAdapter(currentUser.id, UsersGroups);
+        CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+        ServerConnector.getGroups( result -> {
+            TextView errorMessage = container.findViewById(R.id.testerror);
+            errorMessage.setText(result.toString());
+
+            if (result.isSuccess()) {
+                for (int i = 0; i < result.data.length; i++) {
+                    Group nextGroup = new Group(this.getContext(), result.data[i].name,
+                            result.data[i].id, result.data[i].role, result.data[i].muted);
+                    UsersGroups.add(nextGroup);
+                }
+                return;
+            }
+            else if (result.isFailure()) {
+                new ErrorDialog(R.string.error_cannot_connect)
+                        .show(getParentFragmentManager(), null);
+                return;
+            }
+        });
 
         return rootView;
     }
@@ -94,7 +97,7 @@ public class MainFragment extends Fragment {
         /** Creates a welcome message based on the user's id
          * This currently prints the user's id, but later should print their name **/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
-        welcomeText.setText("Welcome " + currentUser.toString());
+        welcomeText.setText("Welcome " + currentUser.toString() + ", you have " + UsersGroups.size() + " groups");
 
         view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,8 +155,8 @@ public class MainFragment extends Fragment {
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(UserID user, ArrayList<Group> dataSet) {
-            this.user = user;
+        public CustomAdapter(UserEntry user, ArrayList<Group> dataSet) {
+            this.user = user.id;
             UserGroups = dataSet;
         }
 
@@ -183,10 +186,10 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            if (UserGroups.get(position).getOwner().equals(user)) {
+            if (UserGroups.get(position).getGroupRole() == GroupRole.OWNER) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
             }
-            else if (UserGroups.get(position).getModerators().contains(user)) {
+            else if (UserGroups.get(position).getGroupRole() == GroupRole.MODERATOR) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
             }
             else {

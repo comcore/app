@@ -63,7 +63,7 @@ public class GroupFragment extends Fragment {
          * Currently displays the groupID, but should be able to access a group
          * object using currentGroupID, and then get the group name from that object**/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
-        welcomeText.setText(Integer.toString(currentGroupID));
+        welcomeText.setText(currentGroupID);
 
     }
 

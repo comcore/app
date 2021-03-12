@@ -2,7 +2,10 @@ package com.gmail.comcorecrew.comcore.classes;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
@@ -14,44 +17,60 @@ public class Group {
     private static int numGroups = 0;
 
     private UUID externalId;
-    private String name;
-    private int groupId;
+
+    private int groupID;
+    private String groupName;
+    private GroupRole groupRole;
+    private Boolean isMuted;
+
     private ArrayList<Module> modules;
-    private ArrayList<UserID> users;
+    private ArrayList<User> users;
     private ArrayList<UserID> moderators;
     private UserID owner;
 
-    public Group(Context context, UUID externalID, String name, UserID owner) {
-        numGroups++;
-        groupId = numGroups;
-        this.owner = owner;
-        this.externalId = externalId;
-        this.name = name;
-        modules = new ArrayList<Module>();
-        users = new ArrayList<UserID>();
-        moderators = new ArrayList<UserID>();
-        File cacheDir = new File(context.getCacheDir(), "gr" + groupId);
+    public Group(Context context, String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
+        this.groupID = Integer.parseInt(groupID.id);
+        this.groupName = name;
+        this.groupRole = groupRole;
+        users = new ArrayList<User>();
+        ServerConnector.getUsers(groupID, result -> {
+            for (int i = 0; i < result.data.length; i++) {
+                User nextUser = new User(result.data[i].id, result.data[i].name);
+                users.add(nextUser);
+            }
+        });
+        this.isMuted = isMuted;
+
+        File cacheDir = new File(context.getCacheDir(), "gr" + this.groupID);
         cacheDir.mkdir();
     }
 
     public String getName() {
-        return name;
+        return groupName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.groupName = name;
     }
 
     public int getGroupId() {
-        return groupId;
+        return groupID;
     }
 
-    public ArrayList<UserID> getUsers() {
+    public ArrayList<User> getUsers() {
         return users;
     }
 
     public ArrayList<UserID> getModerators() {
         return moderators;
+    }
+
+    public GroupRole getGroupRole() {
+        return groupRole;
+    }
+
+    public Boolean getIsMuted() {
+        return isMuted;
     }
 
     public UserID getOwner() {
