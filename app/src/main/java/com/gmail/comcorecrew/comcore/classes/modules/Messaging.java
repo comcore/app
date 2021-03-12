@@ -144,17 +144,26 @@ public class Messaging implements Module {
      * Gets messages from the server and caches them
      */
     public void refreshMessages(Context context) {
-        ServerConnector.getMessages(id,
-                new MessageID(id, messages.get(messages.size() - 1).getMessageid()),
-                null, result -> {
+        MessageID lastMessageId;
+        if (messages.isEmpty()) {
+            lastMessageId = null;
+        } else {
+            lastMessageId = new MessageID(id, messages.get(messages.size() - 1).getMessageid());
+        }
+        ServerConnector.getMessages(id, lastMessageId, null, result -> {
             if (result.isFailure()) {
                 return;
+            }
+
+            // If the message isn't immediately after the existing messages, clear the cache
+            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessageId)) {
+                messages.clear();
             }
 
             for (MessageEntry entry : result.data) {
                 addMessage(entry);
             }
-                });
+        });
         this.toCache(context);
     }
 }

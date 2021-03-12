@@ -48,7 +48,7 @@ public class MessageID {
      * @return true if this message immediately follows the previous one, false otherwise
      */
     public boolean immediatelyAfter(MessageID previousMessage) {
-        return id == previousMessage.id + 1;
+        return previousMessage == null || id == previousMessage.id + 1;
     }
 
     @Override
