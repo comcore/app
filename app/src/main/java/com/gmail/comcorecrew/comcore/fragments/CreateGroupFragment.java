@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
@@ -65,6 +66,14 @@ public class CreateGroupFragment extends Fragment {
         });
 
         /**
+         * If the "back" button is clicked, return to the main page
+         */
+        view.findViewById(R.id.create_group_back_button).setOnClickListener(clickedView -> {
+            NavHostFragment.findNavController(CreateGroupFragment.this)
+                    .navigate(R.id.action_createGroupFragment_to_mainFragment);
+        });
+
+        /**
          * If the "submit" button is clicked, try to create a group using the given information
          */
         view.findViewById(R.id.create_group_submit_button).setOnClickListener(clickedView -> {
@@ -85,6 +94,8 @@ public class CreateGroupFragment extends Fragment {
                     return;
                 }
                 else if (result.isSuccess()) {
+                    //TextView text = (TextView) view.findViewById(R.id.label_create_group);
+                    //text.setText(result.data.toString());
                     NavHostFragment.findNavController(CreateGroupFragment.this)
                             .navigate(R.id.action_createGroupFragment_to_mainFragment);
                     return;

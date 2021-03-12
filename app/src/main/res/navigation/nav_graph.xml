@@ -63,6 +63,9 @@
         tools:layout="@layout/fragment_group" >
         <argument
             android:name="groupID"
-            app:argType="integer" />
+            app:argType="string" />
+        <action
+            android:id="@+id/action_groupFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
 </navigation>

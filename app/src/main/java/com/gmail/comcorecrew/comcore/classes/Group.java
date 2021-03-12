@@ -18,7 +18,7 @@ public class Group {
 
     private UUID externalId;
 
-    private int groupID;
+    private String groupID;
     private String groupName;
     private GroupRole groupRole;
     private Boolean isMuted;
@@ -29,7 +29,7 @@ public class Group {
     private UserID owner;
 
     public Group(Context context, String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
-        this.groupID = Integer.parseInt(groupID.id);
+        this.groupID = groupID.id;
         this.groupName = name;
         this.groupRole = groupRole;
         users = new ArrayList<User>();
@@ -53,7 +53,7 @@ public class Group {
         this.groupName = name;
     }
 
-    public int getGroupId() {
+    public String getGroupId() {
         return groupID;
     }
 

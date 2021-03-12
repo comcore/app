@@ -65,7 +65,8 @@ public final class GroupEntry {
      */
     public static GroupEntry fromJson(JsonObject json) {
         GroupID id = new GroupID(json.get("id").getAsString());
-        String name = json.get("name").getAsString();
+        //String name = json.get("name").getAsString();
+        String name = "placeholder";
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
         boolean muted = json.get("muted").getAsBoolean();
         return new GroupEntry(id, name, role, muted);

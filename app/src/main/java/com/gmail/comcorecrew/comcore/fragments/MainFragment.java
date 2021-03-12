@@ -62,16 +62,7 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
-        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
-        rvGroups.setAdapter(groupAdapter);
-        rvGroups.setItemAnimator(new DefaultItemAnimator());
-
         ServerConnector.getGroups( result -> {
-            TextView errorMessage = container.findViewById(R.id.testerror);
-            errorMessage.setText(result.toString());
 
             if (result.isSuccess()) {
                 for (int i = 0; i < result.data.length; i++) {
@@ -79,10 +70,18 @@ public class MainFragment extends Fragment {
                             result.data[i].id, result.data[i].role, result.data[i].muted);
                     UsersGroups.add(nextGroup);
                 }
+
+                // Create the RecyclerView
+                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
+                rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+                CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
+                rvGroups.setAdapter(groupAdapter);
+                rvGroups.setItemAnimator(new DefaultItemAnimator());
+
                 return;
             }
             else if (result.isFailure()) {
-                new ErrorDialog(R.string.error_cannot_connect)
+                new ErrorDialog(R.string.error_unknown)
                         .show(getParentFragmentManager(), null);
                 return;
             }
@@ -97,7 +96,7 @@ public class MainFragment extends Fragment {
         /** Creates a welcome message based on the user's id
          * This currently prints the user's id, but later should print their name **/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
-        welcomeText.setText("Welcome " + currentUser.toString() + ", you have " + UsersGroups.size() + " groups");
+        welcomeText.setText("Welcome " + currentUser.toString());
 
         view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,7 +145,7 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(0);
+                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment("None");
                 action.setGroupID(groupLink.getGroupId());
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
             }

@@ -10,6 +10,7 @@
     <string name="submit">Submit</string>
     <string name="confirm">Confirm</string>
     <string name="ok">OK</string>
+    <string name="back">Back</string>
 
     <!-- Create Group -->
     <string name="title_create_group">Create A New Group</string>

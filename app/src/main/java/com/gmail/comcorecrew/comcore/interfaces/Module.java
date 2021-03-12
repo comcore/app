@@ -20,5 +20,5 @@ public interface Module {
     boolean fromCache(Context context);
 
     //Returns the id of the group that the module is in.
-    int getGroupId();
+    String getGroupId();
 }

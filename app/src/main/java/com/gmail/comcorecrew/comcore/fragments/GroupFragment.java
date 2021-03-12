@@ -21,7 +21,7 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
 public class GroupFragment extends Fragment {
 
     /** The id of the group that this fragment displays **/
-    private int currentGroupID;
+    private String currentGroupID;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -64,6 +64,14 @@ public class GroupFragment extends Fragment {
          * object using currentGroupID, and then get the group name from that object**/
         TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
         welcomeText.setText(currentGroupID);
+
+        /**
+         * If the "back" button is clicked, return to the main page
+         */
+        view.findViewById(R.id.group_back_button).setOnClickListener(clickedView -> {
+            NavHostFragment.findNavController(GroupFragment.this)
+                    .navigate(R.id.action_groupFragment_to_mainFragment);
+        });
 
     }
 

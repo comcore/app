@@ -12,7 +12,7 @@
         android:clickable="false">
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/label_create_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -28,15 +28,12 @@
             android:id="@+id/create_group_submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="159dp"
-            android:layout_marginEnd="159dp"
-            android:layout_marginBottom="52dp"
-            android:background="@color/primary"
+            android:layout_marginEnd="60dp"
+            android:layout_marginBottom="48dp"
             android:text="@string/submit"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <EditText
             android:id="@+id/editGroupName"
@@ -51,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+            app:layout_constraintTop_toBottomOf="@+id/label_create_group" />
 
         <Switch
             android:id="@+id/switch_calendar"
@@ -160,6 +157,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editGroupName" />
+
+        <Button
+            android:id="@+id/create_group_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="114dp"
+            android:layout_marginBottom="48dp"
+            android:text="@string/back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/create_group_submit_button"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
