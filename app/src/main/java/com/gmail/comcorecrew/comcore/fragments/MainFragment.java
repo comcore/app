@@ -25,6 +25,8 @@ import android.widget.TextView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
@@ -115,6 +117,26 @@ public class MainFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.mainmenu, menu);
 
+    }
+
+    /**
+     * Handles click events for the option menu
+     * Most menu items are not visible unless viewing GroupFragment
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.invitesFragment:
+                /** Handle viewing list of members **/
+
+                new ViewInvitesDialog()
+                        .show(getParentFragmentManager(), null);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
