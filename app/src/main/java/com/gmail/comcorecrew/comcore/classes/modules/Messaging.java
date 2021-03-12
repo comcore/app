@@ -25,19 +25,22 @@ import java.util.Collection;
 public class Messaging implements Module {
     private Context context;
     private String name; //Name of chat
-    private final Group group; //Group that the chat is in
+    //private final Group group; //Group that the chat is in
     private final int mnum; //Module number
     private ChatID id;
+    private GroupID groupID; //temp
     private ArrayList<MsgCacheable> messages; //Messages
 
     private ArrayList<UserEntry> users;
 
-    public Messaging(Context context, Group group, String name, ChatID id) {
+    public Messaging(Context context, GroupID groupID, String name, ChatID id) {
         this.context = context;
-        this.group = group;
+        //this.group = group;
         this.name = name;
         this.id = id;
-        this.mnum = group.addModule(this);
+        this.mnum = 0; //temp
+        this.groupID = groupID; //temp
+        //this.mnum = group.addModule(this);
         messages = new ArrayList<>();
         users = new ArrayList<>();
     }
@@ -62,7 +65,8 @@ public class Messaging implements Module {
 
     @Override
     public String getGroupId() {
-        return group.getGroupId().id;
+        //return group.getGroupId().id;
+        return groupID.id;
     }
 
     public int getMnum() {
@@ -73,8 +77,10 @@ public class Messaging implements Module {
         return id;
     }
 
-    public Group getGroup() {
-        return group;
+    public GroupID getGroup() {
+    //public Group getGroup() {
+        //return group;
+        return groupID;
     }
 
     public String getName() {
