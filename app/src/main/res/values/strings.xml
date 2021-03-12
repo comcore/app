@@ -85,5 +85,6 @@
     <string name="pick_add_moderator">Pick a new moderator.</string>
     <string name="pick_remove_moderator">Pick a moderator to remove.</string>
     <string name="pick_transfer_ownership">Pick a new owner.</string>
+    <string name="pick_kick_user">Pick a user to kick.</string>
 
 </resources>

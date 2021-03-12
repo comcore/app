@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class ViewMembersDialog extends DialogFragment {
      * 1 - Transfer Ownership
      * 2 - Add Moderator
      * 3 - Remove Moderator
+     * 4 - Kick User
      */
     private int flag;
 
@@ -77,6 +79,9 @@ public class ViewMembersDialog extends DialogFragment {
         }
         else if (flag == 3) {
             labelViewMembers.setText(R.string.pick_remove_moderator);
+        }
+        else if (flag == 4) {
+            labelViewMembers.setText(R.string.pick_kick_user);
         }
 
 
@@ -135,11 +140,9 @@ public class ViewMembersDialog extends DialogFragment {
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.owner_color);
 
-
-                            // TODO Success Message
                         }
                         else {
-                            // TODO Failure Message
+
                         }
                     });
 
@@ -148,12 +151,12 @@ public class ViewMembersDialog extends DialogFragment {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.MODERATOR, result -> {
                         if (result.isSuccess()) {
 
-                            // TODO Success Message
+
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
                         }
                         else {
-                            // TODO Failure Message
+
                         }
                     });
                 }
@@ -161,12 +164,20 @@ public class ViewMembersDialog extends DialogFragment {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.USER, result -> {
                         if (result.isSuccess()) {
 
-                            // TODO Success Message
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
 
                         }
                         else {
-                            // TODO Failure Message
+
+                        }
+                    });
+                }
+                else if (flag == 4) {
+                    ServerConnector.kick(currentGroup, currentUser.getID(), result -> {
+                        if (result.isSuccess()) {
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
+
                         }
                     });
                 }
