@@ -29,6 +29,7 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
 import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
+    public static ArrayList<Group> groups =  new ArrayList<>();
 
     private CustomAdapter groupAdapter;
 
@@ -115,9 +116,6 @@ public class MainFragment extends Fragment {
      * the list of groups in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-
-        private ArrayList<Group> userGroups = new ArrayList<>();
-
         /**
          * Provide a reference to the type of views that you are using
          * (custom ViewHolder).
@@ -176,7 +174,8 @@ public class MainFragment extends Fragment {
                             result.data[i].id, result.data[i].role, result.data[i].muted);
                     userGroups.add(nextGroup);
                 }
-                this.userGroups = userGroups;
+                groups = userGroups;
+
                 notifyDataSetChanged();
             });
         }
@@ -197,31 +196,35 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(userGroups.get(position).getName());
-            viewHolder.setGroup(userGroups.get(position));
+            viewHolder.getTextView().setText(groups.get(position).getName());
+            viewHolder.setGroup(groups.get(position));
 
-            /** Changes or removes the image on each group list item based on whether
+            /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
              * the owner tag will take preference.
              *
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            if (userGroups.get(position).getGroupRole() == GroupRole.OWNER) {
-                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
-            }
-            else if (userGroups.get(position).getGroupRole() == GroupRole.MODERATOR) {
-                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
-            }
-            else {
-                viewHolder.viewTag.setVisibility(View.INVISIBLE);
+            switch (groups.get(position).getGroupRole()) {
+                case OWNER:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
+                    break;
+                case MODERATOR:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    break;
+                case USER:
+                    viewHolder.viewTag.setVisibility(View.INVISIBLE);
+                    break;
             }
         }
 
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return userGroups.size();
+            return groups.size();
         }
     }
 

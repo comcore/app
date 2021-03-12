@@ -12,7 +12,9 @@ import com.gmail.comcorecrew.comcore.server.id.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,10 +79,16 @@ public final class ServerConnector {
     public static void foreachListener(Function<NotificationListener, Boolean> function) {
         new Handler(Looper.getMainLooper()).post(() -> {
             synchronized (notificationListeners) {
-                for (NotificationListener listener : notificationListeners) {
+                ArrayDeque<NotificationListener> listeners = new ArrayDeque<>(notificationListeners);
+                while (!listeners.isEmpty()) {
                     try {
+                        NotificationListener listener = listeners.pop();
                         if (function.apply(listener)) {
                             break;
+                        }
+                        Collection<? extends NotificationListener> children = listener.getChildren();
+                        if (children != null) {
+                            listeners.addAll(children);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

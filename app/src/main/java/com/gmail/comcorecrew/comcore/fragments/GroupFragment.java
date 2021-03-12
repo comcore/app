@@ -89,9 +89,13 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groupmenu, menu);
-        inflater.inflate(R.menu.mainmenu, menu);
+        /*
+         * Possibly re-enable this. Currently I disabled it since the main menu has different items
+         * than the group menu, and the 'Refresh' button won't work in the group.
+         */
+        // inflater.inflate(R.menu.mainmenu, menu);
 
-        /**
+        /*
          * If the current user is a moderator, display R.id.menu_group_moderator_actions
          * If the current user is an owner, display R.id.menu_group_owner_actions
          * and R.id.menu_group_moderator_actions
@@ -122,7 +126,7 @@ public class GroupFragment extends Fragment {
             case R.id.view_members:
                 /** Handle viewing list of members **/
 
-                new ViewMembersDialog(currentGroup.getUsers())
+                new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 0)
                         .show(getParentFragmentManager(), null);
                 return true;
             case R.id.leave_group:
@@ -147,16 +151,18 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.add_moderator:
                 /** Handle adding moderator **/
-                TransferOwnershipDialog addModeratorDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.MODERATOR, R.string.add_moderator);
+                ViewMembersDialog addModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 2);
                 addModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.remove_moderator:
                 /** Handle removing moderator **/
-                TransferOwnershipDialog removeModeratorDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.USER, R.string.remove_moderator);
+                ViewMembersDialog removeModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 3);
                 removeModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.kick_member:
                 /** Handle kicking member **/
+                ViewMembersDialog kickUserDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 4);
+                kickUserDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
                 /** Handle disabling/enabling chat **/
@@ -164,7 +170,7 @@ public class GroupFragment extends Fragment {
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/
 
-                TransferOwnershipDialog transferOwnershipDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.OWNER, R.string.transfer_ownership);
+                ViewMembersDialog transferOwnershipDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 1);
                 transferOwnershipDialog.show(getParentFragmentManager(), null);
 
                 return true;

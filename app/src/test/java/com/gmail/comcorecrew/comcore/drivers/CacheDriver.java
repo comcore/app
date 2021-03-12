@@ -4,9 +4,15 @@ import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class CacheDriver implements Module {
 
@@ -41,8 +47,8 @@ public class CacheDriver implements Module {
     }
 
     @Override
-    public int getGroupId() {
-        return 0;
+    public String getGroupId() {
+        return "";
     }
 
     public ArrayList<Cacheable> getData() {
@@ -51,5 +57,28 @@ public class CacheDriver implements Module {
 
     public void setData(ArrayList<Cacheable> data) {
         this.data = data;
+    }
+
+    @Override
+    public void onReceiveMessage(MessageEntry message) {}
+
+    @Override
+    public void onInvitedToGroup(GroupInviteEntry invite) {}
+
+    @Override
+    public void onRoleChanged(GroupID group, GroupRole role) {}
+
+    @Override
+    public void onMuteChanged(GroupID group, boolean muted) {}
+
+    @Override
+    public void onKicked(GroupID group) {}
+
+    @Override
+    public void onLoggedOut() {}
+
+    @Override
+    public Collection<? extends NotificationListener> getChildren() {
+        return null;
     }
 }

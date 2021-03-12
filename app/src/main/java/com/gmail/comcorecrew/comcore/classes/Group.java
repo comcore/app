@@ -6,16 +6,18 @@ import android.os.Parcelable;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Collection;
 
-public class Group implements Parcelable {
+public class Group implements Parcelable, NotificationListener {
     private static int numGroups = 0;
 
     private GroupID groupID;
@@ -121,5 +123,32 @@ public class Group implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(groupName);
         dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
+    }
+
+    @Override
+    public void onReceiveMessage(MessageEntry message) {}
+
+    @Override
+    public void onInvitedToGroup(GroupInviteEntry invite) {}
+
+    @Override
+    public void onRoleChanged(GroupID group, GroupRole role) {
+        groupRole = role;
+    }
+
+    @Override
+    public void onMuteChanged(GroupID group, boolean muted) {
+        isMuted = muted;
+    }
+
+    @Override
+    public void onKicked(GroupID group) {}
+
+    @Override
+    public void onLoggedOut() {}
+
+    @Override
+    public Collection<? extends NotificationListener> getChildren() {
+        return modules;
     }
 }

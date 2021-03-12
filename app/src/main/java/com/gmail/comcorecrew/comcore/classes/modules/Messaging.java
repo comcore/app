@@ -7,9 +7,12 @@ import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -17,25 +20,24 @@ import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class Messaging implements Module {
-
+    private Context context;
     private String name; //Name of chat
-    //private final Group group; //Group that the chat is in
+    private final Group group; //Group that the chat is in
     private final int mnum; //Module number
     private ChatID id;
     private ArrayList<MsgCacheable> messages; //Messages
-    private GroupID groupId; //temp
 
     private ArrayList<UserEntry> users;
 
-    public Messaging(GroupID groupId, String name, ChatID id) {
-        //this.group = group;
+    public Messaging(Context context, Group group, String name, ChatID id) {
+        this.context = context;
+        this.group = group;
         this.name = name;
         this.id = id;
-        //this.mnum = group.addModule(this);
-        this.mnum = 0; //temp
-        this.groupId = groupId;
+        this.mnum = group.addModule(this);
         messages = new ArrayList<>();
         users = new ArrayList<>();
     }
@@ -60,8 +62,7 @@ public class Messaging implements Module {
 
     @Override
     public String getGroupId() {
-        return groupId.id;
-        //return group.getGroupId().id;
+        return group.getGroupId().id;
     }
 
     public int getMnum() {
@@ -72,12 +73,8 @@ public class Messaging implements Module {
         return id;
     }
 
-    //public Group getGroup() {
-    //    return group;
-    //}
-
-    public GroupID getGroup() {
-        return groupId;
+    public Group getGroup() {
+        return group;
     }
 
     public String getName() {
@@ -150,20 +147,65 @@ public class Messaging implements Module {
     }
 
     /*
+     * Get the MessageID of the latest message
+     */
+    private MessageID latestMessageId() {
+        if (messages.isEmpty()) {
+            return null;
+        } else {
+            return new MessageID(id, messages.get(messages.size() - 1).getMessageid());
+        }
+    }
+
+    /*
      * Gets messages from the server and caches them
      */
-    public void refreshMessages(Context context) {
-        ServerConnector.getMessages(id,
-                new MessageID(id, messages.get(messages.size() - 1).getMessageid()),
-                null, result -> {
+    public void refreshMessages() {
+        MessageID lastMessageId = latestMessageId();
+        ServerConnector.getMessages(id, lastMessageId, null, result -> {
             if (result.isFailure()) {
                 return;
+            }
+
+            // If the message isn't immediately after the existing messages, clear the cache
+            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessageId)) {
+                messages.clear();
             }
 
             for (MessageEntry entry : result.data) {
                 addMessage(entry);
             }
-                });
+        });
         this.toCache(context);
+    }
+
+    @Override
+    public void onReceiveMessage(MessageEntry message) {
+        MessageID lastMessageId = latestMessageId();
+        if (!message.id.immediatelyAfter(lastMessageId)) {
+            messages.clear();
+        }
+        addMessage(message);
+        this.toCache(context);
+    }
+
+    @Override
+    public void onInvitedToGroup(GroupInviteEntry invite) {}
+
+    @Override
+    public void onRoleChanged(GroupID group, GroupRole role) {}
+
+    @Override
+    public void onMuteChanged(GroupID group, boolean muted) {}
+
+    @Override
+    public void onKicked(GroupID group) {}
+
+    @Override
+    public void onLoggedOut() {}
+
+    @Override
+    public Collection<? extends NotificationListener> getChildren() {
+        return null;
     }
 }
