@@ -25,6 +25,7 @@ public class TransferOwnershipDialog extends DialogFragment {
     public TransferOwnershipDialog(GroupID groupID, GroupRole targetRole, int message) {
         this.message = message;
         this.groupID = groupID;
+        this.targetRole = targetRole;
     }
 
 
@@ -43,8 +44,6 @@ public class TransferOwnershipDialog extends DialogFragment {
                         UserID userEmail = new UserID(text.getText().toString());
                         ServerConnector.setRole(groupID, userEmail, targetRole, result -> {
                             if (result.isFailure()) {
-                                new ErrorDialog(R.string.error_cannot_connect)
-                                        .show(getParentFragmentManager(), null);
                                 return;
                             }
 
