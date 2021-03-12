@@ -9,13 +9,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.gmail.comcorecrew.comcore.R;
 
-public class ErrorDialog extends DialogFragment {
-    private final int message;
-
-    public ErrorDialog(int message) {
-        this.message = message;
-    }
-
+public class ConfirmEmailDialog extends DialogFragment {
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {

@@ -16,7 +16,6 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
-
 public class CreateUserFragment extends Fragment {
 
     public CreateUserFragment() {
