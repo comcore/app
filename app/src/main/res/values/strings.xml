@@ -57,11 +57,13 @@
     <string name="error_missing_data">Please enter all necessary information.</string>
     <string name="error_unknown">An error occurred.</string>
     <string name="error_set_role">The role of the user could not be changed.</string>
+    <string name="error_send_invite">The invitation could not be sent.</string>
 
 
     <!-- Confirm/Cancel Messages -->
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
     <string name="success_set_role">The role of the user was successfully changed.</string>
+    <string name="success_send_invite">The invitation was sent!</string>
 
 </resources>

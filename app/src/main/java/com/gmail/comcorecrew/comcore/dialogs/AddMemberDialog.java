@@ -8,6 +8,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.gmail.comcorecrew.comcore.R;
@@ -17,16 +18,14 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
-public class TransferOwnershipDialog extends DialogFragment {
+public class AddMemberDialog extends DialogFragment {
     private final int message;
     private GroupID groupID;
-    private GroupRole targetRole;
 
-    public TransferOwnershipDialog(GroupID groupID, GroupRole targetRole, int message) {
+    public AddMemberDialog(GroupID groupID, int message) {
         this.message = message;
         this.groupID = groupID;
     }
-
 
     @Override
     @NonNull
@@ -40,8 +39,8 @@ public class TransferOwnershipDialog extends DialogFragment {
                         this.dismiss();
                     }
                     else {
-                        UserID userEmail = new UserID(text.getText().toString());
-                        ServerConnector.setRole(groupID, userEmail, targetRole, result -> {
+                        String userEmail = text.getText().toString();
+                        ServerConnector.sendInvite(groupID, userEmail, result -> {
                             if (result.isSuccess()) {
                                 // TODO Show success message
                             }

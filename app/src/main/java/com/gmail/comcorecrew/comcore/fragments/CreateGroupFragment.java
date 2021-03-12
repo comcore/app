@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.MemberEmailDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -53,17 +52,6 @@ public class CreateGroupFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        /** If the "Add from email" button is clicked, allow the user to enter the email of
-         * a user they want to add to the new group
-         */
-        view.findViewById(R.id.m_email_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MemberEmailDialog emailDialog = new MemberEmailDialog();
-                emailDialog.show(getParentFragmentManager(), "member_email");
-            }
-        });
 
         /**
          * If the "back" button is clicked, return to the main page

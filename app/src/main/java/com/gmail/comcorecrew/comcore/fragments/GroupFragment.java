@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.TransferOwnershipDialog;
@@ -140,6 +141,8 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.invite_member:
                 /** Handle inviting a new member **/
+                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
+                addMemberDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
                 /** Handle adding moderator **/
