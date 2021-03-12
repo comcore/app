@@ -13,6 +13,7 @@ import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
@@ -20,18 +21,21 @@ import java.util.ArrayList;
 public class Messaging implements Module {
 
     private String name; //Name of chat
-    private final Group group; //Group that the chat is in
+    //private final Group group; //Group that the chat is in
     private final int mnum; //Module number
     private ChatID id;
     private ArrayList<MsgCacheable> messages; //Messages
+    private GroupID groupId; //temp
 
     private ArrayList<UserEntry> users;
 
-    public Messaging(Group group, String name, ChatID id) {
-        this.group = group;
+    public Messaging(GroupID groupId, String name, ChatID id) {
+        //this.group = group;
         this.name = name;
         this.id = id;
-        this.mnum = group.addModule(this);
+        //this.mnum = group.addModule(this);
+        this.mnum = 0; //temp
+        this.groupId = groupId;
         messages = new ArrayList<>();
         users = new ArrayList<>();
     }
@@ -56,7 +60,8 @@ public class Messaging implements Module {
 
     @Override
     public String getGroupId() {
-        return group.getGroupId().id;
+        return groupId.id;
+        //return group.getGroupId().id;
     }
 
     public int getMnum() {
@@ -67,8 +72,12 @@ public class Messaging implements Module {
         return id;
     }
 
-    public Group getGroup() {
-        return group;
+    //public Group getGroup() {
+    //    return group;
+    //}
+
+    public GroupID getGroup() {
+        return groupId;
     }
 
     public String getName() {

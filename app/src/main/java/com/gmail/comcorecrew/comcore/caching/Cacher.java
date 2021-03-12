@@ -19,7 +19,7 @@ public class Cacher {
     public static boolean cacheData(ArrayList<Cacheable> data, Module module, Context context) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
-            File cacheDir = new File(context.getCacheDir(), String.valueOf(module.getGroupId()));
+            File cacheDir = new File(context.getCacheDir(), module.getGroupId());
             if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
                 return false;
             }
