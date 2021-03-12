@@ -1,20 +1,29 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
+import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.ArrayList;
 
@@ -22,9 +31,19 @@ public class ViewMembersDialog extends DialogFragment {
     private RecyclerView recycleView;
     private MainFragment.CustomAdapter adapter;
     private ArrayList<User> userList;
+    private GroupID currentGroup;
 
-    public ViewMembersDialog (ArrayList<User> userList) {
+    /** 0 - View Members
+     * 1 - Transfer Ownership
+     * 2 - Add Moderator
+     * 3 - Remove Moderator
+     */
+    private int flag;
+
+    public ViewMembersDialog (ArrayList<User> userList, GroupID currentGroup, int flag) {
         this.userList = userList;
+        this.flag = flag;
+        this.currentGroup = currentGroup;
     }
 
     @Override
@@ -35,7 +54,7 @@ public class ViewMembersDialog extends DialogFragment {
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_members_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        ViewMembersDialog.CustomAdapter groupAdapter = new ViewMembersDialog.CustomAdapter(userList);
+        ViewMembersDialog.CustomAdapter groupAdapter = new ViewMembersDialog.CustomAdapter(userList, flag);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
@@ -44,6 +63,22 @@ public class ViewMembersDialog extends DialogFragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        TextView labelViewMembers = view.findViewById(R.id.label_view_members);
+
+        if (flag == 0) {
+            labelViewMembers.setText(R.string.view_members);
+        }
+        else if (flag == 1) {
+            labelViewMembers.setText(R.string.pick_transfer_ownership);
+        }
+        else if (flag == 2) {
+            labelViewMembers.setText(R.string.pick_add_moderator);
+        }
+        else if (flag == 3) {
+            labelViewMembers.setText(R.string.pick_remove_moderator);
+        }
+
 
         /**
          * If the "back" button is clicked, close the dialog box
@@ -61,22 +96,80 @@ public class ViewMembersDialog extends DialogFragment {
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
         private ArrayList<User> userList;
+        private int flag;
 
         /**
          * Provide a reference to the type of views that you are using
          * (custom ViewHolder).
          */
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
+            private User currentUser;
+            private ImageView memberViewTag;
 
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
 
                 textView = (TextView) view.findViewById(R.id.label_member);
+                memberViewTag = (ImageView) view.findViewById(R.id.view_member_tag);
             }
 
             public TextView getTextView() {
                 return textView;
+            }
+
+            public void setCurrentUser(User currentUser) {
+                this.currentUser = currentUser;
+            }
+
+            /** TODO Remove SuppressLint */
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void onClick(View view) {
+
+                if (flag == 1) {
+                    ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.OWNER, result -> {
+                        if (result.isSuccess()) {
+
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.owner_color);
+
+
+                            // TODO Success Message
+                        }
+                        else {
+                            // TODO Failure Message
+                        }
+                    });
+
+                }
+                else if (flag == 2) {
+                    ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.MODERATOR, result -> {
+                        if (result.isSuccess()) {
+
+                            // TODO Success Message
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
+                        }
+                        else {
+                            // TODO Failure Message
+                        }
+                    });
+                }
+                else if (flag == 3) {
+                    ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.USER, result -> {
+                        if (result.isSuccess()) {
+
+                            // TODO Success Message
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+
+                        }
+                        else {
+                            // TODO Failure Message
+                        }
+                    });
+                }
             }
 
         }
@@ -84,9 +177,10 @@ public class ViewMembersDialog extends DialogFragment {
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(ArrayList<User> users) {
+        public CustomAdapter(ArrayList<User> users, int flag) {
 
-            userList = users;
+            this.userList = users;
+            this.flag = flag;
         }
 
         // Create new views (invoked by the layout manager)
@@ -103,12 +197,12 @@ public class ViewMembersDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            // Get element from your dataset at this position and replace the
-            // contents of the view with that element
             viewHolder.getTextView().setText(userList.get(position).getName());
+            viewHolder.setCurrentUser(userList.get(position));
+            viewHolder.memberViewTag.setVisibility(View.INVISIBLE);
+
         }
 
-        // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
             return userList.size();
