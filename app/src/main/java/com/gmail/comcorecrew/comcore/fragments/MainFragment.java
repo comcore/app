@@ -38,6 +38,8 @@ public class MainFragment extends Fragment {
     // An ArrayList of groups the current user is a member of
     private ArrayList<Group> UsersGroups;
 
+    private CustomAdapter groupAdapter;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -74,7 +76,7 @@ public class MainFragment extends Fragment {
                 // Create the RecyclerView
                 RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
                 rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-                CustomAdapter groupAdapter = new CustomAdapter(currentUser, UsersGroups);
+                groupAdapter = new CustomAdapter(currentUser, UsersGroups);
                 rvGroups.setAdapter(groupAdapter);
                 rvGroups.setItemAnimator(new DefaultItemAnimator());
 
@@ -123,7 +125,7 @@ public class MainFragment extends Fragment {
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private ImageView viewTag;
-            private Group groupLink;
+            private Group currentGroup;
 
             public ViewHolder(View view) {
                 super(view);
@@ -140,14 +142,16 @@ public class MainFragment extends Fragment {
             }
 
             public void setGroup(Group currentGroup) {
-                groupLink = currentGroup;
+                this.currentGroup = currentGroup;
             }
 
             @Override
             public void onClick(View view) {
-                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment("None");
-                action.setGroupID(groupLink.getGroupId());
-                NavHostFragment.findNavController(MainFragment.this).navigate(action);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("currentGroup", currentGroup);
+
+                NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_mainFragment_to_groupFragment, bundle);
             }
         }
 
@@ -202,7 +206,5 @@ public class MainFragment extends Fragment {
             return UserGroups.size();
         }
     }
-
-
 
 }

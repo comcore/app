@@ -1,6 +1,8 @@
 package com.gmail.comcorecrew.comcore.classes;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
@@ -13,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Group {
+public class Group implements Parcelable {
     private static int numGroups = 0;
 
     private UUID externalId;
@@ -44,6 +46,37 @@ public class Group {
         File cacheDir = new File(context.getCacheDir(), "gr" + this.groupID);
         cacheDir.mkdir();
     }
+
+    protected Group(Parcel in) {
+        groupID = in.readString();
+        groupName = in.readString();
+        byte tmpIsMuted = in.readByte();
+        isMuted = tmpIsMuted == 0 ? null : tmpIsMuted == 1;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(groupID);
+        dest.writeString(groupName);
+        dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Group> CREATOR = new Creator<Group>() {
+        @Override
+        public Group createFromParcel(Parcel in) {
+            return new Group(in);
+        }
+
+        @Override
+        public Group[] newArray(int size) {
+            return new Group[size];
+        }
+    };
 
     public String getName() {
         return groupName;

@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.fragments;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -16,11 +17,18 @@ import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+
+import java.util.ArrayList;
 
 public class GroupFragment extends Fragment {
 
-    /** The id of the group that this fragment displays **/
+    private Group currentGroup;
     private String currentGroupID;
 
     public GroupFragment() {
@@ -33,18 +41,20 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        /** TODO
-         * The fragment should retrieve Group and User objects using the ids passed to it
-         */
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            currentGroup = bundle.getParcelable("currentGroup");
+            currentGroupID = currentGroup.getGroupId();
 
-        /** When the fragment is created, GroupFragment should get a Group using the ID number
-         * passed to it by MainFragment. **/
-        currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
-
+        }
+        else {
+            new ErrorDialog(R.string.error_unknown)
+                    .show(getParentFragmentManager(), null);
+        }
     }
 
     @Override
@@ -99,6 +109,9 @@ public class GroupFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.view_members:
                 /** Handle viewing list of members **/
+
+                new ViewMembersDialog(currentGroup.getUsers())
+                        .show(getParentFragmentManager(), null);
                 return true;
             case R.id.leave_group:
                 /** Handle leaving group **/

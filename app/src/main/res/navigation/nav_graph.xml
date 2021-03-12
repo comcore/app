@@ -61,9 +61,6 @@
         android:name="com.gmail.comcorecrew.comcore.fragments.GroupFragment"
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" >
-        <argument
-            android:name="groupID"
-            app:argType="string" />
         <action
             android:id="@+id/action_groupFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
