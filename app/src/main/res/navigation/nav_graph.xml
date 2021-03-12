@@ -7,7 +7,11 @@
         android:id="@+id/createGroupFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CreateGroupFragment"
         android:label="fragment_create_group"
-        tools:layout="@layout/fragment_create_group" />
+        tools:layout="@layout/fragment_create_group" >
+        <action
+            android:id="@+id/action_createGroupFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.SettingsFragment"
@@ -57,8 +61,8 @@
         android:name="com.gmail.comcorecrew.comcore.fragments.GroupFragment"
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" >
-        <argument
-            android:name="groupID"
-            app:argType="integer" />
+        <action
+            android:id="@+id/action_groupFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
 </navigation>

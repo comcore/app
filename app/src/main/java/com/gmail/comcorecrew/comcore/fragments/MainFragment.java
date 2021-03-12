@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,10 @@ import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -32,12 +37,11 @@ import java.util.UUID;
 
 public class MainFragment extends Fragment {
 
-    // The ID of the user currently viewing the main page
-    private static UserEntry currentUser;
-    private UserID otherUser;
-
+    private UserEntry currentUser;
     // An ArrayList of groups the current user is a member of
     private ArrayList<Group> UsersGroups;
+
+    private CustomAdapter groupAdapter;
 
     public MainFragment() {
         // Required empty public constructor
@@ -53,22 +57,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         UsersGroups = new ArrayList<Group>();
-
-        /** TODO
-         * Creates a new UserID based on the string passed by the Login Fragment.
-         * This is for client testing only
-         * The app should retrieve a user's information using the user id string given
-         * to it by LoginFragment **/
         currentUser = ServerConnector.getUser();
-
-        /** TODO Create placeholder groups
-         * This is for client testing only and should be removed later
-         * These changes aren't implemented in this commit *
-        otherUser = new UserID("Other User");
-        UsersGroups.add(new Group("Owned Group", currentUser));
-        UsersGroups.add(new Group("Moderated Group", otherUser));
-        //UsersGroups.get(1).testsetModerator(currentUser);
-        UsersGroups.add(new Group("Member Group", otherUser));*/
 
     }
 
@@ -78,12 +67,30 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
-        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomAdapter groupAdapter = new CustomAdapter(currentUser.id, UsersGroups);
-        rvGroups.setAdapter(groupAdapter);
-        rvGroups.setItemAnimator(new DefaultItemAnimator());
+        ServerConnector.getGroups( result -> {
+
+            if (result.isSuccess()) {
+                for (int i = 0; i < result.data.length; i++) {
+                    Group nextGroup = new Group(this.getContext(), result.data[i].name,
+                            result.data[i].id, result.data[i].role, result.data[i].muted);
+                    UsersGroups.add(nextGroup);
+                }
+
+                // Create the RecyclerView
+                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
+                rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+                groupAdapter = new CustomAdapter(currentUser, UsersGroups);
+                rvGroups.setAdapter(groupAdapter);
+                rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+                return;
+            }
+            else if (result.isFailure()) {
+                new ErrorDialog(R.string.error_unknown)
+                        .show(getParentFragmentManager(), null);
+                return;
+            }
+        });
 
         return rootView;
     }
@@ -106,6 +113,32 @@ public class MainFragment extends Fragment {
 
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.mainmenu, menu);
+
+    }
+
+    /**
+     * Handles click events for the option menu
+     * Most menu items are not visible unless viewing GroupFragment
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.invitesFragment:
+                /** Handle viewing list of members **/
+
+                new ViewInvitesDialog()
+                        .show(getParentFragmentManager(), null);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
      * the list of groups in the GUI
      */
@@ -121,7 +154,7 @@ public class MainFragment extends Fragment {
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private ImageView viewTag;
-            private Group groupLink;
+            private Group currentGroup;
 
             public ViewHolder(View view) {
                 super(view);
@@ -138,22 +171,24 @@ public class MainFragment extends Fragment {
             }
 
             public void setGroup(Group currentGroup) {
-                groupLink = currentGroup;
+                this.currentGroup = currentGroup;
             }
 
             @Override
             public void onClick(View view) {
-                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(0);
-                action.setGroupID(groupLink.getGroupId());
-                NavHostFragment.findNavController(MainFragment.this).navigate(action);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("currentGroup", currentGroup);
+
+                NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_mainFragment_to_groupFragment, bundle);
             }
         }
 
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(UserID user, ArrayList<Group> dataSet) {
-            this.user = user;
+        public CustomAdapter(UserEntry user, ArrayList<Group> dataSet) {
+            this.user = user.id;
             UserGroups = dataSet;
         }
 
@@ -183,10 +218,10 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            if (UserGroups.get(position).getOwner().equals(user)) {
+            if (UserGroups.get(position).getGroupRole() == GroupRole.OWNER) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
             }
-            else if (UserGroups.get(position).getModerators().contains(user)) {
+            else if (UserGroups.get(position).getGroupRole() == GroupRole.MODERATOR) {
                 viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
             }
             else {
@@ -200,7 +235,5 @@ public class MainFragment extends Fragment {
             return UserGroups.size();
         }
     }
-
-
 
 }

@@ -65,7 +65,14 @@ public final class GroupEntry {
      */
     public static GroupEntry fromJson(JsonObject json) {
         GroupID id = new GroupID(json.get("id").getAsString());
+
+        /** Currently, the json does not return name from the server
+         * Until this bug is fixed, the group's name is set as the id
+         */
         String name = json.get("name").getAsString();
+        //String name = id.toString();
+
+
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
         boolean muted = json.get("muted").getAsBoolean();
         return new GroupEntry(id, name, role, muted);

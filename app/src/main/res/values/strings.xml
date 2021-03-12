@@ -4,12 +4,14 @@
     <string name="action_create_group">New Group</string>
     <string name="action_main_activity">Main Screen</string>
 
-    <string name="error_unknown">**Unknown**</string>
     <!-- General Buttons -->
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
     <string name="confirm">Confirm</string>
     <string name="ok">OK</string>
+    <string name="back">Back</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
 
     <!-- Create Group -->
     <string name="title_create_group">Create A New Group</string>
@@ -57,5 +59,23 @@
     <string name="error_already_exists">An account with that email address already exists.</string>
     <string name="error_incorrect_code">Incorrect code. Please try again.</string>
     <string name="error_missing_data">Please enter all necessary information.</string>
+
+    <string name="error_unknown">An error occurred.</string>
+    <string name="error_set_role">The role of the user could not be changed.</string>
+    <string name="error_send_invite">The invitation could not be sent.</string>
+
+
+
+    <string name="cc_leave_group">Are you sure you want to leave the group?</string>
+
+    <!-- Success Messages -->
+    <string name="success_set_role">The role of the user was successfully changed.</string>
+    <string name="success_send_invite">The invitation was sent!</string>
+
+
+    <!-- Invitation Messages -->
+    <string name="view_invites">View Invitations</string>
+
     <string name="error_missing_pass">Please enter a new password.</string>
+
 </resources>

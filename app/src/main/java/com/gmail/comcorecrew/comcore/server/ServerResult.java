@@ -134,7 +134,7 @@ public final class ServerResult<T> {
         if (isSuccess()) {
             return "success(" + data + ")";
         } else {
-            return "failure(" + errorMessage + ")";
+            return "failure(" + errorMessage + " actually is " + data + ")";
         }
     }
 }

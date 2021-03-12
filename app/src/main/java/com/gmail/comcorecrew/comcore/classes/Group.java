@@ -1,8 +1,13 @@
 package com.gmail.comcorecrew.comcore.classes;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
@@ -10,48 +15,83 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Group {
+public class Group implements Parcelable {
     private static int numGroups = 0;
 
     private UUID externalId;
-    private String name;
-    private int groupId;
+
+    private GroupID groupID;
+    private String groupName;
+    private GroupRole groupRole;
+    private Boolean isMuted;
+
     private ArrayList<Module> modules;
-    private ArrayList<UserID> users;
+    private ArrayList<User> users;
     private ArrayList<UserID> moderators;
     private UserID owner;
 
-    public Group(Context context, UUID externalID, String name, UserID owner) {
-        numGroups++;
-        groupId = numGroups;
-        this.owner = owner;
-        this.externalId = externalId;
-        this.name = name;
-        modules = new ArrayList<Module>();
-        users = new ArrayList<UserID>();
-        moderators = new ArrayList<UserID>();
-        File cacheDir = new File(context.getCacheDir(), "gr" + groupId);
+    public Group(Context context, String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
+        this.groupID = groupID;
+        this.groupName = name;
+        this.groupRole = groupRole;
+        users = new ArrayList<User>();
+        ServerConnector.getUsers(groupID, result -> {
+            for (int i = 0; i < result.data.length; i++) {
+                User nextUser = new User(result.data[i].id, result.data[i].name);
+                users.add(nextUser);
+            }
+        });
+        this.isMuted = isMuted;
+
+        File cacheDir = new File(context.getCacheDir(), "gr" + this.groupID);
         cacheDir.mkdir();
     }
 
+
+    protected Group(Parcel in) {
+        groupName = in.readString();
+        byte tmpIsMuted = in.readByte();
+        isMuted = tmpIsMuted == 0 ? null : tmpIsMuted == 1;
+    }
+
+    public static final Creator<Group> CREATOR = new Creator<Group>() {
+        @Override
+        public Group createFromParcel(Parcel in) {
+            return new Group(in);
+        }
+
+        @Override
+        public Group[] newArray(int size) {
+            return new Group[size];
+        }
+    };
+
     public String getName() {
-        return name;
+        return groupName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.groupName = name;
     }
 
-    public int getGroupId() {
-        return groupId;
+    public GroupID getGroupId() {
+        return groupID;
     }
 
-    public ArrayList<UserID> getUsers() {
+    public ArrayList<User> getUsers() {
         return users;
     }
 
     public ArrayList<UserID> getModerators() {
         return moderators;
+    }
+
+    public GroupRole getGroupRole() {
+        return groupRole;
+    }
+
+    public Boolean getIsMuted() {
+        return isMuted;
     }
 
     public UserID getOwner() {
@@ -72,5 +112,16 @@ public class Group {
         }
         modules.add(module);
         return num;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(groupName);
+        dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
     }
 }
