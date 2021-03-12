@@ -175,6 +175,7 @@ public class MainFragment extends Fragment {
                     userGroups.add(nextGroup);
                 }
                 groups = userGroups;
+
                 notifyDataSetChanged();
             });
         }
@@ -198,21 +199,25 @@ public class MainFragment extends Fragment {
             viewHolder.getTextView().setText(groups.get(position).getName());
             viewHolder.setGroup(groups.get(position));
 
-            /** Changes or removes the image on each group list item based on whether
+            /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
              * the owner tag will take preference.
              *
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            if (groups.get(position).getGroupRole() == GroupRole.OWNER) {
-                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
-            }
-            else if (groups.get(position).getGroupRole() == GroupRole.MODERATOR) {
-                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
-            }
-            else {
-                viewHolder.viewTag.setVisibility(View.INVISIBLE);
+            switch (groups.get(position).getGroupRole()) {
+                case OWNER:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
+                    break;
+                case MODERATOR:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    break;
+                case USER:
+                    viewHolder.viewTag.setVisibility(View.INVISIBLE);
+                    break;
             }
         }
 
