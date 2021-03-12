@@ -54,4 +54,9 @@
         android:name="com.gmail.comcorecrew.comcore.fragments.GroupFragment"
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" />
+    <activity
+        android:id="@+id/ChatFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.ChatFragment"
+        tools:layout="@layout/fragment_chat"
+        />
 </navigation>
