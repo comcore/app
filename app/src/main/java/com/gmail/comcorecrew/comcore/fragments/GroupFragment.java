@@ -20,6 +20,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 public class GroupFragment extends Fragment {
 
     private Group currentGroup;
-    private String currentGroupID;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -48,7 +48,6 @@ public class GroupFragment extends Fragment {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             currentGroup = bundle.getParcelable("currentGroup");
-            currentGroupID = currentGroup.getGroupId();
 
         }
         else {
@@ -68,12 +67,9 @@ public class GroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current group
-         * TODO
-         * Currently displays the groupID, but should be able to access a group
-         * object using currentGroupID, and then get the group name from that object**/
+        /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
-        welcomeText.setText(currentGroupID);
+        welcomeText.setText(currentGroup.getName());
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -94,8 +90,18 @@ public class GroupFragment extends Fragment {
          * If the current user is an owner, display R.id.menu_group_owner_actions
          * and R.id.menu_group_moderator_actions
          */
-        menu.setGroupVisible(R.id.menu_group_moderator_actions, false);
-        menu.setGroupVisible(R.id.menu_group_owner_actions, false);
+        if (currentGroup.getGroupRole() == GroupRole.OWNER) {
+            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
+            menu.setGroupVisible(R.id.menu_group_owner_actions, true);
+        }
+        else if (currentGroup.getGroupRole() == GroupRole.MODERATOR) {
+            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
+            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
+        }
+        else {
+            menu.setGroupVisible(R.id.menu_group_moderator_actions, false);
+            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
+        }
     }
 
     /**
