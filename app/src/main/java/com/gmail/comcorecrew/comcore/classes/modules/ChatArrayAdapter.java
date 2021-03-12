@@ -8,6 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.fragments.ChatFragment;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,26 +18,29 @@ import java.util.List;
 public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         private TextView chatText;
-        private List<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
         private Context context;
+        private Messaging messaging;
 
-        @Override
-        public void add(ChatMessage object) {
-                chatMessageList.add(object);
-                super.add(object);
-        }
+//        @Override
+//        public void add(ChatMessage object) {
+//                chatMessageList.add(object);
+//                super.add(object);
+//        }
 
         public ChatArrayAdapter(Context context, int textViewResourceId) {
                 super(context, textViewResourceId);
+                messaging = new Messaging(getContext(), "Chat", ChatFragment.chatID);
                 this.context = context;
         }
 
         public int getCount() {
-                return this.chatMessageList.size();
+                return this.messaging.messages.size();
         }
 
         public ChatMessage getItem(int index) {
-                return this.chatMessageList.get(index);
+
+                MessageEntry entry = this.messaging.getEntries().get(index);
+                return new ChatMessage(true, entry.contents, entry.timestamp);
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
