@@ -23,7 +23,6 @@ import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.TransferOwnershipDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -163,6 +162,14 @@ public class GroupFragment extends Fragment {
                 /** Handle kicking member **/
                 ViewMembersDialog kickUserDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 4);
                 kickUserDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.mute_member:
+                ViewMembersDialog muteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 5);
+                muteDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.unmute_member:
+                ViewMembersDialog unmuteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 6);
+                unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
                 /** Handle disabling/enabling chat **/
