@@ -82,6 +82,9 @@ public class GroupFragment extends Fragment {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
+        view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
+            // TODO create ChatFragment
+        });
 
     }
 
@@ -172,7 +175,11 @@ public class GroupFragment extends Fragment {
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
-                /** Handle disabling/enabling chat **/
+                ServerConnector.getChats(currentGroup.getGroupId(), result -> {
+                    if (result.isSuccess() && result.data.length == 0) {
+                        ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
+                    }
+                });
                 return true;
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/

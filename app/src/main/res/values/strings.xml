@@ -52,7 +52,7 @@
     <string name="kick_member">Kick Member</string>
     <string name="mute_member">Mute Member</string>
     <string name="unmute_member">Unmute Member</string>
-    <string name="dis_enable_chat">Disable/Enable Chat</string>
+    <string name="dis_enable_chat">Create Chat</string>
     <string name="add_moderator">Add Moderator</string>
     <string name="remove_moderator">Remove Moderator</string>
     <string name="leave_group">Leave Group</string>
