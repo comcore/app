@@ -47,7 +47,6 @@ public class Group implements Parcelable, NotificationListener {
         cacheDir.mkdir();
     }
 
-
     protected Group(Parcel in) {
         groupName = in.readString();
         byte tmpIsMuted = in.readByte();
