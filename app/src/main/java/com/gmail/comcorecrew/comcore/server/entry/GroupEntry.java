@@ -69,8 +69,8 @@ public final class GroupEntry {
         /** Currently, the json does not return name from the server
          * Until this bug is fixed, the group's name is set as the id
          */
-        //String name = json.get("name").getAsString();
-        String name = id.toString();
+        String name = json.get("name").getAsString();
+        //String name = id.toString();
 
 
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
