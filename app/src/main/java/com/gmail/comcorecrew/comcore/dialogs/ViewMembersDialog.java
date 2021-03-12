@@ -83,6 +83,12 @@ public class ViewMembersDialog extends DialogFragment {
         else if (flag == 4) {
             labelViewMembers.setText(R.string.pick_kick_user);
         }
+        else if (flag == 5) {
+            labelViewMembers.setText(R.string.pick_mute_user);
+        }
+        else if (flag == 6) {
+            labelViewMembers.setText(R.string.pick_unmute_user);
+        }
 
 
         /**
@@ -142,7 +148,8 @@ public class ViewMembersDialog extends DialogFragment {
 
                         }
                         else {
-
+                            new ErrorDialog(R.string.error_set_role)
+                                    .show(getParentFragmentManager(), null);
                         }
                     });
 
@@ -156,7 +163,8 @@ public class ViewMembersDialog extends DialogFragment {
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
                         }
                         else {
-
+                            new ErrorDialog(R.string.error_set_role)
+                                    .show(getParentFragmentManager(), null);
                         }
                     });
                 }
@@ -165,10 +173,9 @@ public class ViewMembersDialog extends DialogFragment {
                         if (result.isSuccess()) {
 
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-
-                        }
-                        else {
-
+                        } else {
+                            new ErrorDialog(R.string.error_set_role)
+                                    .show(getParentFragmentManager(), null);
                         }
                     });
                 }
@@ -177,7 +184,29 @@ public class ViewMembersDialog extends DialogFragment {
                         if (result.isSuccess()) {
                             view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
-
+                        } else {
+                            new ErrorDialog(R.string.error_cannot_kick)
+                                    .show(getParentFragmentManager(), null);
+                        }
+                    });
+                } else if (flag == 5) {
+                    ServerConnector.setMuted(currentGroup, currentUser.getID(), true, result -> {
+                        if (result.isSuccess()) {
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
+                        } else {
+                            new ErrorDialog(R.string.error_cannot_mute)
+                                    .show(getParentFragmentManager(), null);
+                        }
+                    });
+                } else if (flag == 6) {
+                    ServerConnector.setMuted(currentGroup, currentUser.getID(), false, result -> {
+                        if (result.isSuccess()) {
+                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
+                        } else {
+                            new ErrorDialog(R.string.error_cannot_unmute)
+                                    .show(getParentFragmentManager(), null);
                         }
                     });
                 }

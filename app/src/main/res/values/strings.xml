@@ -50,6 +50,8 @@
     <string name="invite_member">Invite Member</string>
     <string name="transfer_ownership">Transfer Ownership</string>
     <string name="kick_member">Kick Member</string>
+    <string name="mute_member">Mute Member</string>
+    <string name="unmute_member">Unmute Member</string>
     <string name="dis_enable_chat">Disable/Enable Chat</string>
     <string name="add_moderator">Add Moderator</string>
     <string name="remove_moderator">Remove Moderator</string>
@@ -67,8 +69,9 @@
     <string name="error_unknown">An error occurred.</string>
     <string name="error_set_role">The role of the user could not be changed.</string>
     <string name="error_send_invite">The invitation could not be sent.</string>
-
-
+    <string name="error_cannot_kick">The user could not be kicked.</string>
+    <string name="error_cannot_mute">The user could not be muted.</string>
+    <string name="error_cannot_unmute">The user could not be unmuted.</string>
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
@@ -86,5 +89,7 @@
     <string name="pick_remove_moderator">Pick a moderator to remove.</string>
     <string name="pick_transfer_ownership">Pick a new owner.</string>
     <string name="pick_kick_user">Pick a user to kick.</string>
+    <string name="pick_mute_user">Pick a user to mute.</string>
+    <string name="pick_unmute_user">Pick a user to unmute.</string>
 
 </resources>
