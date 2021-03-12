@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 
+import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
@@ -74,7 +75,8 @@ public class CreateUserFragment extends Fragment {
 
                 boolean created = result.data;
                 if (created) {
-                    // TODO Confirm email address with code
+                    new ConfirmEmailDialog()
+                            .show(getParentFragmentManager(), null);
                 } else {
                     new ErrorDialog(R.string.error_already_exists)
                             .show(getParentFragmentManager(), null);

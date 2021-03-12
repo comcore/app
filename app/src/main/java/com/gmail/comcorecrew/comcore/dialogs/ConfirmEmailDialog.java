@@ -14,8 +14,13 @@ public class ConfirmEmailDialog extends DialogFragment {
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
-                .setMessage(message)
-                .setPositiveButton(R.string.ok, null)
+                .setMessage(R.string.confirm_email)
+                .setPositiveButton(R.string.ok, (dialog, id) -> {
+                    // Finish logging in
+                })
+                .setNegativeButton(R.string.cancel, (dialog, id) -> {
+                    // Return to login menu
+                })
                 .create();
     }
 }

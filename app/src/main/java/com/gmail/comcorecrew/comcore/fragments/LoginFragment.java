@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -73,7 +74,8 @@ public class LoginFragment extends Fragment {
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;
                     case ENTER_CODE:
-                        // TODO Confirm email address with code
+                        new ConfirmEmailDialog()
+                                .show(getParentFragmentManager(), null);
                         break;
                     case DOES_NOT_EXIST:
                         new ErrorDialog(R.string.error_does_not_exist)
