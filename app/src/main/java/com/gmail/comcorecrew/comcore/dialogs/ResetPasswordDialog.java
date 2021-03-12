@@ -14,25 +14,17 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
-public class ConfirmEmailDialog extends DialogFragment {
+public class ResetPasswordDialog extends DialogFragment {
     private final Fragment fragment;
-    private final int success;
-    private final int failure;
     private final int message;
 
-    public ConfirmEmailDialog(Fragment fragment, int success, int failure) {
-        this(fragment, success, failure, R.string.confirm_email);
-    }
-
-    private ConfirmEmailDialog(Fragment fragment, int success, int failure, int message) {
+    public ResetPasswordDialog(Fragment fragment, int message) {
         this.fragment = fragment;
-        this.success = success;
-        this.failure = failure;
         this.message = message;
     }
 
     private void repeat(int message) {
-        new ConfirmEmailDialog(fragment, success, failure, message)
+        new ResetPasswordDialog(fragment, message)
                 .show(fragment.getParentFragmentManager(), null);
     }
 
@@ -40,32 +32,28 @@ public class ConfirmEmailDialog extends DialogFragment {
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         EditText text = new EditText(getContext());
-        text.setInputType(InputType.TYPE_CLASS_NUMBER);
+        text.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         return new AlertDialog.Builder(getActivity())
                 .setMessage(message)
                 .setView(text)
                 .setPositiveButton(R.string.ok, (dialog, id) -> {
-                    String code = text.getText().toString();
-                    if (code.isEmpty()) {
-                        repeat(R.string.error_incorrect_code);
+                    String pass = text.getText().toString();
+                    if (pass.isEmpty()) {
+                        repeat(R.string.error_missing_pass);
                         return;
                     }
 
-                    ServerConnector.enterCode(code, result -> {
+                    ServerConnector.finishReset(pass, result -> {
                         if (result.isFailure()) {
                             repeat(R.string.error_cannot_connect);
-                        } else if (!result.data) {
-                            repeat(R.string.error_incorrect_code);
-                        } else if (success != 0) {
-                            NavHostFragment.findNavController(fragment).navigate(success);
+                            return;
                         }
+
+                        NavHostFragment.findNavController(fragment)
+                                .navigate(R.id.action_loginFragment_to_mainFragment);
                     });
                 })
-                .setNegativeButton(R.string.cancel, (dialog, id) -> {
-                    if (failure != 0) {
-                        NavHostFragment.findNavController(fragment).navigate(failure);
-                    }
-                })
+                .setNegativeButton(R.string.cancel, null)
                 .create();
     }
 }

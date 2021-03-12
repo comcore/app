@@ -13,7 +13,7 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 
-import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
+import com.gmail.comcorecrew.comcore.dialogs.EnterCodeDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
@@ -65,6 +65,7 @@ public class CreateUserFragment extends Fragment {
                 return;
             }
 
+            // Start creating an account with the server
             ServerConnector.createAccount(name, email, pass, result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
@@ -74,7 +75,8 @@ public class CreateUserFragment extends Fragment {
 
                 boolean created = result.data;
                 if (created) {
-                    new ConfirmEmailDialog(this,
+                    // Show the confirmation code dialog
+                    new EnterCodeDialog(this,
                             R.id.action_createUserFragment_to_mainFragment,
                             R.id.action_createUserFragment_to_loginFragment
                     ).show(getParentFragmentManager(), null);

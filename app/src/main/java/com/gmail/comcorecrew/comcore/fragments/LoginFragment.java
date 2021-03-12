@@ -12,8 +12,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.dialogs.ConfirmEmailDialog;
+import com.gmail.comcorecrew.comcore.dialogs.EnterCodeDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.InvalidPasswordDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
@@ -45,8 +46,6 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // TODO reset password button?
-
         view.findViewById(R.id.loginButton).setOnClickListener(clickedView -> {
             EditText usernameView = view.findViewById(R.id.editUsername);
             EditText passwordView = view.findViewById(R.id.editPassword);
@@ -54,12 +53,13 @@ public class LoginFragment extends Fragment {
             String email = usernameView.getText().toString();
             String pass = passwordView.getText().toString();
 
-            if (email.isEmpty() || pass.isEmpty()) {
+            if (email.isEmpty()) {
                 new ErrorDialog(R.string.error_missing_data)
                         .show(getParentFragmentManager(), null);
                 return;
             }
 
+            // Attempt to log into the server
             ServerConnector.login(email, pass, result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
@@ -70,11 +70,13 @@ public class LoginFragment extends Fragment {
                 LoginStatus status = result.data;
                 switch (status) {
                     case SUCCESS:
+                        // Navigate to the main fragment
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;
                     case ENTER_CODE:
-                        new ConfirmEmailDialog(this,
+                        // Show the confirmation code dialog
+                        new EnterCodeDialog(this,
                                 R.id.action_loginFragment_to_mainFragment,
                                 0
                         ).show(getParentFragmentManager(), null);
@@ -84,7 +86,9 @@ public class LoginFragment extends Fragment {
                                 .show(getParentFragmentManager(), null);
                         break;
                     case INVALID_PASSWORD:
-                        new ErrorDialog(R.string.error_invalid_password)
+                        // Show a dialog with an option to reset the password
+                        passwordView.setText("");
+                        new InvalidPasswordDialog(this, email)
                                 .show(getParentFragmentManager(), null);
                         break;
                 }
