@@ -13,7 +13,7 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 
-import com.gmail.comcorecrew.comcore.dialogs.EmptyTextErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
 
@@ -61,14 +61,15 @@ public class CreateUserFragment extends Fragment {
             String pass = passwordView.getText().toString();
 
             if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-                EmptyTextErrorDialog errorDialog = new EmptyTextErrorDialog();
-                errorDialog.show(getParentFragmentManager(), "create_user_error");
+                new ErrorDialog(R.string.error_missing_data)
+                        .show(getParentFragmentManager(), null);
                 return;
             }
 
             ServerConnector.createAccount(name, email, pass, result -> {
                 if (result.isFailure()) {
-                    // TODO Handle cannot connect to server
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
                     return;
                 }
 
@@ -76,7 +77,8 @@ public class CreateUserFragment extends Fragment {
                 if (created) {
                     // TODO Confirm email address with code
                 } else {
-                    // TODO Handle account already exists
+                    new ErrorDialog(R.string.error_already_exists)
+                            .show(getParentFragmentManager(), null);
                 }
             });
         });

@@ -47,7 +47,10 @@
     <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
 
-
-    <string name="label_empty_text_error">You Must Enter All Necessary Information</string>
-
+    <!-- Error Messages -->
+    <string name="error_cannot_connect">Cannot connect to server.</string>
+    <string name="error_does_not_exist">There is no account with that email address.</string>
+    <string name="error_invalid_password">Invalid password. Please try again.</string>
+    <string name="error_already_exists">An account with that email address already exists.</string>
+    <string name="error_missing_data">Please enter all necessary information.</string>
 </resources>

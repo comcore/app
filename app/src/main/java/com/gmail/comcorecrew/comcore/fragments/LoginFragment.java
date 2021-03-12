@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -54,9 +55,16 @@ public class LoginFragment extends Fragment {
             String email = usernameView.getText().toString();
             String pass = passwordView.getText().toString();
 
+            if (email.isEmpty() || pass.isEmpty()) {
+                new ErrorDialog(R.string.error_missing_data)
+                        .show(getParentFragmentManager(), null);
+                return;
+            }
+
             ServerConnector.login(email, pass, result -> {
                 if (result.isFailure()) {
-                    // TODO Handle cannot connect to server
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
                     return;
                 }
 
@@ -70,10 +78,12 @@ public class LoginFragment extends Fragment {
                         // TODO Confirm email address with code
                         break;
                     case DOES_NOT_EXIST:
-                        // TODO Handle account doesn't exist
+                        new ErrorDialog(R.string.error_does_not_exist)
+                                .show(getParentFragmentManager(), null);
                         break;
                     case INVALID_PASSWORD:
-                        // TODO Handle invalid password
+                        new ErrorDialog(R.string.error_invalid_password)
+                                .show(getParentFragmentManager(), null);
                         break;
                 }
             });
