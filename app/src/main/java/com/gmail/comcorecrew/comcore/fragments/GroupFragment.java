@@ -22,6 +22,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.TransferOwnershipDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -154,6 +155,10 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/
+
+                TransferOwnershipDialog transferOwnershipDialog = new TransferOwnershipDialog(currentGroup.getGroupId(), GroupRole.OWNER, R.string.transfer_ownership);
+                transferOwnershipDialog.show(getParentFragmentManager(), null);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -56,9 +56,12 @@
     <string name="error_incorrect_code">Incorrect code. Please try again.</string>
     <string name="error_missing_data">Please enter all necessary information.</string>
     <string name="error_unknown">An error occurred.</string>
+    <string name="error_set_role">The role of the user could not be changed.</string>
 
 
     <!-- Confirm/Cancel Messages -->
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
+
+    <string name="success_set_role">The role of the user was successfully changed.</string>
 
 </resources>
