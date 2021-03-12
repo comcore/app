@@ -157,6 +157,8 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.kick_member:
                 /** Handle kicking member **/
+                ViewMembersDialog kickUserDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 4);
+                kickUserDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
                 /** Handle disabling/enabling chat **/
