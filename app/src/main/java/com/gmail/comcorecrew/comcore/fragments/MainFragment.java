@@ -103,6 +103,9 @@ public class MainFragment extends Fragment {
                 new ViewInvitesDialog(this)
                         .show(getParentFragmentManager(), null);
                 return true;
+            case R.id.refresh_button:
+                refresh();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

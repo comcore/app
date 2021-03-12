@@ -11,6 +11,9 @@
     <!-- Settings -->
 
     <item
+        android:id="@+id/refresh_button"
+        android:title="@string/refresh" />
+    <item
         android:id="@+id/settingsFragment"
         android:title="@string/action_settings"
         app:showAsAction="never" />
