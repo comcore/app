@@ -48,7 +48,7 @@ public class CacheDriver implements Module {
 
     @Override
     public String getGroupId() {
-        return "";
+        return "0";
     }
 
     public ArrayList<Cacheable> getData() {

@@ -25,7 +25,7 @@ public class Cacher {
             }
             String filename = module.getMdid() + module.getMnum();
             File cacheFile = new File(cacheDir, filename);
-            if ((!cacheFile.exists()) && (!cacheDir.createNewFile())) {
+            if ((!cacheFile.exists()) && (!cacheFile.createNewFile())) {
                 return false;
             }
             PrintWriter pw = new PrintWriter(new FileWriter(cacheFile));
