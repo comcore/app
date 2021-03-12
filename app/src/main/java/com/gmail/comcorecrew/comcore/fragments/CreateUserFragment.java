@@ -48,7 +48,6 @@ public class CreateUserFragment extends Fragment {
         view.findViewById(R.id.cancelButton).setOnClickListener(view1 -> {
             NavHostFragment.findNavController(CreateUserFragment.this)
                     .navigate(R.id.action_createUserFragment_to_loginFragment);
-
         });
 
         view.findViewById(R.id.submitButton).setOnClickListener(clickedView -> {
@@ -75,8 +74,10 @@ public class CreateUserFragment extends Fragment {
 
                 boolean created = result.data;
                 if (created) {
-                    new ConfirmEmailDialog()
-                            .show(getParentFragmentManager(), null);
+                    new ConfirmEmailDialog(this,
+                            R.id.action_createUserFragment_to_mainFragment,
+                            R.id.action_createUserFragment_to_loginFragment
+                    ).show(getParentFragmentManager(), null);
                 } else {
                     new ErrorDialog(R.string.error_already_exists)
                             .show(getParentFragmentManager(), null);

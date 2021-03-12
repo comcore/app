@@ -74,8 +74,10 @@ public class LoginFragment extends Fragment {
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;
                     case ENTER_CODE:
-                        new ConfirmEmailDialog()
-                                .show(getParentFragmentManager(), null);
+                        new ConfirmEmailDialog(this,
+                                R.id.action_loginFragment_to_mainFragment,
+                                0
+                        ).show(getParentFragmentManager(), null);
                         break;
                     case DOES_NOT_EXIST:
                         new ErrorDialog(R.string.error_does_not_exist)
