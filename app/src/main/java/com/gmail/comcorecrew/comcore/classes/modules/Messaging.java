@@ -55,7 +55,7 @@ public class Messaging implements Module {
 
     @Override
     public String getGroupId() {
-        return group.getGroupId();
+        return group.getGroupId().id;
     }
 
     public int getMnum() {

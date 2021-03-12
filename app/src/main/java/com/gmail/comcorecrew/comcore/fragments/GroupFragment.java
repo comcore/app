@@ -4,7 +4,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -121,6 +124,18 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.leave_group:
                 /** Handle leaving group **/
+
+                ServerConnector.leaveGroup(currentGroup.getGroupId(), result -> {
+                    if (result.isSuccess()) {
+                        NavHostFragment.findNavController(GroupFragment.this)
+                                .navigate(R.id.action_groupFragment_to_mainFragment);
+                    }
+                    else if (result.isFailure()) {
+                        new StringErrorDialog(result.errorMessage)
+                                .show(getParentFragmentManager(), null);
+                    }
+                });
+
                 return true;
             case R.id.invite_member:
                 /** Handle inviting a new member **/

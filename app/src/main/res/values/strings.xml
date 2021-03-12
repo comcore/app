@@ -4,7 +4,6 @@
     <string name="action_create_group">New Group</string>
     <string name="action_main_activity">Main Screen</string>
 
-    <string name="error_unknown">**Unknown**</string>
     <!-- General Buttons -->
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
@@ -56,4 +55,10 @@
     <string name="error_already_exists">An account with that email address already exists.</string>
     <string name="error_incorrect_code">Incorrect code. Please try again.</string>
     <string name="error_missing_data">Please enter all necessary information.</string>
+    <string name="error_unknown">An error occurred.</string>
+
+
+    <!-- Confirm/Cancel Messages -->
+    <string name="cc_leave_group">Are you sure you want to leave the group?</string>
+
 </resources>

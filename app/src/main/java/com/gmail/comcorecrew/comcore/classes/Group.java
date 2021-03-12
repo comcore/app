@@ -20,7 +20,7 @@ public class Group implements Parcelable {
 
     private UUID externalId;
 
-    private String groupID;
+    private GroupID groupID;
     private String groupName;
     private GroupRole groupRole;
     private Boolean isMuted;
@@ -31,7 +31,7 @@ public class Group implements Parcelable {
     private UserID owner;
 
     public Group(Context context, String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
-        this.groupID = groupID.id;
+        this.groupID = groupID;
         this.groupName = name;
         this.groupRole = groupRole;
         users = new ArrayList<User>();
@@ -47,23 +47,11 @@ public class Group implements Parcelable {
         cacheDir.mkdir();
     }
 
+
     protected Group(Parcel in) {
-        groupID = in.readString();
         groupName = in.readString();
         byte tmpIsMuted = in.readByte();
         isMuted = tmpIsMuted == 0 ? null : tmpIsMuted == 1;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(groupID);
-        dest.writeString(groupName);
-        dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     public static final Creator<Group> CREATOR = new Creator<Group>() {
@@ -86,7 +74,7 @@ public class Group implements Parcelable {
         this.groupName = name;
     }
 
-    public String getGroupId() {
+    public GroupID getGroupId() {
         return groupID;
     }
 
@@ -124,5 +112,16 @@ public class Group implements Parcelable {
         }
         modules.add(module);
         return num;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(groupName);
+        dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
     }
 }
