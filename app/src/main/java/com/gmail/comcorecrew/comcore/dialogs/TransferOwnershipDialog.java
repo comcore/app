@@ -25,8 +25,8 @@ public class TransferOwnershipDialog extends DialogFragment {
     public TransferOwnershipDialog(GroupID groupID, GroupRole targetRole, int message) {
         this.message = message;
         this.groupID = groupID;
+        this.targetRole = targetRole;
     }
-
 
     @Override
     @NonNull
@@ -40,15 +40,17 @@ public class TransferOwnershipDialog extends DialogFragment {
                         this.dismiss();
                     }
                     else {
+                        // FIXME a UserID is *not* an email address, so this will always fail
                         UserID userEmail = new UserID(text.getText().toString());
                         ServerConnector.setRole(groupID, userEmail, targetRole, result -> {
                             if (result.isFailure()) {
-                                new ErrorDialog(R.string.error_cannot_connect)
+                                new ErrorDialog(R.string.error_set_role)
                                         .show(getParentFragmentManager(), null);
                                 return;
                             }
 
-                            // TODO Show success message
+                            new ErrorDialog(R.string.success_set_role)
+                                    .show(getParentFragmentManager(), null);
                         });
                     }
                 })
