@@ -29,13 +29,15 @@
     <string name="label_username">Username</string>
     <string name="label_password">Password</string>
     <string name="create_user">Create an Account</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="pick_new_password">Pick a new password:</string>
 
     <!-- Create User -->
     <string name="label_cu_name">Enter Your Name</string>
     <string name="label_cu_password">Enter Your Password</string>
     <string name="label_cu_email">Enter Your Email</string>
     <string name="label_cu_dob">Enter Your Date of Birth</string>
-    <string name="confirm_email">Please enter the confirmation code that was sent to your email address.</string>
+    <string name="confirm_email">Enter the confirmation code that was sent to your email address:</string>
 
     <!-- Group Menu -->
     <string name="view_members">View Members</string>
@@ -55,4 +57,5 @@
     <string name="error_already_exists">An account with that email address already exists.</string>
     <string name="error_incorrect_code">Incorrect code. Please try again.</string>
     <string name="error_missing_data">Please enter all necessary information.</string>
+    <string name="error_missing_pass">Please enter a new password.</string>
 </resources>
