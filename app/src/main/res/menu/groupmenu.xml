@@ -6,46 +6,40 @@
         <item
             android:id="@+id/invite_member"
             android:title="@string/invite_member"
-            app:showAsAction="never"
-            />
-    </group>
-
-    <!-- These menu items are only showed to the group owner -->
-    <group android:id="@+id/menu_group_owner_actions">
-
-        <item
-            android:id="@+id/transfer_ownership"
-            android:title="@string/transfer_ownership"
-            app:showAsAction="never"
-            />
+            app:showAsAction="never" />
         <item
             android:id="@+id/kick_member"
             android:title="@string/kick_member"
-            app:showAsAction="never"
-            />
-        <item
-            android:id="@+id/dis_enable_chat"
-            android:title="@string/dis_enable_chat"
-            app:showAsAction="never"
-            />
+            app:showAsAction="never" />
         <item
             android:id="@+id/add_moderator"
             android:title="@string/add_moderator"
-            app:showAsAction="never"
-            />
+            app:showAsAction="never" />
         <item
             android:id="@+id/remove_moderator"
             android:title="@string/remove_moderator"
-            app:showAsAction="never"
-            />
+            app:showAsAction="never" />
         <item
             android:id="@+id/mute_member"
             android:title="@string/mute_member" />
         <item
             android:id="@+id/unmute_member"
             android:title="@string/unmute_member" />
+        <item
+            android:id="@+id/dis_enable_chat"
+            android:title="@string/dis_enable_chat"
+            app:showAsAction="never" />
+    </group>
+    <group android:id="@+id/menu_group_owner_actions">
+
+        <item
+            android:id="@+id/transfer_ownership"
+            android:title="@string/transfer_ownership"
+            app:showAsAction="never" />
 
     </group>
+
+    <!-- These menu items are only showed to the group owner -->
 
     <!-- These menu items are only showed in a group fragment -->
     <group android:id="@+id/menu_group_actions">
