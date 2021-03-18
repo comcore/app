@@ -7,37 +7,58 @@ import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
+/**
+ * Static class used to store user data into files.
+ * Must call init before running.
+ */
 public class UserStorage {
 
     private static ArrayList<User> userList; //List of users to fetch from
     private static uNode idList; //Sorted BST of internal ids
 
-
-    public static User getUser(UserID userID) {
-        return getUser(getInternalId(userID));
-    }
-
+    /**
+     * Initiates the user storage to be used by the app.
+     * NOTE: This MUST be run before any use of the user storage.
+     *
+     * @param self User's own user info to initiate empty list
+     * @param context App Context
+     * @throws IOException if an IO error occurs
+     */
     public static void init(User self, Context context) throws IOException {
         if ((!refreshLists(context)) && !addUser(self, context)) {
             throw new StorageFileDisjunctionException();
         }
     }
 
-    public static boolean addUser(User user, Context context) throws IOException{
+    /**
+     * Adds the given user to the user storage.
+     *
+     * @param user User to add
+     * @param context App Context
+     * @return true if user is added; false if user is already in list
+     * @throws IOException if an IO error occurs
+     */
+    public static boolean addUser(User user, Context context) throws IOException {
         ArrayList<User> list = new ArrayList<>();
         list.add(user);
         return addUser(list, context);
     }
 
+    /**
+     * Adds users from the given list of users into the user storage.
+     *
+     * @param users A list of users to add
+     * @param context App context
+     * @return true if every user is added; false if at least one user is already in the list
+     * @throws IOException if an IO error occurs
+     */
     public static boolean addUser(ArrayList<User> users, Context context) throws IOException {
         File userFile = new File(context.getFilesDir(), "userList");
         if (!userFile.exists()) {
@@ -56,9 +77,20 @@ public class UserStorage {
     }
 
     /**
+     * Returns the user containing the given userID from the user list.
      *
-     * @param internalId internal ID of the specified user
-     * @return Returns requested user or null if user does not exist
+     * @param userID UserID of the requested user.
+     * @return the requested user; null if user is not in list
+     */
+    public static User getUser(UserID userID) {
+        return getUser(getInternalId(userID));
+    }
+
+    /**
+     * Returns the user containing the given internalId from the user list.
+     *
+     * @param internalId internal id of the requested user.
+     * @return the requested user; null if user is not in list
      */
     public static User getUser(int internalId) {
         if ((userList == null) || (internalId < 0)) {
@@ -70,11 +102,26 @@ public class UserStorage {
         return userList.get(internalId);
     }
 
-
+    /**
+     * Gets the internal id of the given user id from the list of internal ids.
+     *
+     * @param userID userID of the requested user
+     * @return the internal id corresponding to the given user id
+     */
     public static int getInternalId(UserID userID) {
         return getInternalId(idList, userID);
     }
 
+    /**
+     * Reloads each list from storage
+     * WARNING: DO NOT USE UNLESS YOU ARE SURE THAT YOU NEED TO!
+     * The other functions in this class will make sure that the lists are updated
+     * when data is changed.
+     *
+     * @param context App context
+     * @return true if lists already existed, false if lists were created
+     * @throws IOException if an IO error occurs
+     */
     public static boolean refreshLists(Context context) throws IOException {
         boolean isEmpty = refreshUserList(context);
         if (isEmpty ^ refreshIdList(context)) {
@@ -83,6 +130,16 @@ public class UserStorage {
         return isEmpty;
     }
 
+    /**
+     * Reloads user list from storage
+     * WARNING: DO NOT USE UNLESS YOU ARE SURE THAT YOU NEED TO!
+     * The other functions in this class will make sure that the lists are updated
+     * when data is changed.
+     *
+     * @param context App context
+     * @return true if list already existed, false if list was created
+     * @throws IOException if an IO error occurs
+     */
     public static boolean refreshUserList(Context context) throws IOException {
         File userFile = new File(context.getFilesDir(), "userList");
 
@@ -99,7 +156,7 @@ public class UserStorage {
 
         //Creates reader
         userList = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(userFile));
+        FileReader reader = new FileReader(userFile);
         User user;
         char[] buffer;
         int length = reader.read();
@@ -118,6 +175,16 @@ public class UserStorage {
         return true;
     }
 
+    /**
+     * Reloads id list from storage
+     * WARNING: DO NOT USE UNLESS YOU ARE SURE THAT YOU NEED TO!
+     * The other functions in this class will make sure that the lists are updated
+     * when data is changed.
+     *
+     * @param context App context
+     * @return true if list already existed, false if list was created
+     * @throws IOException if an IO error occurs
+     */
     public static boolean refreshIdList(Context context) throws IOException {
         File idFile = new File(context.getFilesDir(), "idList");
         if (idFile.createNewFile()) {
@@ -126,16 +193,25 @@ public class UserStorage {
             }
             return false;
         }
-        RandomAccessFile file = new RandomAccessFile(idFile, "r");
-        long fileSize = file.length();
+        FileReader reader = new FileReader(idFile);
+        long fileSize = idFile.length();
         if ((fileSize % 2) == 1) {
             throw new InvalidFileFormatException();
         }
-        idList = readNode(new long[] {-1, fileSize / 2}, file);
-        file.close();
+        idList = readNode(new long[] {-1, fileSize / 2}, reader);
+        reader.close();
         return true;
     }
 
+    /**
+     * Hard saves user list into storage.
+     * WARNING: DO NOT USE UNLESS YOU ARE SURE THAT YOU NEED TO!
+     * The other functions in this class will make sure that the lists are updated
+     * when data is changed.
+     *
+     * @param context App context
+     * @throws IOException if an IO error occurs
+     */
     public static void saveUserList(Context context) throws IOException {
         if (userList == null) {
             throw new NullPointerException();
@@ -152,6 +228,15 @@ public class UserStorage {
         writer.close();
     }
 
+    /**
+     * Hard saves id list into storage
+     * WARNING: DO NOT USE UNLESS YOU ARE SURE THAT YOU NEED TO!
+     * The other functions in this class will make sure that the lists are updated
+     * when data is changed.
+     *
+     * @param context App context
+     * @throws IOException if an IO error occurs
+     */
     public static void saveIdList(Context context) throws IOException {
         File idFile = new File(context.getFilesDir(), "idList");
         if ((idFile.createNewFile()) && (idList != null)) {
@@ -165,6 +250,13 @@ public class UserStorage {
         writer.close();
     }
 
+    /**
+     * Helper function used to recursively get the internal id from the BST
+     *
+     * @param root root node of tree to search
+     * @param userID user id to search for
+     * @return internal id of requested user; -1 if user is not in list
+     */
     private static int getInternalId(uNode root, UserID userID) {
         if (userID == null) {
             throw new IllegalArgumentException();
@@ -189,6 +281,14 @@ public class UserStorage {
         }
     }
 
+    /**
+     * Helper function to add a node to the list
+     *
+     * @param root root node of list to add user to
+     * @param user user to add to the list
+     * @param writer writer that writes user to storage when space is found
+     * @return true if user is added; false if user is already in list
+     */
     private static boolean addUserNode(uNode root, User user, PrintWriter writer) {
         if (root == null) {
             user.setInternalId(0);
@@ -237,20 +337,33 @@ public class UserStorage {
         }
     }
 
-    private static uNode readNode(long[] bounds, RandomAccessFile file) throws IOException {
+    /**
+     * Helper function to read list of internal ids into a BST recursively
+     *
+     * @param bounds array containing the beginning and end of section to add
+     * @param reader reader to read from
+     * @return root node of the read section
+     * @throws IOException if an IO error occurs
+     */
+    private static uNode readNode(long[] bounds, FileReader reader) throws IOException {
         if ((bounds[1] - bounds[0]) == 1) {
             return null;
         }
         uNode node = new uNode();
         long mid = (bounds[0] + bounds[1]) / 2;
-        file.seek(2 * mid);
-        node.internalId = file.read();
-        node.internalId = (node.internalId << 16) | file.read();
-        node.leftChild = readNode(new long[] {bounds[0], mid}, file);
-        node.rightChild = readNode(new long[] {mid, bounds[1]}, file);
+        node.leftChild = readNode(new long[] {bounds[0], mid}, reader);
+        node.internalId = reader.read();
+        node.internalId = (node.internalId << 16) | reader.read();
+        node.rightChild = readNode(new long[] {mid, bounds[1]}, reader);
         return node;
     }
 
+    /**
+     * Helper function to write BST into storage
+     *
+     * @param root root of the tree to write to storage
+     * @param writer writer that writes tree
+     */
     private static void writeNode(uNode root, PrintWriter writer) {
         if (root == null) {
             return;
@@ -262,6 +375,12 @@ public class UserStorage {
         writeNode(root.rightChild, writer);
     }
 
+    /**
+     * Helper to write user info to storage.
+     *
+     * @param user user to write the info of
+     * @param writer writer that writes data
+     */
     private static void writeUser(User user, PrintWriter writer) {
         String storage = toStorageString(user);
         int length = storage.length();
@@ -271,6 +390,14 @@ public class UserStorage {
         writer.flush();
     }
 
+    /**
+     * Helper to convert user info into string.
+     * NOTE: As more user data is added, this function will expand to store
+     * the added info
+     *
+     * @param user user to convert info to string
+     * @return string of user info
+     */
     private static String toStorageString(User user) {
         String storage = "";
         int length = user.getName().length();
@@ -284,10 +411,19 @@ public class UserStorage {
         return storage;
     }
 
+    /**
+     * Helper to read user info from storage string
+     * NOTE: As more user data is added, this function will expand to store
+     * the added info
+     *
+     * @param string string of user info
+     * @return user with given info
+     */
     private static User fromStorageString(String string) {
         int length;
         int i = 0;
 
+        //Parses through string
         length = string.charAt(i);
         i++;
         length = (length << 16) | string.charAt(i);
@@ -299,9 +435,13 @@ public class UserStorage {
         length = (length << 16) | string.charAt(i);
         i++;
         String id = string.substring(i, i + length);
+
         return new User(new UserID(id), userName);
     }
 
+    /**
+     * Helper class that contains internal ids in a BTS
+     */
     private static class uNode {
         public uNode leftChild;
         public uNode rightChild;
