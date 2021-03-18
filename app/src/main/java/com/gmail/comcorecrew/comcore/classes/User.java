@@ -7,12 +7,23 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
  */
 public class User {
 
-    private UserID userID;
-    private String userName;
+    private int internalId;
+    private final UserID userID;
+    private final String userName;
 
     public User (UserID userID, String userName) {
+        if ((userID == null) || (userName == null)) {
+            throw new IllegalArgumentException();
+        }
         this.userID = userID;
         this.userName = userName;
+        internalId = -1; //Unregistered
+    }
+
+    public User (UserID userID, String userName, int internalId) {
+        this.userID = userID;
+        this.userName = userName;
+        this.internalId = internalId;
     }
 
     public UserID getID() {
@@ -21,5 +32,15 @@ public class User {
 
     public String getName() {
         return this.userName;
+    }
+
+    public int getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(int internalId) {
+        if (this.internalId == -1) {
+            this.internalId = internalId;
+        }
     }
 }
