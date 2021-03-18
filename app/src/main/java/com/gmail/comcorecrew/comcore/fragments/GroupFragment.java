@@ -83,7 +83,14 @@ public class GroupFragment extends Fragment {
                     .popBackStack();
         });
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
-            // TODO create ChatFragment
+            ServerConnector.getChats(currentGroup.getGroupId(), result -> {
+                if (result.isFailure() || result.data.length == 0) {
+                    return;
+                }
+                ChatFragment.chatID = result.data[0].id;
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_groupFragment_to_chatFragment);
+            });
         });
 
     }

@@ -29,7 +29,7 @@ public class Messaging implements Module {
     private final int mnum; //Module number
     private ChatID id;
     private GroupID groupID; //temp
-    private ArrayList<MsgCacheable> messages; //Messages
+    public ArrayList<MsgCacheable> messages; //Messages
 
     private ArrayList<UserEntry> users;
 

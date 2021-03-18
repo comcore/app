@@ -4,14 +4,18 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
@@ -31,8 +35,8 @@ import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ChatFragment extends AppCompatActivity {
-
+public class ChatFragment extends Fragment {
+    public static ChatID chatID;
     private ChatArrayAdapter chatArrayAdapter;
     private ListView listView;
     private EditText chatText;
@@ -43,30 +47,30 @@ public class ChatFragment extends AppCompatActivity {
     private GroupEntry[] group;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        setContentView(R.layout.fragment_chat);
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_chat, container, false);
+    }
 
-        ResultHandler<ChatID> handler = null;
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         UserEntry user = ServerConnector.getUser();
         ServerConnector.getGroups(result -> {
-                    if (result.isFailure()) {
+            if (result.isFailure()) {
 
-                        return;
-                    }
-                    group = result.data;
+                return;
+            }
+            group = result.data;
 
-                });
-
-        ServerConnector.createChat(group[0].id, group[0].name + " Chat", handler);
+        });
 
 
+        InitializeFields(view);
 
-        InitializeFields();
-
-        chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.rightside);
+        chatArrayAdapter = new ChatArrayAdapter(getContext(), R.layout.rightside);
         listView.setAdapter(chatArrayAdapter);
 
         listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -96,26 +100,29 @@ public class ChatFragment extends AppCompatActivity {
                 listView.setSelection(chatArrayAdapter.getCount() - 1);
             }
         });
+
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
-    private void InitializeFields() {
-        mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Group Name");
+    private void InitializeFields(View view) {
+//        mToolbar = (Toolbar) view.findViewById(R.id.group_chat_bar_layout);
+//        setSupportActionBar(mToolbar);
+//        getSupportActionBar().setTitle("Group Name");
 
-        buttonSend = (Button) findViewById(R.id.send);
-        listView = (ListView) findViewById(R.id.msgview);
-        chatText = (EditText) findViewById(R.id.msg);
+        buttonSend = (Button) view.findViewById(R.id.send);
+        listView = (ListView) view.findViewById(R.id.msgview);
+        chatText = (EditText) view.findViewById(R.id.msg);
     }
 
     private boolean sendChatMessage() {
-        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString(), time.getTime()));
+        ServerConnector.sendMessage(chatID, chatText.getText().toString(), null);
+        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString(), System.currentTimeMillis()));
         chatText.setText("");
         side = !side;
 
-        /*
-        Send message info to server.
-         */
         return true;
     }
 }

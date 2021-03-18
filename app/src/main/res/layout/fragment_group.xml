@@ -39,9 +39,10 @@
             android:id="@+id/open_chat_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
             android:text="Open Chat"
-            tools:layout_editor_absoluteX="156dp"
-            tools:layout_editor_absoluteY="564dp" />
+            app:layout_constraintBottom_toTopOf="@+id/group_back_button"
+            tools:layout_editor_absoluteX="156dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
