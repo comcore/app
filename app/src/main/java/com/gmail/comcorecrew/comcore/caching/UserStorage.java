@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.caching;
 
-import android.content.Context;
-
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
@@ -28,11 +27,10 @@ public class UserStorage {
      * NOTE: This MUST be run before any use of the user storage.
      *
      * @param self User's own user info to initiate empty list
-     * @param context App Context
      * @throws IOException if an IO error occurs
      */
-    public static void init(User self, Context context) throws IOException {
-        if ((!refreshLists(context)) && !addUser(self, context)) {
+    public static void init(User self) throws IOException {
+        if ((!refreshLists()) && !addUser(self)) {
             throw new StorageFileDisjunctionException();
         }
     }
@@ -41,26 +39,24 @@ public class UserStorage {
      * Adds the given user to the user storage.
      *
      * @param user User to add
-     * @param context App Context
      * @return true if user is added; false if user is already in list
      * @throws IOException if an IO error occurs
      */
-    public static boolean addUser(User user, Context context) throws IOException {
+    public static boolean addUser(User user) throws IOException {
         ArrayList<User> list = new ArrayList<>();
         list.add(user);
-        return addUser(list, context);
+        return addUser(list);
     }
 
     /**
      * Adds users from the given list of users into the user storage.
      *
      * @param users A list of users to add
-     * @param context App context
      * @return true if every user is added; false if at least one user is already in the list
      * @throws IOException if an IO error occurs
      */
-    public static boolean addUser(ArrayList<User> users, Context context) throws IOException {
-        File userFile = new File(context.getFilesDir(), "userList");
+    public static boolean addUser(ArrayList<User> users) throws IOException {
+        File userFile = new File(AppData.filesDir, "userList");
         if (!userFile.exists()) {
             throw new StorageFileDisjunctionException();
         }
@@ -72,7 +68,7 @@ public class UserStorage {
             }
         }
         writer.close();
-        saveIdList(context);
+        saveIdList();
         return allAdded;
     }
 
@@ -118,13 +114,12 @@ public class UserStorage {
      * The other functions in this class will make sure that the lists are updated
      * when data is changed.
      *
-     * @param context App context
      * @return true if lists already existed, false if lists were created
      * @throws IOException if an IO error occurs
      */
-    public static boolean refreshLists(Context context) throws IOException {
-        boolean isEmpty = refreshUserList(context);
-        if (isEmpty ^ refreshIdList(context)) {
+    public static boolean refreshLists() throws IOException {
+        boolean isEmpty = refreshUserList();
+        if (isEmpty ^ refreshIdList()) {
             throw new StorageFileDisjunctionException();
         }
         return isEmpty;
@@ -136,12 +131,11 @@ public class UserStorage {
      * The other functions in this class will make sure that the lists are updated
      * when data is changed.
      *
-     * @param context App context
      * @return true if list already existed, false if list was created
      * @throws IOException if an IO error occurs
      */
-    public static boolean refreshUserList(Context context) throws IOException {
-        File userFile = new File(context.getFilesDir(), "userList");
+    public static boolean refreshUserList() throws IOException {
+        File userFile = new File(AppData.filesDir, "userList");
 
         //Makes sure there is no file funny business occurring
         if (userFile.createNewFile()) {
@@ -181,12 +175,11 @@ public class UserStorage {
      * The other functions in this class will make sure that the lists are updated
      * when data is changed.
      *
-     * @param context App context
      * @return true if list already existed, false if list was created
      * @throws IOException if an IO error occurs
      */
-    public static boolean refreshIdList(Context context) throws IOException {
-        File idFile = new File(context.getFilesDir(), "idList");
+    public static boolean refreshIdList() throws IOException {
+        File idFile = new File(AppData.filesDir, "idList");
         if (idFile.createNewFile()) {
             if (idList != null) {
                 throw new StorageFileDisjunctionException();
@@ -209,14 +202,13 @@ public class UserStorage {
      * The other functions in this class will make sure that the lists are updated
      * when data is changed.
      *
-     * @param context App context
      * @throws IOException if an IO error occurs
      */
-    public static void saveUserList(Context context) throws IOException {
+    public static void saveUserList() throws IOException {
         if (userList == null) {
             throw new NullPointerException();
         }
-        File userFile = new File(context.getFilesDir(), "userList");
+        File userFile = new File(AppData.filesDir, "userList");
         if (userFile.createNewFile()) {
             throw new StorageFileDisjunctionException();
         }
@@ -234,11 +226,10 @@ public class UserStorage {
      * The other functions in this class will make sure that the lists are updated
      * when data is changed.
      *
-     * @param context App context
      * @throws IOException if an IO error occurs
      */
-    public static void saveIdList(Context context) throws IOException {
-        File idFile = new File(context.getFilesDir(), "idList");
+    public static void saveIdList() throws IOException {
+        File idFile = new File(AppData.filesDir, "idList");
         if ((idFile.createNewFile()) && (idList != null)) {
             throw new StorageFileDisjunctionException();
         } //Throws if a new file had to be made but there was data already in the idList

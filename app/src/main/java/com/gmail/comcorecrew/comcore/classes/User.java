@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.classes;
 
+import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 /**
@@ -30,6 +31,10 @@ public class User {
         this.userID = userID;
         this.userName = userName;
         this.internalId = internalId;
+    }
+
+    public UserEntry toUserEntry() {
+        return new UserEntry(userID, userName);
     }
 
     public UserID getID() {

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
@@ -19,11 +20,11 @@ import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Messaging implements Module {
-    private Context context;
     private String name; //Name of chat
     //private final Group group; //Group that the chat is in
     private final int mnum; //Module number
@@ -31,10 +32,7 @@ public class Messaging implements Module {
     private GroupID groupID; //temp
     public ArrayList<MsgCacheable> messages; //Messages
 
-    private ArrayList<UserEntry> users;
-
-    public Messaging(Context context, String name, ChatID id) {
-        this.context = context;
+    public Messaging(String name, ChatID id) {
         //this.group = group;
         this.name = name;
         this.id = id;
@@ -42,20 +40,6 @@ public class Messaging implements Module {
         this.groupID = id.group; //temp
         //this.mnum = group.addModule(this);
         messages = new ArrayList<>();
-        users = new ArrayList<>();
-    }
-
-    //Temp function for saving users. WARNING! Has bad search time.
-    public int getIndex(UserEntry user) {
-        int index = 0;
-        while (index < users.size()) {
-            if (user.id.equals(users.get(index).id)) {
-                return index;
-            }
-            index++;
-        }
-        users.add(user);
-        return index;
     }
 
     @Override
@@ -92,7 +76,7 @@ public class Messaging implements Module {
     }
 
     @Override
-    public boolean toCache(Context context) {
+    public boolean toCache() {
         if (messages.size() == 0) {
             return true;
         }
@@ -113,12 +97,12 @@ public class Messaging implements Module {
             index++;
         }
 
-        return Cacher.cacheData(cacheMessages, this, context);
+        return Cacher.cacheData(cacheMessages, this);
     }
 
     @Override
-    public boolean fromCache(Context context) {
-        char[][] data = Cacher.uncacheData(this, context);
+    public boolean fromCache() {
+        char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return false;
         }
@@ -134,7 +118,16 @@ public class Messaging implements Module {
      * Adds a message and saves the user data.
      */
     public boolean addMessage(MessageEntry entry) {
-        MsgCacheable newMsg = new MsgCacheable(getIndex(entry.sender), entry.id.id,
+        int internalId = UserStorage.getInternalId(entry.sender.id);
+        if (internalId == -1) {/*
+            try {
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }*/
+            return false; //TODO remove temporary handling.
+        }
+        MsgCacheable newMsg = new MsgCacheable(internalId, entry.id.id,
                 entry.timestamp, entry.contents);
         messages.add(newMsg);
         return true;
@@ -146,7 +139,8 @@ public class Messaging implements Module {
     public ArrayList<MessageEntry> getEntries() {
         ArrayList<MessageEntry> entries = new ArrayList<>();
         for (MsgCacheable msg : messages) {
-            entries.add(new MessageEntry(new MessageID(id, msg.getMessageid()), users.get(msg.getId()),
+            entries.add(new MessageEntry(new MessageID(id, msg.getMessageid()),
+                    UserStorage.getUser(msg.getId()).toUserEntry(),
                     msg.getTimestamp(), msg.getData()));
         }
         return entries;
@@ -182,7 +176,7 @@ public class Messaging implements Module {
                 addMessage(entry);
             }
         });
-        this.toCache(context);
+        this.toCache();
     }
 
     @Override
@@ -192,7 +186,7 @@ public class Messaging implements Module {
             messages.clear();
         }
         addMessage(message);
-        this.toCache(context);
+        this.toCache();
     }
 
     @Override

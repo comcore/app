@@ -29,7 +29,7 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         public ChatArrayAdapter(Context context, int textViewResourceId) {
                 super(context, textViewResourceId);
-                messaging = new Messaging(getContext(), "Chat", ChatFragment.chatID);
+                messaging = new Messaging( "Chat", ChatFragment.chatID);
                 this.context = context;
         }
 

@@ -16,10 +16,10 @@ public interface Module extends NotificationListener {
     int getMnum();
 
     //Caches the data of the module and returns true if successful.
-    boolean toCache(Context context);
+    boolean toCache();
 
     //Loads the data from the cache into the module and returns true if successful.
-    boolean fromCache(Context context);
+    boolean fromCache();
 
     //Returns the id of the group that the module is in.
     String getGroupId();

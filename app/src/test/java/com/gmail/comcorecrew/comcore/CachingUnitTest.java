@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.drivers.CacheDriver;
 import com.gmail.comcorecrew.comcore.drivers.CacheableDriver;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
@@ -34,13 +35,14 @@ public class CachingUnitTest {
     @Test
     public void cacheSingleLine() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver("Hello World!"));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
-            File actualFile = new File(context.getCacheDir(), "0/test0");
+            File actualFile = new File(AppData.cacheDir, "0/test0");
             File expectedFile = new File(testDir, "test1.txt");
 
             PrintWriter writer = new PrintWriter(expectedFile);
@@ -67,6 +69,7 @@ public class CachingUnitTest {
     @Test
     public void cacheManyLines() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver("Hello, World!"));
@@ -74,7 +77,7 @@ public class CachingUnitTest {
             data.add(new CacheableDriver("Hi, World!"));
             data.add(new CacheableDriver("What do you want, World?"));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             File actualFile = new File(context.getCacheDir(), "0/test0");
             File expectedFile = new File(testDir, "test2.txt");
@@ -113,11 +116,12 @@ public class CachingUnitTest {
     @Test
     public void cacheNullLine() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver(""));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             File actualFile = new File(context.getCacheDir(), "0/test0");
             File expectedFile = new File(testDir, "test3.txt");
@@ -146,6 +150,7 @@ public class CachingUnitTest {
     @Test
     public void cacheLargeLine() {
         try {
+            AppData.init(context);
             StringBuilder lineToCache = new StringBuilder();
             for (int i = 0; i < 0x00010000; i++) {
                 lineToCache.append("H");
@@ -154,9 +159,9 @@ public class CachingUnitTest {
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver(lineToCache.toString()));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
-            File actualFile = new File(context.getCacheDir(), "0/test0");
+            File actualFile = new File(AppData.cacheDir, "0/test0");
             File expectedFile = new File(testDir, "test4.txt");
 
             PrintWriter writer = new PrintWriter(expectedFile);
@@ -184,6 +189,7 @@ public class CachingUnitTest {
     @Test
     public void cacheTooLarge() {
         try {
+            AppData.init(context);
             char[] line = new char[0x01000000];
 
 
@@ -191,7 +197,7 @@ public class CachingUnitTest {
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver(new String(line)));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
             assert(false);
         } catch (IllegalArgumentException e) {
             assert true;
@@ -201,14 +207,15 @@ public class CachingUnitTest {
     @Test
     public void uncacheSingleLine() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver("Hello World!"));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             CacheDriver newDriver = new CacheDriver();
-            newDriver.fromCache(context);
+            newDriver.fromCache();
             ArrayList<Cacheable> actualData = newDriver.getData();
             for (int i = 0; i < data.size(); i++) {
                 assertEquals(((CacheableDriver) actualData.get(i)).getData(),
@@ -223,6 +230,7 @@ public class CachingUnitTest {
     @Test
     public void uncacheManyLines() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver("Hello, World!"));
@@ -230,10 +238,10 @@ public class CachingUnitTest {
             data.add(new CacheableDriver("Hi, World!"));
             data.add(new CacheableDriver("What do you want, World?"));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             CacheDriver newDriver = new CacheDriver();
-            newDriver.fromCache(context);
+            newDriver.fromCache();
             ArrayList<Cacheable> actualData = newDriver.getData();
             for (int i = 0; i < data.size(); i++) {
                 assertEquals(((CacheableDriver) actualData.get(i)).getData(),
@@ -248,14 +256,15 @@ public class CachingUnitTest {
     @Test
     public void uncacheNullLine() {
         try {
+            AppData.init(context);
             CacheDriver driver = new CacheDriver();
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver(""));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             CacheDriver newDriver = new CacheDriver();
-            newDriver.fromCache(context);
+            newDriver.fromCache();
             ArrayList<Cacheable> actualData = newDriver.getData();
             for (int i = 0; i < data.size(); i++) {
                 assertEquals(((CacheableDriver) actualData.get(i)).getData(),
@@ -270,6 +279,7 @@ public class CachingUnitTest {
     @Test
     public void uncacheLargeLine() {
         try {
+            AppData.init(context);
             StringBuilder lineToCache = new StringBuilder();
             for (int i = 0; i < 0x00010000; i++) {
                 lineToCache.append("H");
@@ -278,10 +288,10 @@ public class CachingUnitTest {
             ArrayList<Cacheable> data = new ArrayList<>();
             data.add(new CacheableDriver(lineToCache.toString()));
             driver.setData(data);
-            driver.toCache(context);
+            driver.toCache();
 
             CacheDriver newDriver = new CacheDriver();
-            newDriver.fromCache(context);
+            newDriver.fromCache();
             ArrayList<Cacheable> actualData = newDriver.getData();
             for (int i = 0; i < data.size(); i++) {
                 assertEquals(((CacheableDriver) actualData.get(i)).getData(),

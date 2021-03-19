@@ -7,8 +7,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.NotificationListener;
@@ -18,12 +18,12 @@ import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements NotificationListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppData.init(getApplicationContext());
         super.onCreate(savedInstanceState);
 
         // Initialize the connection to the server using the application context

@@ -1,7 +1,5 @@
 package com.gmail.comcorecrew.comcore.drivers;
 
-import android.content.Context;
-
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
@@ -29,13 +27,13 @@ public class CacheDriver implements Module {
     }
 
     @Override
-    public boolean toCache(Context context) {
-        return Cacher.cacheData(data, this, context);
+    public boolean toCache() {
+        return Cacher.cacheData(data, this);
     }
 
     @Override
-    public boolean fromCache(Context context) {
-        char[][] rawData = Cacher.uncacheData(this, context);
+    public boolean fromCache() {
+        char[][] rawData = Cacher.uncacheData(this);
         if (rawData == null) {
             return false;
         }

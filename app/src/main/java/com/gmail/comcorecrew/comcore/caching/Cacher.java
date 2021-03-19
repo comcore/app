@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.caching;
 
-import android.content.Context;
-
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Helper;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 
@@ -16,10 +15,10 @@ import java.util.ArrayList;
 public class Cacher {
 
     //Caches the given data in the modules cache file.
-    public static boolean cacheData(ArrayList<Cacheable> data, Module module, Context context) {
+    public static boolean cacheData(ArrayList<Cacheable> data, Module module) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
-            File cacheDir = new File(context.getCacheDir(), module.getGroupId());
+            File cacheDir = new File(AppData.cacheDir, module.getGroupId());
             if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
                 return false;
             }
@@ -55,11 +54,11 @@ public class Cacher {
         }
     }
 
-    public static char[][] uncacheData(Module module, Context context) {
+    public static char[][] uncacheData(Module module) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
             String filename = module.getGroupId() + "/" + module.getMdid() + module.getMnum();
-            File cacheFile = new File(context.getCacheDir(), filename);
+            File cacheFile = new File(AppData.cacheDir, filename);
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
             size = (size << 16) | br.read();
