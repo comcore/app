@@ -187,24 +187,22 @@ public final class ServerConnection implements Connection {
             return;
         }
 
-        if (pass == null) {
-            // They were trying to do a password reset and got disconnected
-
-            loggedOut();
-            return;
-        }
-
         JsonObject data = new JsonObject();
         data.addProperty("email", email);
-        data.addProperty("pass", pass);
-        startTask(new Task(new Message("login", data), result -> {
+        if (pass != null) {
+            data.addProperty("pass", pass);
+        }
+        startTask(new Task(new Message(pass == null ? "requestReset" : "login", data), result -> {
             if (result.isFailure()) {
                 // A failure doesn't necessarily mean the information was wrong
                 return;
             }
 
             try {
-                if (LoginStatus.fromJson(result.data) == LoginStatus.SUCCESS) {
+                if (pass == null && result.data.get("sent").getAsBoolean()) {
+                    // The password reset was continued, so do nothing
+                    return;
+                } else if (LoginStatus.fromJson(result.data) == LoginStatus.SUCCESS) {
                     // The login was successful, so do nothing
                     return;
                 }

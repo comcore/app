@@ -685,17 +685,27 @@ public final class ServerConnector {
         requestArray(new Message(request, data), handler, clazz, "info", parser);
     }
 
+    /**
+     * Generic helper method for handling requests that return arrays.
+     *
+     * @param message the message to send to the server
+     * @param handler the handler for the response of the server
+     * @param clazz   the class of the item in the array
+     * @param field   the name of the array in the response
+     * @param parser  a parser for the server response
+     * @param <T>     the type of the item in the array
+     */
     @SuppressWarnings("unchecked")
     private static <T> void requestArray(Message message, ResultHandler<T[]> handler,
                                          Class<T> clazz, String field,
                                          Function<JsonObject, T> parser) {
         getConnection().send(message, handler, response -> {
-            JsonArray infoJson = response.get(field).getAsJsonArray();
-            T[] info = (T[]) Array.newInstance(clazz, infoJson.size());
-            for (int i = 0; i < info.length; i++) {
-                info[i] = parser.apply(infoJson.get(i).getAsJsonObject());
+            JsonArray json = response.get(field).getAsJsonArray();
+            T[] array = (T[]) Array.newInstance(clazz, json.size());
+            for (int i = 0; i < array.length; i++) {
+                array[i] = parser.apply(json.get(i).getAsJsonObject());
             }
-            return info;
+            return array;
         });
     }
 }
