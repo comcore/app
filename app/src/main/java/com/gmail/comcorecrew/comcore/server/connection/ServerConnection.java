@@ -199,9 +199,11 @@ public final class ServerConnection implements Connection {
             }
 
             try {
-                if (pass == null && result.data.get("sent").getAsBoolean()) {
-                    // The password reset was continued, so do nothing
-                    return;
+                if (pass == null) {
+                    if (result.data.get("sent").getAsBoolean()) {
+                        // The password reset was continued, so do nothing
+                        return;
+                    }
                 } else if (LoginStatus.fromJson(result.data) == LoginStatus.SUCCESS) {
                     // The login was successful, so do nothing
                     return;

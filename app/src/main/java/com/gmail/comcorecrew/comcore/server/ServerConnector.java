@@ -527,7 +527,7 @@ public final class ServerConnector {
      */
     public static void getGroupInfo(GroupID group, long lastRefresh,
                                     ResultHandler<GroupInfo> handler) {
-        getGroupInfo(Collections.singletonList(group), lastRefresh, result -> {
+        getGroupInfo(Collections.singletonList(group), lastRefresh, result ->
             handler.handleResult(result.map(groups -> {
                 switch (groups.length) {
                     case 0:
@@ -537,8 +537,7 @@ public final class ServerConnector {
                     default:
                         throw new IllegalArgumentException("multiple groups returned");
                 }
-            }));
-        });
+            })));
     }
 
     /**
@@ -569,7 +568,7 @@ public final class ServerConnector {
      */
     public static void getUserInfo(UserID user, long lastRefresh,
                                    ResultHandler<UserInfo> handler) {
-        getUserInfo(Collections.singletonList(user), lastRefresh, result -> {
+        getUserInfo(Collections.singletonList(user), lastRefresh, result ->
             handler.handleResult(result.map(users -> {
                 switch (users.length) {
                     case 0:
@@ -579,8 +578,7 @@ public final class ServerConnector {
                     default:
                         throw new IllegalArgumentException("multiple users returned");
                 }
-            }));
-        });
+            })));
     }
 
     /**
@@ -600,18 +598,16 @@ public final class ServerConnector {
     }
 
     /**
-     * Get the info of a ModuleID. The info will only be retrieved if it has been updated more
-     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the module
-     * info will always be retrieved.
+     * Get the info of a ModuleID.
      *
      * @param module      the module to retrieve the info of
-     * @param lastRefresh the last time the cached info was refreshed or 0
      * @param handler     the handler for the response of the server
+     * @param <T>         the type of module which is being fetched
      * @see ModuleInfo
      */
-    public static void getModuleInfo(ModuleID module, long lastRefresh,
-                                     ResultHandler<ModuleInfo> handler) {
-        getModuleInfo(Collections.singletonList(module), lastRefresh, result -> {
+    public static <T extends ModuleID> void getModuleInfo(T module,
+                                                          ResultHandler<ModuleInfo<T>> handler) {
+        getModuleInfo(Collections.singletonList(module), result ->
             handler.handleResult(result.map(modules -> {
                 switch (modules.length) {
                     case 0:
@@ -621,24 +617,22 @@ public final class ServerConnector {
                     default:
                         throw new IllegalArgumentException("multiple modules returned");
                 }
-            }));
-        });
+            })));
     }
 
     /**
-     * Get the info of multiple ModuleIDs. Only the info of modules which have been updated more
-     * recently than lastRefresh will be returned, otherwise they will be omitted. If lastRefresh
-     * is 0, the module info will always be retrieved.
+     * Get the info of multiple ModuleIDs.
      *
      * @param modules     the modules to retrieve the info of
-     * @param lastRefresh the last time the cached info was refreshed or 0
      * @param handler     the handler for the response of the server
+     * @param <T>         the type of modules which are being fetched
      * @see ModuleInfo
      */
-    public static void getModuleInfo(List<? extends ModuleID> modules, long lastRefresh,
-                                     ResultHandler<ModuleInfo[]> handler) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T extends ModuleID> void getModuleInfo(List<T> modules,
+                                                          ResultHandler<ModuleInfo<T>[]> handler) {
         getInfo(ModuleInfo.class, "modules", "getModuleInfo", ModuleInfo::fromJson,
-                modules, lastRefresh, handler);
+                modules, -1, (ResultHandler<ModuleInfo[]>) handler);
     }
 
     /**
@@ -650,7 +644,7 @@ public final class ServerConnector {
      * @param request     the kind of the request
      * @param parser      a parser for the server response
      * @param ids         the ids to retrieve the info of
-     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param lastRefresh the last time the cached info was refreshed or 0 (or omitted if negative)
      * @param handler     the handler for the response of the server
      * @param <T>         the type of the info
      * @param <U>         the type of the item
@@ -662,8 +656,6 @@ public final class ServerConnector {
                                                       ResultHandler<T[]> handler) {
         if (ids == null) {
             throw new IllegalArgumentException(field + " cannot be null");
-        } else if (lastRefresh < 0) {
-            throw new IllegalArgumentException("last refresh time cannot be negative");
         }
 
         if (ids.isEmpty()) {
@@ -681,7 +673,9 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.add(field, array);
-        data.addProperty("lastRefresh", lastRefresh);
+        if (lastRefresh >= 0) {
+            data.addProperty("lastRefresh", lastRefresh);
+        }
         requestArray(new Message(request, data), handler, clazz, "info", parser);
     }
 
