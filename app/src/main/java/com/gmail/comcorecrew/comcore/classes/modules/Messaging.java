@@ -1,26 +1,19 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.content.Context;
-
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
-import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -140,7 +133,7 @@ public class Messaging implements Module {
         ArrayList<MessageEntry> entries = new ArrayList<>();
         for (MsgCacheable msg : messages) {
             entries.add(new MessageEntry(new MessageID(id, msg.getMessageid()),
-                    UserStorage.getUser(msg.getId()).toUserEntry(),
+                    UserStorage.getUser(msg.getId()).toUserInfo(),
                     msg.getTimestamp(), msg.getData()));
         }
         return entries;

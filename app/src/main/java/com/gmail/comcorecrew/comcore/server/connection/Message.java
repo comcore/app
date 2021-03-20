@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 /**
  * Represents a message to send or receive from the server.
  */
-public class Message {
+public final class Message {
     /**
      * The kind of message which identifies the action to perform.
      */

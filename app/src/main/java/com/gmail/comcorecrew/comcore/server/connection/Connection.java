@@ -1,7 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
 
 /**
@@ -24,7 +24,7 @@ public interface Connection {
      *
      * @return the user data or null if there is no logged in user
      */
-    UserEntry getUser();
+    UserInfo getUserInfo();
 
     /**
      * Set the login information to use for connecting to the server. Note that this doesn't

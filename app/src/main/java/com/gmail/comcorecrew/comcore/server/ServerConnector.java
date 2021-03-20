@@ -9,9 +9,11 @@ import com.gmail.comcorecrew.comcore.server.connection.Function;
 import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
+import com.gmail.comcorecrew.comcore.server.info.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,8 +112,8 @@ public final class ServerConnector {
      *
      * @return the user data or null if there is no logged in user
      */
-    public static UserEntry getUser() {
-        return getConnection().getUser();
+    public static UserInfo getUser() {
+        return getConnection().getUserInfo();
     }
 
     /**
@@ -258,14 +260,14 @@ public final class ServerConnector {
      * Get a list of all groups that the user is in.
      *
      * @param handler the handler for the response of the server
-     * @see GroupEntry
      */
-    public static void getGroups(ResultHandler<GroupEntry[]> handler) {
+    public static void getGroups(ResultHandler<GroupID[]> handler) {
         getConnection().send(new Message("getGroups"), handler, response -> {
             JsonArray groupsJson = response.get("groups").getAsJsonArray();
-            GroupEntry[] groups = new GroupEntry[groupsJson.size()];
+            GroupID[] groups = new GroupID[groupsJson.size()];
             for (int i = 0; i < groups.length; i++) {
-                groups[i] = GroupEntry.fromJson(groupsJson.get(i).getAsJsonObject());
+                JsonObject group = groupsJson.get(i).getAsJsonObject();
+                groups[i] = new GroupID(group.get("id").getAsString());
             }
             return groups;
         });
@@ -298,9 +300,9 @@ public final class ServerConnector {
      *
      * @param group   the group to list the users of
      * @param handler the handler for the response of the server
-     * @see UserEntry
+     * @see GroupUserEntry
      */
-    public static void getUsers(GroupID group, ResultHandler<UserEntry[]> handler) {
+    public static void getUsers(GroupID group, ResultHandler<GroupUserEntry[]> handler) {
         if (group == null) {
             throw new IllegalArgumentException("GroupID cannot be null");
         }
@@ -309,38 +311,34 @@ public final class ServerConnector {
         data.addProperty("group", group.id);
         getConnection().send(new Message("getUsers", data), handler, response -> {
             JsonArray usersJson = response.get("users").getAsJsonArray();
-            UserEntry[] users = new UserEntry[usersJson.size()];
+            GroupUserEntry[] users = new GroupUserEntry[usersJson.size()];
             for (int i = 0; i < users.length; i++) {
-                users[i] = UserEntry.fromJson(usersJson.get(i).getAsJsonObject());
+                users[i] = GroupUserEntry.fromJson(usersJson.get(i).getAsJsonObject());
             }
             return users;
         });
     }
 
     /**
-     * Get a list of all chats in a group.
+     * Get a list of all modules in a group.
      *
-     * @param group   the group to list the chats of
+     * @param group   the group to list the modules of
      * @param handler the handler for the response of the server
-     * @see ChatEntry
      */
-    public static void getChats(GroupID group, ResultHandler<ChatEntry[]> handler) {
+    public static void getModules(GroupID group, ResultHandler<ModuleID[]> handler) {
         if (group == null) {
             throw new IllegalArgumentException("GroupID cannot be null");
         }
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        getConnection().send(new Message("getChats", data), handler, response -> {
-            JsonArray chatsJson = response.get("chats").getAsJsonArray();
-            ChatEntry[] chats = new ChatEntry[chatsJson.size()];
-            for (int i = 0; i < chats.length; i++) {
-                JsonObject chat = chatsJson.get(i).getAsJsonObject();
-                ChatID id = new ChatID(group, chat.get("id").getAsString());
-                String name = chat.get("name").getAsString();
-                chats[i] = new ChatEntry(id, name);
+        getConnection().send(new Message("getModules", data), handler, response -> {
+            JsonArray modulesJson = response.get("modules").getAsJsonArray();
+            ModuleID[] modules = new ModuleID[modulesJson.size()];
+            for (int i = 0; i < modules.length; i++) {
+                modules[i] = ModuleID.fromJson(group, modulesJson.get(i).getAsJsonObject());
             }
-            return chats;
+            return modules;
         });
     }
 
@@ -545,6 +543,183 @@ public final class ServerConnector {
                 messages[i] = MessageEntry.fromJson(chat, messagesJson.get(i).getAsJsonObject());
             }
             return messages;
+        });
+    }
+
+    /**
+     * Get the info of a GroupID. The info will only be retrieved if it has been updated more
+     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the group
+     * info will always be retrieved.
+     *
+     * @param group       the group to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see GroupInfo
+     */
+    public static void getGroupInfo(GroupID group, long lastRefresh,
+                                    ResultHandler<GroupInfo> handler) {
+        getGroupInfo(Collections.singletonList(group), lastRefresh, result -> {
+            handler.handleResult(result.map(groups -> {
+                switch (groups.length) {
+                    case 0:
+                        return null;
+                    case 1:
+                        return groups[0];
+                    default:
+                        throw new IllegalArgumentException("multiple groups returned");
+                }
+            }));
+        });
+    }
+
+    /**
+     * Get the info of multiple GroupIDs. Only the info of groups which have been updated more
+     * recently than lastRefresh will be returned, otherwise they will be omitted. If lastRefresh
+     * is 0, the group info will always be retrieved.
+     *
+     * @param groups      the groups to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see GroupInfo
+     */
+    public static void getGroupInfo(List<GroupID> groups, long lastRefresh,
+                                    ResultHandler<GroupInfo[]> handler) {
+        getInfo(GroupInfo.class, "groups", "getGroupInfo", GroupInfo::fromJson,
+                groups, lastRefresh, handler);
+    }
+
+    /**
+     * Get the info of a UserID. The info will only be retrieved if it has been updated more
+     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the user
+     * info will always be retrieved.
+     *
+     * @param user        the user to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see UserInfo
+     */
+    public static void getUserInfo(UserID user, long lastRefresh,
+                                   ResultHandler<UserInfo> handler) {
+        getUserInfo(Collections.singletonList(user), lastRefresh, result -> {
+            handler.handleResult(result.map(users -> {
+                switch (users.length) {
+                    case 0:
+                        return null;
+                    case 1:
+                        return users[0];
+                    default:
+                        throw new IllegalArgumentException("multiple users returned");
+                }
+            }));
+        });
+    }
+
+    /**
+     * Get the info of multiple UserIDs. Only the info of users which have been updated more
+     * recently than lastRefresh will be returned, otherwise they will be omitted. If lastRefresh
+     * is 0, the user info will always be retrieved.
+     *
+     * @param users       the users to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see UserInfo
+     */
+    public static void getUserInfo(List<UserID> users, long lastRefresh,
+                                   ResultHandler<UserInfo[]> handler) {
+        getInfo(UserInfo.class, "users", "getUserInfo", UserInfo::fromJson,
+                users, lastRefresh, handler);
+    }
+
+    /**
+     * Get the info of a ModuleID. The info will only be retrieved if it has been updated more
+     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the module
+     * info will always be retrieved.
+     *
+     * @param module      the module to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see ModuleInfo
+     */
+    public static void getModuleInfo(ModuleID module, long lastRefresh,
+                                     ResultHandler<ModuleInfo> handler) {
+        getModuleInfo(Collections.singletonList(module), lastRefresh, result -> {
+            handler.handleResult(result.map(modules -> {
+                switch (modules.length) {
+                    case 0:
+                        return null;
+                    case 1:
+                        return modules[0];
+                    default:
+                        throw new IllegalArgumentException("multiple modules returned");
+                }
+            }));
+        });
+    }
+
+    /**
+     * Get the info of multiple ModuleIDs. Only the info of modules which have been updated more
+     * recently than lastRefresh will be returned, otherwise they will be omitted. If lastRefresh
+     * is 0, the module info will always be retrieved.
+     *
+     * @param modules     the modules to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @see ModuleInfo
+     */
+    public static void getModuleInfo(List<? extends ModuleID> modules, long lastRefresh,
+                                     ResultHandler<ModuleInfo[]> handler) {
+        getInfo(ModuleInfo.class, "modules", "getModuleInfo", ModuleInfo::fromJson,
+                modules, lastRefresh, handler);
+    }
+
+    /**
+     * Generic helper method for retrieving info about an ItemID from the server. Used to implement
+     * getGroupInfo(), getUserInfo(), and getModuleInfo().
+     *
+     * @param clazz       the class of the info
+     * @param field       the name of the field in the request
+     * @param request     the kind of the request
+     * @param parser      a parser for the server response
+     * @param ids         the ids to retrieve the info of
+     * @param lastRefresh the last time the cached info was refreshed or 0
+     * @param handler     the handler for the response of the server
+     * @param <T>         the type of the info
+     * @param <U>         the type of the item
+     */
+    @SuppressWarnings("unchecked")
+    private static <T, U extends ItemID> void getInfo(Class<T> clazz, String field, String request,
+                                                      Function<JsonObject, T> parser,
+                                                      List<U> ids, long lastRefresh,
+                                                      ResultHandler<T[]> handler) {
+        if (ids == null) {
+            throw new IllegalArgumentException(field + " cannot be null");
+        } else if (lastRefresh < 0) {
+            throw new IllegalArgumentException("last refresh time cannot be negative");
+        }
+
+        if (ids.isEmpty()) {
+            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
+            return;
+        }
+
+        JsonArray array = new JsonArray();
+        for (ItemID id : ids) {
+            if (id == null) {
+                throw new IllegalArgumentException("ItemID cannot be null");
+            }
+            array.add(id.id);
+        }
+
+        JsonObject data = new JsonObject();
+        data.add(field, array);
+        data.addProperty("lastRefresh", lastRefresh);
+        getConnection().send(new Message(request, data), handler, response -> {
+            JsonArray infoJson = response.get("info").getAsJsonArray();
+            T[] info = (T[]) Array.newInstance(clazz, infoJson.size());
+            for (int i = 0; i < info.length; i++) {
+                info[i] = parser.apply(infoJson.get(i).getAsJsonObject());
+            }
+            return info;
         });
     }
 }

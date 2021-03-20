@@ -12,9 +12,11 @@ import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class Group implements Parcelable, NotificationListener {
@@ -36,8 +38,9 @@ public class Group implements Parcelable, NotificationListener {
         this.groupRole = groupRole;
         users = new ArrayList<User>();
         ServerConnector.getUsers(groupID, result -> {
+            // TODO use cached user data with name
             for (int i = 0; i < result.data.length; i++) {
-                User nextUser = new User(result.data[i].id, result.data[i].name);
+                User nextUser = new User(result.data[i].id, "<NAME>");
                 users.add(nextUser);
             }
         });

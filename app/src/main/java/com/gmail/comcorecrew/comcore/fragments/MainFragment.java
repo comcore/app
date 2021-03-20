@@ -22,11 +22,11 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainFragment extends Fragment {
     public static ArrayList<Group> groups =  new ArrayList<>();
@@ -168,15 +168,24 @@ public class MainFragment extends Fragment {
                     return;
                 }
 
-                ArrayList<Group> userGroups = new ArrayList<>();
-                for (int i = 0; i < result.data.length; i++) {
-                    Group nextGroup = new Group(getContext(), result.data[i].name,
-                            result.data[i].id, result.data[i].role, result.data[i].muted);
-                    userGroups.add(nextGroup);
-                }
-                groups = userGroups;
+                ServerConnector.getGroupInfo(Arrays.asList(result.data), 0, result1 -> {
+                    if (result1.isFailure()) {
+                        new ErrorDialog(R.string.error_cannot_connect)
+                                .show(getParentFragmentManager(), null);
+                        return;
+                    }
 
-                notifyDataSetChanged();
+                    GroupInfo[] info = result1.data;
+                    ArrayList<Group> userGroups = new ArrayList<>();
+                    for (int i = 0; i < result.data.length; i++) {
+                        Group nextGroup = new Group(getContext(), info[i].name,  info[i].id,
+                                info[i].role, info[i].muted);
+                        userGroups.add(nextGroup);
+                    }
+                    groups = userGroups;
+
+                    notifyDataSetChanged();
+                });
             });
         }
 

@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 /**
  * Represents a Task which can be executed by a ServerConnection.
  */
-public class Task implements ResultHandler<JsonObject> {
+public final class Task implements ResultHandler<JsonObject> {
     /**
      * The message to send when starting the task.
      */

@@ -1,7 +1,7 @@
 package com.gmail.comcorecrew.comcore.classes;
 
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 /**
  * The User class is used to store information about other users for reference by the client
@@ -33,8 +33,8 @@ public class User {
         this.internalId = internalId;
     }
 
-    public UserEntry toUserEntry() {
-        return new UserEntry(userID, userName);
+    public UserInfo toUserInfo() {
+        return new UserInfo(userID, userName);
     }
 
     public UserID getID() {

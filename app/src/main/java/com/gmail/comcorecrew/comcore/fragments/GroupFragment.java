@@ -26,6 +26,7 @@ import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
@@ -82,12 +83,13 @@ public class GroupFragment extends Fragment {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
+
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
-            ServerConnector.getChats(currentGroup.getGroupId(), result -> {
-                if (result.isFailure() || result.data.length == 0) {
+            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+                if (result.isFailure() || result.data.length == 0 || !(result.data[0] instanceof ChatID)) {
                     return;
                 }
-                ChatFragment.chatID = result.data[0].id;
+                ChatFragment.chatID = (ChatID) result.data[0];
                 NavHostFragment.findNavController(this)
                         .navigate(R.id.action_groupFragment_to_chatFragment);
             });
@@ -182,7 +184,7 @@ public class GroupFragment extends Fragment {
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
-                ServerConnector.getChats(currentGroup.getGroupId(), result -> {
+                ServerConnector.getModules(currentGroup.getGroupId(), result -> {
                     if (result.isSuccess() && result.data.length == 0) {
                         ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
                     }

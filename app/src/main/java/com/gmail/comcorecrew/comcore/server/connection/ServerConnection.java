@@ -8,7 +8,7 @@ import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerReader;
 import com.gmail.comcorecrew.comcore.server.connection.thread.ServerWriter;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -40,7 +40,7 @@ public final class ServerConnection implements Connection {
 
     private String email;
     private String pass;
-    private UserEntry userData;
+    private UserInfo userInfo;
 
     private Socket socket;
     private BufferedReader in;
@@ -236,8 +236,8 @@ public final class ServerConnection implements Connection {
      *
      * @param userData the user data
      */
-    public synchronized void setUser(UserEntry userData) {
-        this.userData = userData;
+    public synchronized void setUserInfo(UserInfo userData) {
+        this.userInfo = userData;
     }
 
     /**
@@ -342,14 +342,14 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
-    public synchronized UserEntry getUser() {
-        return userData;
+    public synchronized UserInfo getUserInfo() {
+        return userInfo;
     }
 
     @Override
     public synchronized void setInformation(String email, String pass) {
         if (pass == null) {
-            this.userData = null;
+            this.userInfo = null;
         }
 
         if (email != null || pass == null) {

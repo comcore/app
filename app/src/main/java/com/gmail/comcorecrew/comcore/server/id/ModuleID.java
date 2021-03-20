@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.id;
 
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 /**
@@ -25,6 +27,28 @@ public abstract class ModuleID extends ItemID {
         }
 
         this.group = group;
+    }
+
+    /**
+     * Parse a ModuleID from a JsonObject. If specified, the given GroupID is used. Otherwise,
+     * it is taken from the JSON data.
+     *
+     * @param group the group which the module was retrieved from or null
+     * @param json  the data sent by the server
+     * @return the ModuleID
+     */
+    public static ModuleID fromJson(GroupID group, JsonObject json) {
+        if (group == null) {
+            group = new GroupID(json.get("group").getAsString());
+        }
+        String id = json.get("id").getAsString();
+        String kind = json.get("kind").getAsString();
+        switch (kind) {
+            case "chat":
+                return new ChatID(group, id);
+            default:
+                throw new IllegalArgumentException("invalid module kind: " + kind);
+        }
     }
 
     @Override

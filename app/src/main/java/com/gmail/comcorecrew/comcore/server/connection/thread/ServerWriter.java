@@ -6,7 +6,7 @@ import com.gmail.comcorecrew.comcore.server.connection.Task;
 /**
  * The writer thread which initiates tasks by sending them to the server.
  */
-public class ServerWriter extends ServerThread {
+public final class ServerWriter extends ServerThread {
     /**
      * Create a ServerWriter associated with a ServerConnection.
      *

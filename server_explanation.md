@@ -143,7 +143,10 @@ ServerConnector.requestReset(password, result -> {
 });
 ```
 
-## Creating groups and chats
+## Creating and listing items
+
+These examples will show creating and listing groups, but there are similar methods for users and
+group modules as well. See the static methods of `ServerConnector` for more info.
 
 #### Creating a group
 
@@ -160,23 +163,6 @@ ServerConnector.createGroup(groupName, result -> {
 });
 ```
 
-#### Creating a chat in a group
-
-```java
-ServerConnector.createChat(groupId, chatName, result -> {
-    if (result.isFailure()) {
-        // Handle connection failure
-        return;
-    }
-
-    ChatID chatId = result.data;
-
-    // Store the chat data and open next menu
-});
-```
-
-## Listing groups, chats, and users
-
 #### Listing all groups
 
 ```java
@@ -186,38 +172,40 @@ ServerConnector.getGroups(result -> {
         return;
     }
 
-    for (GroupEntry group : result.data) {
+    for (GroupID group : result.data) {
         // Do something with the group
     }
 });
 ```
 
-#### Listing all users in a group
+#### Getting group info for a single group
 
 ```java
-ServerConnector.getUsers(groupId, result -> {
+ServerConnector.getGroupInfo(group, lastRefresh, result -> {
     if (result.isFailure()) {
         // Handle connection failure
         return;
     }
 
-    for (UserEntry user : result.data) {
-        // Do something with the user
+    GroupInfo groupInfo = result.data;
+    if (groupInfo != null) {
+        // Update the group information
     }
 });
 ```
 
-#### Listing all chats in a group
+#### Getting group info for multiple groups
 
 ```java
-ServerConnector.getChats(groupId, result -> {
+ServerConnector.getGroupInfo(groups, lastRefresh, result -> {
     if (result.isFailure()) {
         // Handle connection failure
         return;
     }
 
-    for (ChatEntry chat : result.data) {
-        // Do something with the chat
+    GroupInfo[] info = result.data;
+    for (GroupInfo groupInfo : info) {
+        // Update the group information
     }
 });
 ```
@@ -289,22 +277,6 @@ of the notification listeners.
 
 ```java
 ServerConnector.addNotificationListener(notificationListener);
-```
-
-#### Example notification listener
-
-```java
-class ExampleListener implements NotificationListener {
-    @Override
-    public void onReceiveMessage(MessageEntry message) {
-        System.out.println(message.sender.name + " says: " + message.contents);
-    }
-
-    @Override
-    public void onLoggedOut() {
-        System.out.println("Logged out by server!");
-    }
-}
 ```
 
 ## Other requests

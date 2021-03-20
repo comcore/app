@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Represents a sequential identifier for a message in a chat.
  */
-public class MessageID {
+public final class MessageID {
     /**
      * The maximum value of a MessageID (2^53). This is the limit because it is the largest integer
      * such that all smaller integers can be stored in a double-precision floating point number.
