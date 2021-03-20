@@ -13,4 +13,9 @@ public final class ChatID extends ModuleID {
     public ChatID(GroupID group, String id) {
         super(group, id);
     }
+
+    @Override
+    public String getKind() {
+        return "chat";
+    }
 }

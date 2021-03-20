@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore.server.id;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 /**
@@ -24,6 +26,17 @@ public abstract class ItemID {
         }
 
         this.id = id;
+    }
+
+    /**
+     * Convert this ItemID to a JSON object.
+     *
+     * @return the JsonObject
+     */
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", id);
+        return json;
     }
 
     @Override

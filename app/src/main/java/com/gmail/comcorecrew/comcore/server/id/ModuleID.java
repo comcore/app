@@ -51,6 +51,22 @@ public abstract class ModuleID extends ItemID {
         }
     }
 
+    /**
+     * Get a string describing the kind of module.
+     *
+     * @return the String describing the kind
+     */
+    public abstract String getKind();
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty("group", group.id);
+        json.addProperty("id", id);
+        json.addProperty("kind", getKind());
+        return json;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

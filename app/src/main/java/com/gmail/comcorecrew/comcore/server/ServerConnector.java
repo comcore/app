@@ -262,15 +262,8 @@ public final class ServerConnector {
      * @param handler the handler for the response of the server
      */
     public static void getGroups(ResultHandler<GroupID[]> handler) {
-        getConnection().send(new Message("getGroups"), handler, response -> {
-            JsonArray groupsJson = response.get("groups").getAsJsonArray();
-            GroupID[] groups = new GroupID[groupsJson.size()];
-            for (int i = 0; i < groups.length; i++) {
-                JsonObject group = groupsJson.get(i).getAsJsonObject();
-                groups[i] = new GroupID(group.get("id").getAsString());
-            }
-            return groups;
-        });
+        requestArray(new Message("getGroups"), handler, GroupID.class,
+                "groups", json -> new GroupID(json.get("id").getAsString()));
     }
 
     /**
@@ -309,14 +302,8 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        getConnection().send(new Message("getUsers", data), handler, response -> {
-            JsonArray usersJson = response.get("users").getAsJsonArray();
-            GroupUserEntry[] users = new GroupUserEntry[usersJson.size()];
-            for (int i = 0; i < users.length; i++) {
-                users[i] = GroupUserEntry.fromJson(usersJson.get(i).getAsJsonObject());
-            }
-            return users;
-        });
+        requestArray(new Message("getUsers", data), handler, GroupUserEntry.class,
+                "users", GroupUserEntry::fromJson);
     }
 
     /**
@@ -332,14 +319,8 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        getConnection().send(new Message("getModules", data), handler, response -> {
-            JsonArray modulesJson = response.get("modules").getAsJsonArray();
-            ModuleID[] modules = new ModuleID[modulesJson.size()];
-            for (int i = 0; i < modules.length; i++) {
-                modules[i] = ModuleID.fromJson(group, modulesJson.get(i).getAsJsonObject());
-            }
-            return modules;
-        });
+        requestArray(new Message("getModules", data), handler, ModuleID.class,
+                "modules", json -> ModuleID.fromJson(group, json));
     }
 
     /**
@@ -372,14 +353,8 @@ public final class ServerConnector {
      * @see GroupInviteEntry
      */
     public static void getInvites(ResultHandler<GroupInviteEntry[]> handler) {
-        getConnection().send(new Message("getInvites"), handler, response -> {
-            JsonArray invitesJson = response.get("invites").getAsJsonArray();
-            GroupInviteEntry[] invites = new GroupInviteEntry[invitesJson.size()];
-            for (int i = 0; i < invites.length; i++) {
-                invites[i] = GroupInviteEntry.fromJson(invitesJson.get(i).getAsJsonObject());
-            }
-            return invites;
-        });
+        requestArray(new Message("getInvites"), handler, GroupInviteEntry.class,
+                "invites", GroupInviteEntry::fromJson);
     }
 
     /**
@@ -536,14 +511,8 @@ public final class ServerConnector {
         data.addProperty("chat", chat.id);
         data.addProperty("after", after == null ? 0 : after.id);
         data.addProperty("before", before == null ? 0 : before.id);
-        getConnection().send(new Message("getMessages", data), handler, response -> {
-            JsonArray messagesJson = response.get("messages").getAsJsonArray();
-            MessageEntry[] messages = new MessageEntry[messagesJson.size()];
-            for (int i = 0; i < messages.length; i++) {
-                messages[i] = MessageEntry.fromJson(chat, messagesJson.get(i).getAsJsonObject());
-            }
-            return messages;
-        });
+        requestArray(new Message("getMessages", data), handler, MessageEntry.class,
+                "messages", json -> MessageEntry.fromJson(chat, json));
     }
 
     /**
@@ -707,14 +676,21 @@ public final class ServerConnector {
             if (id == null) {
                 throw new IllegalArgumentException("ItemID cannot be null");
             }
-            array.add(id.id);
+            array.add(id.toJson());
         }
 
         JsonObject data = new JsonObject();
         data.add(field, array);
         data.addProperty("lastRefresh", lastRefresh);
-        getConnection().send(new Message(request, data), handler, response -> {
-            JsonArray infoJson = response.get("info").getAsJsonArray();
+        requestArray(new Message(request, data), handler, clazz, "info", parser);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void requestArray(Message message, ResultHandler<T[]> handler,
+                                         Class<T> clazz, String field,
+                                         Function<JsonObject, T> parser) {
+        getConnection().send(message, handler, response -> {
+            JsonArray infoJson = response.get(field).getAsJsonArray();
             T[] info = (T[]) Array.newInstance(clazz, infoJson.size());
             for (int i = 0; i < info.length; i++) {
                 info[i] = parser.apply(infoJson.get(i).getAsJsonObject());
