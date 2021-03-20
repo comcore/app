@@ -75,6 +75,7 @@ public class NotificationHandler implements NotificationListener {
                 .setSmallIcon(R.drawable.receivedmsg)
                 .setContentTitle(message.sender.name)
                 .setContentText(message.contents)
+                .setWhen(message.timestamp)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build());
     }
