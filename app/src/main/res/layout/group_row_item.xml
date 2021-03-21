@@ -6,7 +6,6 @@
     android:layout_height="50dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="@color/secondary_d1"
     android:clickable="true"
     android:focusable="auto"
     android:gravity="center_vertical">
@@ -25,7 +24,6 @@
             android:layout_marginEnd="5dp"
             android:gravity="center"
             android:text="@string/error_unknown"
-            android:textColor="@color/primary"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

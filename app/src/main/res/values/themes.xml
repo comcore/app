@@ -15,6 +15,7 @@
 
         <item name="android:colorBackground" tools:targetApi="l">?attr/colorSecondary</item>
         <item name="android:toolbarStyle" tools:targetApi="l">?attr/colorPrimary</item>
+        <item name="additionalButtonBackground">@color/primary</item>
 
     </style>
 </resources>
