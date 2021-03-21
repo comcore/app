@@ -602,11 +602,9 @@ public final class ServerConnector {
      *
      * @param module      the module to retrieve the info of
      * @param handler     the handler for the response of the server
-     * @param <T>         the type of module which is being fetched
      * @see ModuleInfo
      */
-    public static <T extends ModuleID> void getModuleInfo(T module,
-                                                          ResultHandler<ModuleInfo<T>> handler) {
+    public static void getModuleInfo(ModuleID module, ResultHandler<ModuleInfo> handler) {
         getModuleInfo(Collections.singletonList(module), result ->
             handler.handleResult(result.map(modules -> {
                 switch (modules.length) {
@@ -625,14 +623,11 @@ public final class ServerConnector {
      *
      * @param modules     the modules to retrieve the info of
      * @param handler     the handler for the response of the server
-     * @param <T>         the type of modules which are being fetched
      * @see ModuleInfo
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends ModuleID> void getModuleInfo(List<T> modules,
-                                                          ResultHandler<ModuleInfo<T>[]> handler) {
+    public static void getModuleInfo(List<ModuleID> modules, ResultHandler<ModuleInfo[]> handler) {
         getInfo(ModuleInfo.class, "modules", "getModuleInfo", ModuleInfo::fromJson,
-                modules, -1, (ResultHandler<ModuleInfo[]>) handler);
+                modules, -1, handler);
     }
 
     /**
