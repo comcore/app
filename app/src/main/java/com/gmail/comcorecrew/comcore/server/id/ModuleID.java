@@ -46,6 +46,8 @@ public abstract class ModuleID extends ItemID {
         switch (kind) {
             case "chat":
                 return new ChatID(group, id);
+            case "task":
+                return new TaskListID(group, id);
             default:
                 throw new IllegalArgumentException("invalid module kind: " + kind);
         }

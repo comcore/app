@@ -240,6 +240,29 @@ public final class ServerConnector {
     }
 
     /**
+     * Checks if two-factor authentication is enabled for the current user. If two-factor
+     * authentication is enabled, all login requests will return LoginStatus.ENTER_CODE rather than
+     * LoginStatus.SUCCESS, and the user will only be able to log in after entering the code.
+     *
+     * @param handler the handler for the response of the server
+     */
+    public static void getTwoFactor(ResultHandler<Boolean> handler) {
+        getConnection().send(new Message("getTwoFactor"), handler, response ->
+                response.get("enabled").getAsBoolean());
+    }
+
+    /**
+     * Enables or disables two-factor authentication for the user.
+     *
+     * @param handler the handler for the response of the server
+     */
+    public static void setTwoFactor(boolean enabled, ResultHandler<Void> handler) {
+        JsonObject data = new JsonObject();
+        data.addProperty("enabled", enabled);
+        getConnection().send(new Message("setTwoFactor", data), handler, response -> null);
+    }
+
+    /**
      * Create a new group with a given name.
      *
      * @param name the name of the group
@@ -274,18 +297,19 @@ public final class ServerConnector {
      * @param handler the handler for the response of the server
      */
     public static void createChat(GroupID group, String name, ResultHandler<ChatID> handler) {
-        if (group == null) {
-            throw new IllegalArgumentException("GroupID cannot be null");
-        } else if (name == null) {
-            throw new IllegalArgumentException("chat name cannot be null");
-        }
+        createModule("chat", group, name, handler, id -> new ChatID(group, id));
+    }
 
-        JsonObject data = new JsonObject();
-        data.addProperty("group", group.id);
-        data.addProperty("name", name);
-        getConnection().send(new Message("createChat", data), handler, response ->
-                new ChatID(group, response.get("id").getAsString())
-        );
+    /**
+     * Create a new task list with a given name.
+     *
+     * @param group   the parent group of the task list
+     * @param name    the name of the task list
+     * @param handler the handler for the response of the server
+     */
+    public static void createTaskList(GroupID group, String name,
+                                      ResultHandler<TaskListID> handler) {
+        createModule("task", group, name, handler, id -> new TaskListID(group, id));
     }
 
     /**
@@ -600,8 +624,8 @@ public final class ServerConnector {
     /**
      * Get the info of a ModuleID.
      *
-     * @param module      the module to retrieve the info of
-     * @param handler     the handler for the response of the server
+     * @param module  the module to retrieve the info of
+     * @param handler the handler for the response of the server
      * @see ModuleInfo
      */
     public static void getModuleInfo(ModuleID module, ResultHandler<ModuleInfo> handler) {
@@ -621,13 +645,29 @@ public final class ServerConnector {
     /**
      * Get the info of multiple ModuleIDs.
      *
-     * @param modules     the modules to retrieve the info of
-     * @param handler     the handler for the response of the server
+     * @param modules the modules to retrieve the info of
+     * @param handler the handler for the response of the server
      * @see ModuleInfo
      */
     public static void getModuleInfo(List<ModuleID> modules, ResultHandler<ModuleInfo[]> handler) {
         getInfo(ModuleInfo.class, "modules", "getModuleInfo", ModuleInfo::fromJson,
                 modules, -1, handler);
+    }
+
+    private static <T> void createModule(String kind, GroupID group, String name,
+                                         ResultHandler<T> handler, Function<String, T> module) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (name == null) {
+            throw new IllegalArgumentException("module name cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("name", name);
+        data.addProperty("kind", kind);
+        getConnection().send(new Message("createModule", data), handler, response ->
+                module.apply(response.get("id").getAsString()));
     }
 
     /**
