@@ -221,6 +221,8 @@ ServerConnector.sendMessage(chatId, messageContents, result -> {
         return;
     }
 
+    MessageID messageId = result.data;
+
     // Display the message as being sent
 });
 ```

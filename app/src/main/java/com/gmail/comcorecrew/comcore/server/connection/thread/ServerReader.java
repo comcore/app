@@ -3,9 +3,9 @@ package com.gmail.comcorecrew.comcore.server.connection.thread;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
-import com.gmail.comcorecrew.comcore.server.connection.Message;
+import com.gmail.comcorecrew.comcore.server.connection.ServerMsg;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
-import com.gmail.comcorecrew.comcore.server.connection.Task;
+import com.gmail.comcorecrew.comcore.server.connection.ServerTask;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -26,12 +26,12 @@ public final class ServerReader extends ServerThread {
 
     @Override
     protected void step() {
-        Message message = connection.receiveMessage();
+        ServerMsg message = connection.receiveMessage();
         if (message == null) {
             return;
         }
 
-        Task task = null;
+        ServerTask task = null;
         try {
             switch (message.kind) {
                 case "REPLY": {

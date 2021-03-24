@@ -26,6 +26,7 @@ public final class MessageID {
 
     /**
      * Create a MessageID from a parent chat and a numeric ID.
+     *
      * @param chat the parent chat
      * @param id   the numeric ID
      */

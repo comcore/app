@@ -6,7 +6,7 @@ import android.os.Looper;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
-import com.gmail.comcorecrew.comcore.server.connection.Message;
+import com.gmail.comcorecrew.comcore.server.connection.ServerMsg;
 import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.*;
@@ -134,7 +134,7 @@ public final class ServerConnector {
         data.addProperty("email", email);
         data.addProperty("pass", pass);
         Connection connection = getConnection();
-        connection.send(new Message("login", data), handler, response -> {
+        connection.send(new ServerMsg("login", data), handler, response -> {
             LoginStatus status = LoginStatus.fromJson(response);
             if (status.isValid) {
                 connection.setInformation(email, pass);
@@ -166,7 +166,7 @@ public final class ServerConnector {
         data.addProperty("email", email);
         data.addProperty("pass", pass);
         Connection connection = getConnection();
-        connection.send(new Message("createAccount", data), handler, response -> {
+        connection.send(new ServerMsg("createAccount", data), handler, response -> {
             boolean created = response.get("created").getAsBoolean();
             if (created) {
                 connection.setInformation(email, pass);
@@ -190,7 +190,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("email", email);
         Connection connection = getConnection();
-        connection.send(new Message("requestReset", data), handler, response -> {
+        connection.send(new ServerMsg("requestReset", data), handler, response -> {
             boolean sent = response.get("sent").getAsBoolean();
             if (sent) {
                 connection.setInformation(email, null);
@@ -214,7 +214,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("code", code);
-        getConnection().send(new Message("enterCode", data), handler, response ->
+        getConnection().send(new ServerMsg("enterCode", data), handler, response ->
             response.get("correct").getAsBoolean());
     }
 
@@ -233,7 +233,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("pass", pass);
         Connection connection = getConnection();
-        connection.send(new Message("finishReset", data), handler, response -> {
+        connection.send(new ServerMsg("finishReset", data), handler, response -> {
             connection.setInformation(null, pass);
             return null;
         });
@@ -247,7 +247,7 @@ public final class ServerConnector {
      * @param handler the handler for the response of the server
      */
     public static void getTwoFactor(ResultHandler<Boolean> handler) {
-        getConnection().send(new Message("getTwoFactor"), handler, response ->
+        getConnection().send(new ServerMsg("getTwoFactor"), handler, response ->
                 response.get("enabled").getAsBoolean());
     }
 
@@ -259,7 +259,7 @@ public final class ServerConnector {
     public static void setTwoFactor(boolean enabled, ResultHandler<Void> handler) {
         JsonObject data = new JsonObject();
         data.addProperty("enabled", enabled);
-        getConnection().send(new Message("setTwoFactor", data), handler, response -> null);
+        getConnection().send(new ServerMsg("setTwoFactor", data), handler, response -> null);
     }
 
     /**
@@ -275,7 +275,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("name", name);
-        getConnection().send(new Message("createGroup", data), handler, response ->
+        getConnection().send(new ServerMsg("createGroup", data), handler, response ->
                 new GroupID(response.get("id").getAsString()));
     }
 
@@ -285,7 +285,7 @@ public final class ServerConnector {
      * @param handler the handler for the response of the server
      */
     public static void getGroups(ResultHandler<GroupID[]> handler) {
-        requestArray(new Message("getGroups"), handler, GroupID.class,
+        requestArray(new ServerMsg("getGroups"), handler, GroupID.class,
                 "groups", json -> new GroupID(json.get("id").getAsString()));
     }
 
@@ -313,6 +313,25 @@ public final class ServerConnector {
     }
 
     /**
+     * Create a new custom module with a given name and type.
+     *
+     * @param group   the parent group of the task list
+     * @param name    the name of the task list
+     * @param type    the type string of the custom module
+     * @param handler the handler for the response of the server
+     */
+    public static void createCustomModule(GroupID group, String name, String type,
+                                          ResultHandler<CustomModuleID> handler) {
+        if (type == null || type.isEmpty()) {
+            throw new IllegalArgumentException("type string cannot be empty");
+        } else if (ModuleID.isKnownType(type)) {
+            throw new IllegalArgumentException("cannot create custom module with type " + type);
+        }
+
+        createModule(type, group, name, handler, id -> new CustomModuleID(group, id, type));
+    }
+
+    /**
      * Get a list of all users in a group, including the current user.
      *
      * @param group   the group to list the users of
@@ -326,7 +345,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        requestArray(new Message("getUsers", data), handler, GroupUserEntry.class,
+        requestArray(new ServerMsg("getUsers", data), handler, GroupUserEntry.class,
                 "users", GroupUserEntry::fromJson);
     }
 
@@ -347,7 +366,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        requestArray(new Message("getModules", data), handler, ModuleInfo.class,
+        requestArray(new ServerMsg("getModules", data), handler, ModuleInfo.class,
                 "modules", json -> ModuleInfo.fromJson(group, json));
     }
 
@@ -370,7 +389,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
         data.addProperty("email", email);
-        getConnection().send(new Message("sendInvite", data), handler, response ->
+        getConnection().send(new ServerMsg("sendInvite", data), handler, response ->
                 response.get("sent").getAsBoolean());
     }
 
@@ -381,7 +400,7 @@ public final class ServerConnector {
      * @see GroupInviteEntry
      */
     public static void getInvites(ResultHandler<GroupInviteEntry[]> handler) {
-        requestArray(new Message("getInvites"), handler, GroupInviteEntry.class,
+        requestArray(new ServerMsg("getInvites"), handler, GroupInviteEntry.class,
                 "invites", GroupInviteEntry::fromJson);
     }
 
@@ -400,7 +419,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
         data.addProperty("accept", accept);
-        getConnection().send(new Message("replyToInvite", data), handler, response -> null);
+        getConnection().send(new ServerMsg("replyToInvite", data), handler, response -> null);
     }
 
     /**
@@ -416,7 +435,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        getConnection().send(new Message("leaveGroup", data), handler, response -> null);
+        getConnection().send(new ServerMsg("leaveGroup", data), handler, response -> null);
     }
 
     /**
@@ -437,7 +456,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
         data.addProperty("target", target.id);
-        getConnection().send(new Message("kick", data), handler, response -> null);
+        getConnection().send(new ServerMsg("kick", data), handler, response -> null);
     }
 
     /**
@@ -466,7 +485,7 @@ public final class ServerConnector {
         data.addProperty("group", group.id);
         data.addProperty("target", target.id);
         data.addProperty("role", role.toString());
-        getConnection().send(new Message("setRole", data), handler, response -> null);
+        getConnection().send(new ServerMsg("setRole", data), handler, response -> null);
     }
 
     /**
@@ -490,7 +509,7 @@ public final class ServerConnector {
         data.addProperty("group", group.id);
         data.addProperty("target", target.id);
         data.addProperty("muted", muted);
-        getConnection().send(new Message("setMuted", data), handler, response -> null);
+        getConnection().send(new ServerMsg("setMuted", data), handler, response -> null);
     }
 
     /**
@@ -500,7 +519,7 @@ public final class ServerConnector {
      * @param message the message to send
      * @param handler the handler for the response of the server
      */
-    public static void sendMessage(ChatID chat, String message, ResultHandler<Void> handler) {
+    public static void sendMessage(ChatID chat, String message, ResultHandler<MessageID> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
         } else if (message == null) {
@@ -511,7 +530,8 @@ public final class ServerConnector {
         data.addProperty("group", chat.group.id);
         data.addProperty("chat", chat.id);
         data.addProperty("contents", message);
-        getConnection().send(new Message("sendMessage", data), handler, response -> null);
+        getConnection().send(new ServerMsg("sendMessage", data), handler,
+                response -> new MessageID(chat, response.get("id").getAsLong()));
     }
 
     /**
@@ -539,8 +559,103 @@ public final class ServerConnector {
         data.addProperty("chat", chat.id);
         data.addProperty("after", after == null ? 0 : after.id);
         data.addProperty("before", before == null ? 0 : before.id);
-        requestArray(new Message("getMessages", data), handler, MessageEntry.class,
+        requestArray(new ServerMsg("getMessages", data), handler, MessageEntry.class,
                 "messages", json -> MessageEntry.fromJson(chat, json));
+    }
+
+    /**
+     * Update a message in a chat. If the newContents is null, the message will be deleted.
+     * Otherwise, the contents of the message will be updated to match newContents.
+     *
+     * @param message     the message to update
+     * @param newContents the new contents of the message or null
+     * @param handler     the handler for the response of the server
+     */
+    public static void updateMessage(MessageID message, String newContents,
+                                     ResultHandler<Void> handler) {
+        if (message == null) {
+            throw new IllegalArgumentException("MessageID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", message.chat.group.id);
+        data.addProperty("chat", message.chat.id);
+        data.addProperty("id", message.id);
+        data.addProperty("newContents", newContents);
+        getConnection().send(new ServerMsg("updateMessage", data), handler, response -> null);
+    }
+
+    /**
+     * Add a task with a given description to a task list.
+     *
+     * @param taskList    the task list to add the task to
+     * @param description the description of the task
+     * @param handler     the handler for the response of the server
+     */
+    public static void addTask(TaskListID taskList, String description,
+                               ResultHandler<TaskID> handler) {
+        if (taskList == null) {
+            throw new IllegalArgumentException("TaskListID cannot be null");
+        } else if (description == null) {
+            throw new IllegalArgumentException("task description cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", taskList.group.id);
+        data.addProperty("taskList", taskList.id);
+        data.addProperty("description", description);
+        getConnection().send(new ServerMsg("addTask", data), handler,
+                response -> new TaskID(taskList));
+    }
+
+    /**
+     * Get a list of the tasks in a task list.
+     *
+     * @param taskList the task list to request tasks from
+     * @param handler  the handler for the response of the server
+     * @see TaskEntry
+     */
+    public static void getTasks(TaskListID taskList, ResultHandler<TaskEntry[]> handler) {
+        if (taskList == null) {
+            throw new IllegalArgumentException("TaskListID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", taskList.group.id);
+        data.addProperty("taskList", taskList.id);
+        requestArray(new ServerMsg("getTasks", data), handler, TaskEntry.class,
+                "tasks", json -> TaskEntry.fromJson(taskList, json));
+    }
+
+    /**
+     * Update a task's completed status.
+     *
+     * @param task      the task to update
+     * @param completed whether the task has been completed
+     * @param handler   the handler for the response of the server
+     */
+    public static void updateTask(TaskID task, boolean completed, ResultHandler<Void> handler) {
+        if (task == null) {
+            throw new IllegalArgumentException("TaskID cannot be null");
+        }
+
+        // TODO implement
+        handler.handleResult(ServerResult.failure("unimplemented: updateTask"));
+    }
+
+    /**
+     * Delete a task from a task list. The TaskID becomes invalid and can no longer be used.
+     *
+     * @param task    the task to delete
+     * @param handler the handler for the response of the server
+     */
+    public static void deleteTask(TaskID task, ResultHandler<Void> handler) {
+        if (task == null) {
+            throw new IllegalArgumentException("TaskID cannot be null");
+        }
+
+        // TODO implement
+        handler.handleResult(ServerResult.failure("unimplemented: deleteTask"));
     }
 
     /**
@@ -658,6 +773,17 @@ public final class ServerConnector {
                 json -> ModuleInfo.fromJson(null, json), modules, -1, handler);
     }
 
+    /**
+     * Generic helper method for creating different types of modules. Used to implement
+     * createChat(), createTaskList(), and createCustomModule().
+     *
+     * @param type    the type string of the module
+     * @param group   the group to create the module in
+     * @param name    the name of the module
+     * @param handler the handler for the response of the server
+     * @param module  a function to convert a module ID string into a specific type of ModuleID
+     * @param <T>     the type of the module ID
+     */
     private static <T> void createModule(String type, GroupID group, String name,
                                          ResultHandler<T> handler, Function<String, T> module) {
         if (group == null) {
@@ -670,7 +796,7 @@ public final class ServerConnector {
         data.addProperty("group", group.id);
         data.addProperty("name", name);
         data.addProperty("type", type);
-        getConnection().send(new Message("createModule", data), handler, response ->
+        getConnection().send(new ServerMsg("createModule", data), handler, response ->
                 module.apply(response.get("id").getAsString()));
     }
 
@@ -715,7 +841,7 @@ public final class ServerConnector {
         if (lastRefresh >= 0) {
             data.addProperty("lastRefresh", lastRefresh);
         }
-        requestArray(new Message(request, data), handler, clazz, field, parser);
+        requestArray(new ServerMsg(request, data), handler, clazz, field, parser);
     }
 
     /**
@@ -729,7 +855,7 @@ public final class ServerConnector {
      * @param <T>     the type of the item in the array
      */
     @SuppressWarnings("unchecked")
-    private static <T> void requestArray(Message message, ResultHandler<T[]> handler,
+    private static <T> void requestArray(ServerMsg message, ResultHandler<T[]> handler,
                                          Class<T> clazz, String field,
                                          Function<JsonObject, T> parser) {
         getConnection().send(message, handler, response -> {

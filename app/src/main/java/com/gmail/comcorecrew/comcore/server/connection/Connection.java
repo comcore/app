@@ -44,5 +44,5 @@ public interface Connection {
      * @param handler  the handler for the response of the server
      * @param function a function to convert the raw response to the proper type
      */
-    <T> void send(Message message, ResultHandler<T> handler, Function<JsonObject, T> function);
+    <T> void send(ServerMsg message, ResultHandler<T> handler, Function<JsonObject, T> function);
 }

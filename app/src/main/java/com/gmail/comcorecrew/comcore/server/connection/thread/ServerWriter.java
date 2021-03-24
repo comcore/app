@@ -1,7 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection.thread;
 
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
-import com.gmail.comcorecrew.comcore.server.connection.Task;
+import com.gmail.comcorecrew.comcore.server.connection.ServerTask;
 
 /**
  * The writer thread which initiates tasks by sending them to the server.
@@ -18,7 +18,7 @@ public final class ServerWriter extends ServerThread {
 
     @Override
     protected void step() {
-        Task task = getTask();
+        ServerTask task = getTask();
         if (task == null) {
             connection.connect();
         } else {

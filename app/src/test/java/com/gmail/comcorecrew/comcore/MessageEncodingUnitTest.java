@@ -4,11 +4,11 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.MockConnection;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -28,7 +28,7 @@ public class MessageEncodingUnitTest {
         // Create a message with unicode contents
         MessageEntry entry = new MessageEntry(
                 new MessageID(chatID, 1),
-                new UserEntry(new UserID("uid"), "Sender"),
+                new UserInfo(new UserID("uid"), "Sender"),
                 System.currentTimeMillis(),
                 "Test message வணக்கம் \uD83D\uDC4D \uD83C\uDDFA\uD83C\uDDF8");
 

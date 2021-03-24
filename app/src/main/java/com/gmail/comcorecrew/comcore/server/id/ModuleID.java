@@ -54,6 +54,16 @@ public abstract class ModuleID extends ItemID {
     }
 
     /**
+     * Checks if a type string is known to correspond to a type of module.
+     *
+     * @param type the type string
+     * @return true if it corresponds to a type of module, false otherwise
+     */
+    public static boolean isKnownType(String type) {
+        return type.equals("chat") || type.equals("task") || type.equals("cal");
+    }
+
+    /**
      * Get a string describing the kind of module.
      *
      * @return the String describing the kind

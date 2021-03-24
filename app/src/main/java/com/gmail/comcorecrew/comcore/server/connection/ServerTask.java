@@ -10,11 +10,11 @@ import com.google.gson.JsonObject;
 /**
  * Represents a Task which can be executed by a ServerConnection.
  */
-public final class Task implements ResultHandler<JsonObject> {
+public final class ServerTask implements ResultHandler<JsonObject> {
     /**
      * The message to send when starting the task.
      */
-    public final Message message;
+    public final ServerMsg message;
 
     /**
      * A handler for the result returned by the server (may be null).
@@ -27,7 +27,7 @@ public final class Task implements ResultHandler<JsonObject> {
      * @param message the message to send
      * @param handler the handler for the response of the server
      */
-    public Task(Message message, ResultHandler<JsonObject> handler) {
+    public ServerTask(ServerMsg message, ResultHandler<JsonObject> handler) {
         if (message == null) {
             throw new IllegalArgumentException("task message cannot be null");
         }

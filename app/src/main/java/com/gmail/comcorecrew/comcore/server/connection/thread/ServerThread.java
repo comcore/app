@@ -2,7 +2,7 @@ package com.gmail.comcorecrew.comcore.server.connection.thread;
 
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
-import com.gmail.comcorecrew.comcore.server.connection.Task;
+import com.gmail.comcorecrew.comcore.server.connection.ServerTask;
 
 import java.util.ArrayDeque;
 
@@ -11,7 +11,7 @@ import java.util.ArrayDeque;
  */
 public abstract class ServerThread {
     private final Thread thread;
-    private final ArrayDeque<Task> currentTasks = new ArrayDeque<>();
+    private final ArrayDeque<ServerTask> currentTasks = new ArrayDeque<>();
     private boolean running = true;
 
     /**
@@ -44,7 +44,7 @@ public abstract class ServerThread {
      *
      * @param task the task to add
      */
-    public final synchronized void addTask(Task task) {
+    public final synchronized void addTask(ServerTask task) {
         if (running) {
             currentTasks.add(task);
             notifyAll();
@@ -59,7 +59,7 @@ public abstract class ServerThread {
      *
      * @return the next task from the queue
      */
-    protected final synchronized Task getTask() {
+    protected final synchronized ServerTask getTask() {
         if (!running) {
             return null;
         }
@@ -86,7 +86,7 @@ public abstract class ServerThread {
      * Clear all tasks from the queue, failing them.
      */
     public final synchronized void clearTasks() {
-        for (Task task : currentTasks) {
+        for (ServerTask task : currentTasks) {
             task.handleResult(ServerResult.disconnected());
         }
         currentTasks.clear();

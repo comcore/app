@@ -35,7 +35,7 @@ public final class MockConnection implements Connection {
     public void setInformation(String email, String pass) {}
 
     @Override
-    public <T> void send(Message message, ResultHandler<T> handler,
+    public <T> void send(ServerMsg message, ResultHandler<T> handler,
                          Function<JsonObject, T> function) {
         if (handler != null) {
             handler.handleResult(result.map(function));

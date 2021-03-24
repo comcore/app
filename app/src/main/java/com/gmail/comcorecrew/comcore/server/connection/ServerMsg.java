@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 /**
  * Represents a message to send or receive from the server.
  */
-public final class Message {
+public final class ServerMsg {
     /**
      * The kind of message which identifies the action to perform.
      */
@@ -21,7 +21,7 @@ public final class Message {
      *
      * @param kind the kind of message
      */
-    public Message(String kind) {
+    public ServerMsg(String kind) {
         this(kind, new JsonObject());
     }
 
@@ -31,7 +31,7 @@ public final class Message {
      * @param kind the kind of message
      * @param data the data of the message
      */
-    public Message(String kind, JsonObject data) {
+    public ServerMsg(String kind, JsonObject data) {
         if (kind == null || kind.isEmpty()) {
             throw new IllegalArgumentException("message kind cannot be null or empty");
         } else if (data == null) {
@@ -60,9 +60,9 @@ public final class Message {
      * @param json the data sent by the server
      * @return the Message
      */
-    public static Message fromJson(JsonObject json) {
+    public static ServerMsg fromJson(JsonObject json) {
         String kind = json.get("kind").getAsString();
         JsonObject data = json.get("data").getAsJsonObject();
-        return new Message(kind, data);
+        return new ServerMsg(kind, data);
     }
 }

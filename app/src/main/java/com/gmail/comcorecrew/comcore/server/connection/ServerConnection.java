@@ -167,7 +167,7 @@ public final class ServerConnection implements Connection {
      *
      * @param task the task to execute
      */
-    private synchronized void addTask(Task task) {
+    private synchronized void addTask(ServerTask task) {
         writerThread.addTask(task);
     }
 
@@ -192,7 +192,7 @@ public final class ServerConnection implements Connection {
         if (pass != null) {
             data.addProperty("pass", pass);
         }
-        startTask(new Task(new Message(pass == null ? "requestReset" : "login", data), result -> {
+        startTask(new ServerTask(new ServerMsg(pass == null ? "requestReset" : "login", data), result -> {
             if (result.isFailure()) {
                 // A failure doesn't necessarily mean the information was wrong
                 return;
@@ -247,7 +247,7 @@ public final class ServerConnection implements Connection {
      *
      * @param task the task to start
      */
-    public void startTask(Task task) {
+    public void startTask(ServerTask task) {
         if (task == null) {
             return;
         }
@@ -283,7 +283,7 @@ public final class ServerConnection implements Connection {
      *
      * @return the next message from the server or null on failure
      */
-    public Message receiveMessage() {
+    public ServerMsg receiveMessage() {
         synchronized (this) {
             while (sslContext != null && in == null) {
                 try {
@@ -302,7 +302,7 @@ public final class ServerConnection implements Connection {
             String line = in.readLine();
             if (line != null && !line.isEmpty()) {
                 JsonObject json = JsonParser.parseString(line).getAsJsonObject();
-                return Message.fromJson(json);
+                return ServerMsg.fromJson(json);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -338,7 +338,7 @@ public final class ServerConnection implements Connection {
     public void logout()  {
         setInformation(null, null);
 
-        addTask(new Task(new Message("logout"), null));
+        addTask(new ServerTask(new ServerMsg("logout"), null));
     }
 
     @Override
@@ -360,9 +360,9 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
-    public <T> void send(Message message, ResultHandler<T> handler,
+    public <T> void send(ServerMsg message, ResultHandler<T> handler,
                          Function<JsonObject, T> function) {
-        addTask(new Task(message, handler == null ? null : result ->
+        addTask(new ServerTask(message, handler == null ? null : result ->
                 handler.handleResult(result.map(function))));
     }
 }

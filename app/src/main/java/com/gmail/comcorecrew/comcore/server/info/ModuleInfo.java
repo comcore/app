@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -23,20 +24,34 @@ public final class ModuleInfo {
     public final String name;
 
     /**
+     * Timestamp for the last cache-clearing action in this module. A cache clearing action is one
+     * that invalidates cached data. In the case of chats, sending a message is not cache-clearing
+     * since it can be added to the end of the cache. However, editing/deleting an old message is
+     * cache-clearing since the previously cached message data becomes invalid. Therefore, if this
+     * timestamp is more recent than the last time the cache was updated, then the cache should be
+     * cleared and the data reloaded.
+     */
+    public final long cacheClearTimestamp;
+
+    /**
      * Create a ModuleInfo from a ModuleID and a name.
      *
      * @param id   the ModuleID of the module
      * @param name the name of the module
+     * @param cacheClearTimestamp when the last cache-clearing action occurred
      */
-    public ModuleInfo(ModuleID id, String name) {
+    public ModuleInfo(ModuleID id, String name, long cacheClearTimestamp) {
         if (id == null) {
             throw new IllegalArgumentException("ModuleID cannot be null");
         } else if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("module name cannot be null or empty");
+        } else if (cacheClearTimestamp < 0) {
+            throw new IllegalArgumentException("cache clear time cannot be negative");
         }
 
         this.id = id;
         this.name = name;
+        this.cacheClearTimestamp = cacheClearTimestamp;
     }
 
     /**
@@ -49,7 +64,10 @@ public final class ModuleInfo {
     public static ModuleInfo fromJson(GroupID group, JsonObject json) {
         ModuleID id = ModuleID.fromJson(group, json);
         String name = json.get("name").getAsString();
-        return new ModuleInfo(id, name);
+        // TODO remove this check when it becomes unnecessary
+        JsonElement lastUpdateJson = json.get("lastUpdate");
+        long cacheClearTimestamp = lastUpdateJson == null ? 0 : json.get("lastUpdate").getAsLong();
+        return new ModuleInfo(id, name, cacheClearTimestamp);
     }
 
     @Override
