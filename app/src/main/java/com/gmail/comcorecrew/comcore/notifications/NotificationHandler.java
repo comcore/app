@@ -13,15 +13,16 @@ import androidx.core.app.NotificationManagerCompat;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
-import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.Collection;
 
 public class NotificationHandler implements NotificationListener {
     private static final String CHANNEL_MESSAGE = "message";
+    private static final String CHANNEL_TASK = "task";
     private static final String CHANNEL_INVITE = "invite";
     private static final String CHANNEL_STATUS = "status";
 
@@ -57,6 +58,10 @@ public class NotificationHandler implements NotificationListener {
                 CHANNEL_MESSAGE, NotificationManager.IMPORTANCE_HIGH);
 
         createNotificationChannel(
+                R.string.ch_name_task, R.string.ch_desc_task,
+                CHANNEL_TASK, NotificationManager.IMPORTANCE_HIGH);
+
+        createNotificationChannel(
                 R.string.ch_name_invite, R.string.ch_desc_invite,
                 CHANNEL_INVITE, NotificationManager.IMPORTANCE_DEFAULT);
 
@@ -76,6 +81,16 @@ public class NotificationHandler implements NotificationListener {
                 .setContentTitle(message.sender.name)
                 .setContentText(message.contents)
                 .setWhen(message.timestamp)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build());
+    }
+
+    @Override
+    public void onTaskAdded(TaskEntry task) {
+        notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
+                .setSmallIcon(R.drawable.receivedmsg)
+                .setContentTitle("Task Added")
+                .setContentText(task.description)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build());
     }
@@ -124,9 +139,6 @@ public class NotificationHandler implements NotificationListener {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build());
     }
-
-    @Override
-    public void onLoggedOut() {}
 
     @Override
     public Collection<? extends NotificationListener> getChildren() {

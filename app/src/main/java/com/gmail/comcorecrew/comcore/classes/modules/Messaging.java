@@ -4,18 +4,14 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
-import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class Messaging implements Module {
     private String name; //Name of chat
@@ -180,25 +176,5 @@ public class Messaging implements Module {
         }
         addMessage(message);
         this.toCache();
-    }
-
-    @Override
-    public void onInvitedToGroup(GroupInviteEntry invite) {}
-
-    @Override
-    public void onRoleChanged(GroupID group, GroupRole role) {}
-
-    @Override
-    public void onMuteChanged(GroupID group, boolean muted) {}
-
-    @Override
-    public void onKicked(GroupID group) {}
-
-    @Override
-    public void onLoggedOut() {}
-
-    @Override
-    public Collection<? extends NotificationListener> getChildren() {
-        return null;
     }
 }

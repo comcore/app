@@ -95,6 +95,8 @@
     <!-- Notificaiton Channels -->
     <string name="ch_name_message">Chat Messages</string>
     <string name="ch_desc_message">Notifications for messages received in chats.</string>
+    <string name="ch_name_task">Tasks</string>
+    <string name="ch_desc_task">Notifications for tasks added to task lists.</string>
     <string name="ch_name_invite">Group Invites</string>
     <string name="ch_desc_invite">Notifications for invitations to join new groups.</string>
     <string name="ch_name_status">Group Status Changes</string>

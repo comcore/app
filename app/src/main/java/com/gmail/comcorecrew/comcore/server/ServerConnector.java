@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
 import com.gmail.comcorecrew.comcore.server.connection.ServerMsg;

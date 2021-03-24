@@ -1,8 +1,6 @@
 package com.gmail.comcorecrew.comcore.interfaces;
 
-import android.content.Context;
-
-import com.gmail.comcorecrew.comcore.server.NotificationListener;
+import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 
 /*
  * Basic interface for the module class.

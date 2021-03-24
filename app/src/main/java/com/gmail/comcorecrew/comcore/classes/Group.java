@@ -6,17 +6,13 @@ import android.os.Parcelable;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
-import com.gmail.comcorecrew.comcore.server.NotificationListener;
+import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
-import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
-import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 public class Group implements Parcelable, NotificationListener {
@@ -128,12 +124,6 @@ public class Group implements Parcelable, NotificationListener {
     }
 
     @Override
-    public void onReceiveMessage(MessageEntry message) {}
-
-    @Override
-    public void onInvitedToGroup(GroupInviteEntry invite) {}
-
-    @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
         groupRole = role;
     }
@@ -142,12 +132,6 @@ public class Group implements Parcelable, NotificationListener {
     public void onMuteChanged(GroupID group, boolean muted) {
         isMuted = muted;
     }
-
-    @Override
-    public void onKicked(GroupID group) {}
-
-    @Override
-    public void onLoggedOut() {}
 
     @Override
     public Collection<? extends NotificationListener> getChildren() {
