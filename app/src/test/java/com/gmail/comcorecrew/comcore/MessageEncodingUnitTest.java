@@ -51,7 +51,7 @@ public class MessageEncodingUnitTest {
         ServerConnector.setConnection(new MockConnection(ServerResult.success(response)));
 
         // Check that the decoding of the message produces the same message that was sent
-        ServerConnector.getMessages(entry.id.chat, null, null, result -> {
+        ServerConnector.getMessages(entry.id.module, null, null, result -> {
             assertTrue(result.isSuccess());
             assertEquals(result.data.length, 1);
             assertEquals(result.data[0], entry);

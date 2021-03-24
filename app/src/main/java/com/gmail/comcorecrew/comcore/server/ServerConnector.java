@@ -549,9 +549,9 @@ public final class ServerConnector {
                                    ResultHandler<MessageEntry[]> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
-        } else if (after != null && after.chat != chat) {
+        } else if (after != null && after.module != chat) {
             throw new IllegalArgumentException("'after' message must be in the same chat");
-        } else if (before != null && before.chat != chat) {
+        } else if (before != null && before.module != chat) {
             throw new IllegalArgumentException("'before' message must be in the same chat");
         }
 
@@ -579,8 +579,8 @@ public final class ServerConnector {
         }
 
         JsonObject data = new JsonObject();
-        data.addProperty("group", message.chat.group.id);
-        data.addProperty("chat", message.chat.id);
+        data.addProperty("group", message.module.group.id);
+        data.addProperty("chat", message.module.id);
         data.addProperty("id", message.id);
         data.addProperty("newContents", newContents);
         getConnection().send(new ServerMsg("updateMessage", data), handler, response -> null);
@@ -606,7 +606,7 @@ public final class ServerConnector {
         data.addProperty("taskList", taskList.id);
         data.addProperty("description", description);
         getConnection().send(new ServerMsg("addTask", data), handler,
-                response -> new TaskID(taskList));
+                response -> new TaskID(taskList, response.get("id").getAsLong()));
     }
 
     /**
