@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
@@ -66,16 +65,11 @@ public final class MessageEntry {
      * @return the MessageEntry
      */
     public static MessageEntry fromJson(ChatID chat, JsonObject json) {
-        if (chat == null) {
-            GroupID group = new GroupID(json.get("group").getAsString());
-            chat = new ChatID(group, json.get("chat").getAsString());
-        }
-
-        long id = json.get("id").getAsLong();
+        MessageID id = MessageID.fromJson(chat, json);
         UserInfo sender = UserInfo.fromJson(json.get("sender").getAsJsonObject());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
-        return new MessageEntry(new MessageID(chat, id), sender, timestamp, contents);
+        return new MessageEntry(id, sender, timestamp, contents);
     }
 
     @Override

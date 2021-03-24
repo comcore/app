@@ -6,9 +6,8 @@ import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.ServerMsg;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 import com.gmail.comcorecrew.comcore.server.connection.ServerTask;
-import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
-import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.entry.*;
+import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 /**
@@ -58,6 +57,41 @@ public final class ServerReader extends ServerThread {
                     MessageEntry entry = MessageEntry.fromJson(null, message.data);
                     ServerConnector.foreachListener(listener -> {
                         listener.onReceiveMessage(entry);
+                        return false;
+                    });
+                    break;
+                }
+                case "messageUpdate": {
+                    MessageID id = MessageID.fromJson(null, message.data);
+                    String newContents = message.data.get("newContents").getAsString();
+                    long timestamp = message.data.get("timestamp").getAsLong();
+                    ServerConnector.foreachListener(listener -> {
+                        listener.onMessageUpdated(id, newContents, timestamp);
+                        return false;
+                    });
+                    break;
+                }
+                case "taskAdded": {
+                    TaskEntry entry = TaskEntry.fromJson(null, message.data);
+                    ServerConnector.foreachListener(listener -> {
+                        listener.onTaskAdded(entry);
+                        return false;
+                    });
+                    break;
+                }
+                case "taskUpdated": {
+                    TaskEntry entry = TaskEntry.fromJson(null, message.data);
+                    boolean completed = message.data.get("completed").getAsBoolean();
+                    ServerConnector.foreachListener(listener -> {
+                        listener.onTaskUpdated(entry, completed);
+                        return false;
+                    });
+                    break;
+                }
+                case "taskDeleted": {
+                    TaskID id = TaskID.fromJson(null, message.data);
+                    ServerConnector.foreachListener(listener -> {
+                        listener.onTaskDeleted(id);
                         return false;
                     });
                     break;

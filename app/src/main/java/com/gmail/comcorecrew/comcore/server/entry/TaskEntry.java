@@ -1,11 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
-import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
-import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -57,14 +53,10 @@ public final class TaskEntry {
      * @return the TaskEntry
      */
     public static TaskEntry fromJson(TaskListID taskList, JsonObject json) {
-        if (taskList == null) {
-            GroupID group = new GroupID(json.get("group").getAsString());
-            taskList = new TaskListID(group, json.get("taskList").getAsString());
-        }
-
+        TaskID id = TaskID.fromJson(taskList, json);
         String description = json.get("description").getAsString();
         boolean completed = json.get("completed").getAsBoolean();
-        return new TaskEntry(new TaskID(taskList), description, completed);
+        return new TaskEntry(id, description, completed);
     }
 
     @Override

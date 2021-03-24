@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.id;
 
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 /**
@@ -20,6 +22,23 @@ public class TaskID {
      */
     public TaskID(TaskListID taskList /* more parameters will be added here */) {
         this.taskList = taskList;
+    }
+
+    /**
+     * Parse a TaskID from a JsonObject. If specified, the given TaskListID is used. Otherwise,
+     * it is taken from the message data.
+     *
+     * @param taskList the task list which contains the task or null
+     * @param json     the data sent by the server
+     * @return the TaskID
+     */
+    public static TaskID fromJson(TaskListID taskList, JsonObject json) {
+        if (taskList == null) {
+            GroupID group = new GroupID(json.get("group").getAsString());
+            taskList = new TaskListID(group, json.get("taskList").getAsString());
+        }
+
+        return new TaskID(taskList);
     }
 
     @Override

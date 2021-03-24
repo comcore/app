@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore.server.id;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 /**
@@ -50,6 +52,24 @@ public final class MessageID {
      */
     public boolean immediatelyAfter(MessageID previousMessage) {
         return previousMessage == null || id == previousMessage.id + 1;
+    }
+
+    /**
+     * Parse a MessageID from a JsonObject. If specified, the given ChatID is used. Otherwise,
+     * it is taken from the message data.
+     *
+     * @param chat the chat which the message was retrieved from or null
+     * @param json the data sent by the server
+     * @return the MessageID
+     */
+    public static MessageID fromJson(ChatID chat, JsonObject json) {
+        if (chat == null) {
+            GroupID group = new GroupID(json.get("group").getAsString());
+            chat = new ChatID(group, json.get("chat").getAsString());
+        }
+
+        long id = json.get("id").getAsLong();
+        return new MessageID(chat, id);
     }
 
     @Override
