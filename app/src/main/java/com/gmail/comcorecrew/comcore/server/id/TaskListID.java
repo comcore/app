@@ -15,7 +15,7 @@ public final class TaskListID extends ModuleID {
     }
 
     @Override
-    public String getKind() {
+    public String getType() {
         return "task";
     }
 }

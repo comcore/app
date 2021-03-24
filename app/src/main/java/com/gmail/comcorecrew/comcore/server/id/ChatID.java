@@ -15,7 +15,7 @@ public final class ChatID extends ModuleID {
     }
 
     @Override
-    public String getKind() {
+    public String getType() {
         return "chat";
     }
 }

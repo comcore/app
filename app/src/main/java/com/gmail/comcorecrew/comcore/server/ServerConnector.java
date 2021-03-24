@@ -331,20 +331,24 @@ public final class ServerConnector {
     }
 
     /**
-     * Get a list of all modules in a group.
+     * Get a list of all modules in a group. Note that this method directly returns the module info
+     * instead of requiring separate calls like other methods, since the server is able to
+     * efficiently retrieve this information all at once. However, getModuleInfo() is still provided
+     * as a convenience.
      *
      * @param group   the group to list the modules of
      * @param handler the handler for the response of the server
+     * @see ModuleInfo
      */
-    public static void getModules(GroupID group, ResultHandler<ModuleID[]> handler) {
+    public static void getModules(GroupID group, ResultHandler<ModuleInfo[]> handler) {
         if (group == null) {
             throw new IllegalArgumentException("GroupID cannot be null");
         }
 
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
-        requestArray(new Message("getModules", data), handler, ModuleID.class,
-                "modules", json -> ModuleID.fromJson(group, json));
+        requestArray(new Message("getModules", data), handler, ModuleInfo.class,
+                "modules", json -> ModuleInfo.fromJson(group, json));
     }
 
     /**
@@ -650,11 +654,11 @@ public final class ServerConnector {
      * @see ModuleInfo
      */
     public static void getModuleInfo(List<ModuleID> modules, ResultHandler<ModuleInfo[]> handler) {
-        getInfo(ModuleInfo.class, "modules", "getModuleInfo", ModuleInfo::fromJson,
-                modules, -1, handler);
+        getInfo(ModuleInfo.class, "modules", "getModuleInfo",
+                json -> ModuleInfo.fromJson(null, json), modules, -1, handler);
     }
 
-    private static <T> void createModule(String kind, GroupID group, String name,
+    private static <T> void createModule(String type, GroupID group, String name,
                                          ResultHandler<T> handler, Function<String, T> module) {
         if (group == null) {
             throw new IllegalArgumentException("GroupID cannot be null");
@@ -665,7 +669,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", group.id);
         data.addProperty("name", name);
-        data.addProperty("kind", kind);
+        data.addProperty("type", type);
         getConnection().send(new Message("createModule", data), handler, response ->
                 module.apply(response.get("id").getAsString()));
     }
@@ -711,7 +715,7 @@ public final class ServerConnector {
         if (lastRefresh >= 0) {
             data.addProperty("lastRefresh", lastRefresh);
         }
-        requestArray(new Message(request, data), handler, clazz, "info", parser);
+        requestArray(new Message(request, data), handler, clazz, field, parser);
     }
 
     /**

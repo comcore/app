@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -77,7 +78,9 @@ public final class GroupInfo {
         String name = json.get("name").getAsString();
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
         boolean muted = json.get("muted").getAsBoolean();
-        long lastUpdate = json.get("lastUpdate").getAsLong();
+        // TODO remove this check when it becomes unnecessary
+        JsonElement lastUpdateJson = json.get("lastUpdate");
+        long lastUpdate = lastUpdateJson == null ? 0 : json.get("lastUpdate").getAsLong();
         return new GroupInfo(id, name, role, muted, lastUpdate);
     }
 

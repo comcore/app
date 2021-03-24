@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server.info;
 
 import androidx.annotation.NonNull;
 
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.google.gson.JsonObject;
 
@@ -41,11 +42,12 @@ public final class ModuleInfo {
     /**
      * Parse a ModuleInfo from a JsonObject.
      *
+     * @param group the group which the module was retrieved from or null
      * @param json the data sent by the server
      * @return the ModuleInfo
      */
-    public static ModuleInfo fromJson(JsonObject json) {
-        ModuleID id = ModuleID.fromJson(null, json);
+    public static ModuleInfo fromJson(GroupID group, JsonObject json) {
+        ModuleID id = ModuleID.fromJson(group, json);
         String name = json.get("name").getAsString();
         return new ModuleInfo(id, name);
     }

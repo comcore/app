@@ -28,6 +28,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
@@ -86,12 +87,16 @@ public class GroupFragment extends Fragment {
 
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
             ServerConnector.getModules(currentGroup.getGroupId(), result -> {
-                if (result.isFailure() || result.data.length == 0 || !(result.data[0] instanceof ChatID)) {
+                if (result.isFailure() || result.data.length == 0) {
                     return;
                 }
-                ChatFragment.chatID = (ChatID) result.data[0];
-                NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_groupFragment_to_chatFragment);
+
+                ModuleID id = result.data[0].id;
+                if (id instanceof ChatID) {
+                    ChatFragment.chatID = (ChatID) id;
+                    NavHostFragment.findNavController(this)
+                            .navigate(R.id.action_groupFragment_to_chatFragment);
+                }
             });
         });
 

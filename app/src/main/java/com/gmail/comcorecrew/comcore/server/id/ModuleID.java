@@ -42,14 +42,14 @@ public abstract class ModuleID extends ItemID {
             group = new GroupID(json.get("group").getAsString());
         }
         String id = json.get("id").getAsString();
-        String kind = json.get("kind").getAsString();
-        switch (kind) {
+        String type = json.get("type").getAsString();
+        switch (type) {
             case "chat":
                 return new ChatID(group, id);
             case "task":
                 return new TaskListID(group, id);
             default:
-                throw new IllegalArgumentException("invalid module kind: " + kind);
+                return new CustomModuleID(group, id, type);
         }
     }
 
@@ -58,14 +58,14 @@ public abstract class ModuleID extends ItemID {
      *
      * @return the String describing the kind
      */
-    public abstract String getKind();
+    public abstract String getType();
 
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         json.addProperty("group", group.id);
         json.addProperty("id", id);
-        json.addProperty("kind", getKind());
+        json.addProperty("type", getType());
         return json;
     }
 
