@@ -170,7 +170,7 @@ public class MainFragment extends Fragment {
 
                 ArrayList<Group> userGroups = new ArrayList<>();
                 for (int i = 0; i < result.data.length; i++) {
-                    Group nextGroup = new Group(getContext(), result.data[i].name,
+                    Group nextGroup = new Group(result.data[i].name,
                             result.data[i].id, result.data[i].role, result.data[i].muted);
                     userGroups.add(nextGroup);
                 }

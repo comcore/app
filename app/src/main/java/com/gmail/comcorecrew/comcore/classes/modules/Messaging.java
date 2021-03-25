@@ -1,56 +1,70 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.caching.StdCacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.UserEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Messaging implements Module {
     private String name; //Name of chat
-    //private final Group group; //Group that the chat is in
-    private final int mnum; //Module number
+    private Group group; //Group that the chat is in
+    private int mnum; //Module number
     private ChatID id;
-    private GroupID groupID; //temp
+    public boolean muted;
     public ArrayList<MsgCacheable> messages; //Messages
 
-    public Messaging(String name, ChatID id) {
-        //this.group = group;
+    public Messaging() {
+        // Empty Module
+    }
+
+    public Messaging(String name, ChatID id, Group group) {
+        this.group = group;
         this.name = name;
         this.id = id;
-        this.mnum = 0; //temp
-        this.groupID = id.group; //temp
-        //this.mnum = group.addModule(this);
+        this.mnum = group.addModule(this);
+        muted = false;
         messages = new ArrayList<>();
     }
 
     @Override
-    public String getMdid() {
-        return "cmsg";
+    public Mdid getMdid() {
+        return Mdid.CMSG;
     }
 
     @Override
     public String getGroupId() {
-        //return group.getGroupId().id;
-        return groupID.id;
+        return group.getGroupId().id;
+    }
+
+    @Override
+    public boolean getMuted() {
+        return muted;
+    }
+
+    @Override
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 
     public int getMnum() {
@@ -61,10 +75,8 @@ public class Messaging implements Module {
         return id;
     }
 
-    public GroupID getGroup() {
-    //public Group getGroup() {
-        //return group;
-        return groupID;
+    public Group getGroup() {
+        return group;
     }
 
     public String getName() {
@@ -76,9 +88,9 @@ public class Messaging implements Module {
     }
 
     @Override
-    public boolean toCache() {
+    public void toCache() {
         if (messages.size() == 0) {
-            return true;
+            return;
         }
 
         int index = messages.size() - 1;
@@ -97,22 +109,64 @@ public class Messaging implements Module {
             index++;
         }
 
-        return Cacher.cacheData(cacheMessages, this);
+        Cacher.cacheData(cacheMessages, this);
     }
 
     @Override
-    public boolean fromCache() {
+    public void fromCache() {
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
-            return false;
+            return;
         }
 
         messages = new ArrayList<>();
         for (char[] line : data) {
             messages.add(new MsgCacheable(line));
         }
-        return true;
     }
+
+    @Override
+    public void toFile() {
+        try {
+            File storage = new File(AppData.filesDir,
+                    getGroupId() + "/" + getMdid().toString() + mnum);
+            if ((!storage.exists()) && (!storage.createNewFile())) {
+                throw new IOException();
+            }
+            PrintWriter writer = new PrintWriter(storage);
+
+            AppData.writeString(name, writer);
+            AppData.writeString(id.id, writer);
+            AppData.writeBool(muted, writer);
+
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void fromFile(File file, Group group) {
+        try {
+            String filename = file.getName();
+            mnum = Integer.parseInt(filename.substring(4));
+
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+
+            name = AppData.readString(reader);
+            id = new ChatID(group.getGroupId(), AppData.readString(reader));
+            muted = AppData.readBool(reader);
+
+            reader.close();
+
+            this.group = group;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /*
      * Adds a message and saves the user data.

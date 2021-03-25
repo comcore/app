@@ -26,12 +26,11 @@ public class UserStorage {
      * Initiates the user storage to be used by the app.
      * NOTE: This MUST be run before any use of the user storage.
      *
-     * @param self User's own user info to initiate empty list
      * @throws IOException if an IO error occurs
      */
-    public static void init(User self) throws IOException {
-        if ((!refreshLists()) && !addUser(self)) {
-            throw new StorageFileDisjunctionException();
+    public static void init() throws IOException {
+        if ((!refreshLists())) {
+            // TODO: Prompt user information to add to storage.
         }
     }
 
