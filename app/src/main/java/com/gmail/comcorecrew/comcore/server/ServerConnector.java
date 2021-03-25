@@ -656,8 +656,12 @@ public final class ServerConnector {
             throw new IllegalArgumentException("TaskID cannot be null");
         }
 
-        // TODO implement
-        handler.handleResult(ServerResult.failure("unimplemented: updateTask"));
+        JsonObject data = new JsonObject();
+        data.addProperty("group", task.module.group.id);
+        data.addProperty("taskList", task.module.id);
+        data.addProperty("id", task.id);
+        data.addProperty("completed", completed);
+        getConnection().send(new ServerMsg("updateTask", data), handler, response -> null);
     }
 
     /**
@@ -671,8 +675,11 @@ public final class ServerConnector {
             throw new IllegalArgumentException("TaskID cannot be null");
         }
 
-        // TODO implement
-        handler.handleResult(ServerResult.failure("unimplemented: deleteTask"));
+        JsonObject data = new JsonObject();
+        data.addProperty("group", task.module.group.id);
+        data.addProperty("taskList", task.module.id);
+        data.addProperty("id", task.id);
+        getConnection().send(new ServerMsg("deleteTask", data), handler, response -> null);
     }
 
     /**
