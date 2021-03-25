@@ -73,29 +73,45 @@ public final class ServerConnector {
     }
 
     /**
-     * Call a function for all notification listeners attached to the ServerConnector. The listeners
-     * are called in the order they are added, and if the function returns true, iteration will
-     * stop immediately. The notification listeners are always called on the main thread.
+     * Represents a notification to send to a notification listener.
      *
-     * @param function the function to call
+     * @see NotificationListener
      */
-    public static void foreachListener(Function<NotificationListener, Boolean> function) {
+    public interface Notification {
+        void notify(NotificationListener listener);
+    }
+
+    /**
+     * Pass a notification to all of the notification listeners attached to the ServerConnector.
+     * The listeners are always notified on the main thread. Parents are always notified before
+     * their children, but that is the only constraint on the order.
+     *
+     * @param notification the notification to send
+     * @see NotificationListener
+     * @see Notification
+     */
+    public static void sendNotification(Notification notification) {
+        // Run on the main thread
         new Handler(Looper.getMainLooper()).post(() -> {
+            // Create a queue from the notification listeners list
+            ArrayDeque<NotificationListener> listeners;
             synchronized (notificationListeners) {
-                ArrayDeque<NotificationListener> listeners = new ArrayDeque<>(notificationListeners);
-                while (!listeners.isEmpty()) {
-                    try {
-                        NotificationListener listener = listeners.pop();
-                        if (function.apply(listener)) {
-                            break;
-                        }
-                        Collection<? extends NotificationListener> children = listener.getChildren();
-                        if (children != null) {
-                            listeners.addAll(children);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                listeners = new ArrayDeque<>(notificationListeners);
+            }
+
+            // Loop over the notification listeners, giving each the notification
+            while (!listeners.isEmpty()) {
+                try {
+                    NotificationListener listener = listeners.removeLast();
+                    notification.notify(listener);
+
+                    // Visit all of the children next, in undefined order
+                    Collection<? extends NotificationListener> children = listener.getChildren();
+                    if (children != null) {
+                        listeners.addAll(children);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

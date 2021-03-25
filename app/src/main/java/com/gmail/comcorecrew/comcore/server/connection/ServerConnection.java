@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server.connection;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
@@ -225,10 +226,7 @@ public final class ServerConnection implements Connection {
     public void loggedOut() {
         setInformation(null, null);
 
-        ServerConnector.foreachListener(listener -> {
-            listener.onLoggedOut();
-            return false;
-        });
+        ServerConnector.sendNotification(NotificationListener::onLoggedOut);
     }
 
     /**

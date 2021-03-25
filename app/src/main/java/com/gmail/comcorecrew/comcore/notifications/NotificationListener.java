@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
@@ -9,6 +10,8 @@ import java.util.Collection;
 /**
  * Interface containing methods that will be called by the ServerConnector when it receives a
  * notification from the server. Notification listeners are always called on the main thread.
+ *
+ * @see ServerConnector.Notification
  */
 public interface NotificationListener {
     /**
@@ -88,6 +91,8 @@ public interface NotificationListener {
 
     /**
      * Gets a list of children notification listeners to also notify. May be null.
+     *
+     * @see ServerConnector.Notification
      */
     default Collection<? extends NotificationListener> getChildren() {
         return null;
