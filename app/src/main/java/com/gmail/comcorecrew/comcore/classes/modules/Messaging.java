@@ -13,6 +13,7 @@ import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.connection.Message;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -146,6 +147,26 @@ public class Messaging extends AbstractModule implements Module {
             messages.clear();
         }
         addMessage(message);
+        this.toCache();
+    }
+
+    public void deleteMessage(MessageID messageID) {
+        for (int i = 0; i < messages.size(); i++) {
+            if (messageID.id == messages.get(i).getId()) {
+                messages.remove(i);
+                break;
+            }
+        }
+        this.toCache();
+    }
+
+    public void editMessage(MessageID messageID, String newMsg) {
+        for (int i = 0; i < messages.size(); i++) {
+            if (messageID.id == messages.get(i).getId()) {
+                messages.get(i).setData(newMsg);
+                break;
+            }
+        }
         this.toCache();
     }
 
