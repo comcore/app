@@ -2,12 +2,13 @@ package com.gmail.comcorecrew.comcore.server.id;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Represents a unique identifier for a type of item.
  */
-public abstract class ItemID {
+public abstract class ItemID implements Serializable {
     /**
      * The ID string corresponding to this item.
      */
