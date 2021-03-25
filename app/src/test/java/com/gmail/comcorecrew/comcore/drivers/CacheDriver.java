@@ -19,6 +19,15 @@ public class CacheDriver implements Module {
     }
 
     @Override
+    public String getLocatorString() {
+        return null;
+    }
+
+    @Override
+    public String getGroupIdString() {
+        return "testid/test0";
+    }
+
     public int getMnum() {
         return 0;
     }
@@ -41,27 +50,12 @@ public class CacheDriver implements Module {
     }
 
     @Override
-    public void toFile() {
-
-    }
-
-    @Override
-    public void fromFile(File file, Group group) {
-
-    }
-
-    @Override
-    public String getGroupId() {
-        return "0";
-    }
-
-    @Override
     public void setMuted(boolean muted) {
 
     }
 
     @Override
-    public boolean getMuted() {
+    public boolean isMuted() {
         return false;
     }
 

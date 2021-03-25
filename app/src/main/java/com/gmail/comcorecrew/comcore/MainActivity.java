@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 
-import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -16,16 +15,16 @@ import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            AppData.init(getApplicationContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         super.onCreate(savedInstanceState);
 
         // Initialize the notification manager
         Context context = getBaseContext();
+        try {
+            AppData.init(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         NotificationHandler notificationHandler = new NotificationHandler(context);
 
         // Initialize the connection to the server using the application context

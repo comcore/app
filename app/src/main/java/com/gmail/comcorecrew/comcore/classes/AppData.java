@@ -101,17 +101,4 @@ public class AppData {
         }
         return String.copyValueOf(buf);
     }
-
-    public static Module readModule(File file, Group group) throws IOException {
-        String mdid = file.getName().substring(0, 4);
-
-        switch (Mdid.fromString(mdid)) {
-            case CMSG:
-                Messaging mod = new Messaging();
-                mod.fromFile(file, group);
-                return mod;
-        }
-
-        throw new InvalidFileFormatException();
-    }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
@@ -43,7 +44,12 @@ public class Group implements Parcelable, NotificationListener {
                 users.add(nextUser);
             }
         });
+
         this.isMuted = isMuted;
+        modules = new ArrayList<>();
+        users = new ArrayList<>();
+        moderators = new ArrayList<>();
+        owner = UserStorage.getUser(0).getID();
 
         File cacheDir = new File(AppData.cacheDir, "gr" + this.groupID);
         cacheDir.mkdir();
@@ -133,9 +139,6 @@ public class Group implements Parcelable, NotificationListener {
         for(Module m : modules) {
             if (m.getMdid() == mdid) {
                 num++;
-            }
-            if (m.getGroupId().equals(module.getGroupId())) {
-                return -1;
             }
         }
         modules.add(module);

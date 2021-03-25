@@ -19,18 +19,18 @@ public interface Module extends NotificationListener {
     Mdid getMdid();
 
     /**
-     * Returns the module number (Distinguishes same modules apart)
+     * Prints the locator string of the module. Consists of the mdid, mnum, and groupid.
      *
-     * @return module number of module
+     * @return String of the files location in storage
      */
-    int getMnum();
+    String getLocatorString();
 
     /**
      * Gets the group id of the module
      *
      * @return groupId of the group of the modules
      */
-    String getGroupId();
+    String getGroupIdString();
 
     /**
      * Sets the muted status of the module
@@ -44,7 +44,7 @@ public interface Module extends NotificationListener {
      *
      * @return muted status
      */
-    boolean getMuted();
+    boolean isMuted();
 
     /**
      * Caches data to cache
@@ -56,15 +56,4 @@ public interface Module extends NotificationListener {
      */
     void fromCache();
 
-    /**
-     * Saves data to file
-     */
-    void toFile();
-
-    /**
-     * Retrieves data from file
-     *
-     * @param file File to read from
-     */
-    void fromFile(File file, Group group);
 }

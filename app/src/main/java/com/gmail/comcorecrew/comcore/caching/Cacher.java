@@ -23,12 +23,12 @@ public class Cacher {
     public static boolean cacheData(ArrayList<Cacheable> data, Module module) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
-            File cacheDir = new File(AppData.cacheDir, module.getGroupId());
+            File cacheDir = new File(AppData.cacheDir, module.getGroupIdString());
             if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
                 return false;
             }
-            String filename = module.getMdid().toString() + module.getMnum();
-            File cacheFile = new File(cacheDir, filename);
+            String filename = module.getLocatorString();
+            File cacheFile = new File(AppData.cacheDir, filename);
             if ((!cacheFile.exists()) && (!cacheFile.createNewFile())) {
                 return false;
             }
@@ -68,7 +68,7 @@ public class Cacher {
     public static char[][] uncacheData(Module module) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
-            String filename = module.getGroupId() + "/" + module.getMdid() + module.getMnum();
+            String filename = module.getLocatorString();
             File cacheFile = new File(AppData.cacheDir, filename);
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
