@@ -1,6 +1,6 @@
 package com.gmail.comcorecrew.comcore.caching;
 
-import com.gmail.comcorecrew.comcore.classes.Helper;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 
 /*
  * Class for the standard cacheable format. Supports the caching of an int,
@@ -14,7 +14,7 @@ public class MsgCacheable implements Cacheable {
     private String data; //Data contained in the message.
 
     public MsgCacheable(int id, long messageid, long timestamp, String data) {
-        if (data.length() > (Helper.maxData - 5)) {
+        if (data.length() > (AppData.maxData - 5)) {
             throw new IllegalArgumentException();
         }
         this.id = id;

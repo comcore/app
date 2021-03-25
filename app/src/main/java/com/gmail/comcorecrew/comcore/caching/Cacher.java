@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.caching;
 
 import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.classes.Helper;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 
 import java.io.BufferedReader;
@@ -14,7 +13,13 @@ import java.util.ArrayList;
 
 public class Cacher {
 
-    //Caches the given data in the modules cache file.
+    /**
+     * Caches the given list of cacheables into the modules cache file
+     *
+     * @param data data to be cached
+     * @param module module that owns the data
+     * @return true if data is cached; false if error occurs
+     */
     public static boolean cacheData(ArrayList<Cacheable> data, Module module) {
         try {
             //Sets up cache file, creates new file, and sets up print writer.
@@ -22,7 +27,7 @@ public class Cacher {
             if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
                 return false;
             }
-            String filename = module.getMdid() + module.getMnum();
+            String filename = module.getMdid().toString() + module.getMnum();
             File cacheFile = new File(cacheDir, filename);
             if ((!cacheFile.exists()) && (!cacheFile.createNewFile())) {
                 return false;
@@ -37,7 +42,7 @@ public class Cacher {
             for (Cacheable group : data) {
                 char[] line = group.toCache();
                 int lineLength = line.length;
-                if (lineLength > Helper.maxData) {
+                if (lineLength > AppData.maxData) {
                     throw new IllegalArgumentException();
                 }
                 pw.print((char) (lineLength >> 16));
@@ -54,6 +59,12 @@ public class Cacher {
         }
     }
 
+    /**
+     * Reads the data stored in a modules cache file
+     *
+     * @param module the module that contains the data
+     * @return the data in the file
+     */
     public static char[][] uncacheData(Module module) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
@@ -68,7 +79,7 @@ public class Cacher {
             for (int i = 0; i < size; i++) {
                 int lineSize = br.read();
                 lineSize = (lineSize << 16) | br.read();
-                if (lineSize > Helper.maxData) {
+                if (lineSize > AppData.maxData) {
                     throw new IllegalArgumentException();
                 }
                 data[i] = new char[lineSize];

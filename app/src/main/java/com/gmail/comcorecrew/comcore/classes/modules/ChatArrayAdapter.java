@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -29,7 +30,7 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         public ChatArrayAdapter(Context context, int textViewResourceId) {
                 super(context, textViewResourceId);
-                messaging = new Messaging( "Chat", ChatFragment.chatID);
+                messaging = new Messaging( "Chat", ChatFragment.chatID, AppData.groups.get(0));
                 this.context = context;
         }
 

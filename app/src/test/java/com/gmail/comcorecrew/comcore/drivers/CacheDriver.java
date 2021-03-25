@@ -2,8 +2,11 @@ package com.gmail.comcorecrew.comcore.drivers;
 
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
+import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class CacheDriver implements Module {
@@ -11,8 +14,8 @@ public class CacheDriver implements Module {
     private ArrayList<Cacheable> data = null;
 
     @Override
-    public String getMdid() {
-        return "test";
+    public Mdid getMdid() {
+        return Mdid.TEST;
     }
 
     @Override
@@ -21,26 +24,45 @@ public class CacheDriver implements Module {
     }
 
     @Override
-    public boolean toCache() {
-        return Cacher.cacheData(data, this);
+    public void toCache() {
+        Cacher.cacheData(data, this);
     }
 
     @Override
-    public boolean fromCache() {
+    public void fromCache() {
         char[][] rawData = Cacher.uncacheData(this);
         if (rawData == null) {
-            return false;
+            return;
         }
         data = new ArrayList<>();
         for (char[] line : rawData) {
             data.add(new CacheableDriver(String.copyValueOf(line)));
         }
-        return true;
+    }
+
+    @Override
+    public void toFile() {
+
+    }
+
+    @Override
+    public void fromFile(File file, Group group) {
+
     }
 
     @Override
     public String getGroupId() {
         return "0";
+    }
+
+    @Override
+    public void setMuted(boolean muted) {
+
+    }
+
+    @Override
+    public boolean getMuted() {
+        return false;
     }
 
     public ArrayList<Cacheable> getData() {

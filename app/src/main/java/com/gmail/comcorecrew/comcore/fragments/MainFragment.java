@@ -178,7 +178,7 @@ public class MainFragment extends Fragment {
                     GroupInfo[] info = result1.data;
                     ArrayList<Group> userGroups = new ArrayList<>();
                     for (int i = 0; i < result.data.length; i++) {
-                        Group nextGroup = new Group(getContext(), info[i].name,  info[i].id,
+                        Group nextGroup = new Group(info[i].name,  info[i].id,
                                 info[i].role, info[i].muted);
                         userGroups.add(nextGroup);
                     }

@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -16,23 +17,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Group implements Parcelable, NotificationListener {
-    private static int numGroups = 0;
 
     private GroupID groupID;
     private String groupName;
     private GroupRole groupRole;
     private Boolean isMuted;
-
     private ArrayList<Module> modules;
     private ArrayList<User> users;
     private ArrayList<UserID> moderators;
     private UserID owner;
 
-    public Group(Context context, String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
+    public Group(GroupID groupID) {
+        this.groupID = groupID;
+    }
+
+    public Group(String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
         this.groupID = groupID;
         this.groupName = name;
         this.groupRole = groupRole;
-        users = new ArrayList<User>();
+        users = new ArrayList<>();
         ServerConnector.getUsers(groupID, result -> {
             // TODO use cached user data with name
             for (int i = 0; i < result.data.length; i++) {
@@ -42,7 +45,7 @@ public class Group implements Parcelable, NotificationListener {
         });
         this.isMuted = isMuted;
 
-        File cacheDir = new File(context.getCacheDir(), "gr" + this.groupID);
+        File cacheDir = new File(AppData.cacheDir, "gr" + this.groupID);
         cacheDir.mkdir();
     }
 
@@ -80,32 +83,59 @@ public class Group implements Parcelable, NotificationListener {
         return users;
     }
 
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
+
     public ArrayList<UserID> getModerators() {
         return moderators;
+    }
+
+    public void setModerators(ArrayList<UserID> moderators) {
+        this.moderators = moderators;
     }
 
     public GroupRole getGroupRole() {
         return groupRole;
     }
 
+    public void setGroupRole(GroupRole groupRole) {
+        this.groupRole = groupRole;
+    }
+
     public Boolean getIsMuted() {
         return isMuted;
+    }
+
+    public void setMuted(Boolean muted) {
+        isMuted = muted;
     }
 
     public UserID getOwner() {
         return owner;
     }
 
+    public void setOwner(UserID owner) {
+        this.owner = owner;
+    }
+
     public ArrayList<Module> getModules() {
         return modules;
     }
 
+    public void setModules(ArrayList<Module> modules) {
+        this.modules = modules;
+    }
+
     public int addModule(Module module) {
         int num = 0;
-        String mdid = module.getMdid();
+        Mdid mdid = module.getMdid();
         for(Module m : modules) {
-            if (m.getMdid().equals(mdid)) {
+            if (m.getMdid() == mdid) {
                 num++;
+            }
+            if (m.getGroupId().equals(module.getGroupId())) {
+                return -1;
             }
         }
         modules.add(module);
