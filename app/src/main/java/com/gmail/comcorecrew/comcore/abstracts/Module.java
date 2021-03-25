@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.abstracts;
 
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
+import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.io.Serializable;
 /**
  * Abstract module class that stores basic module info. Recommended for implementation of modules.
  */
-public abstract class AbstractModule implements Serializable {
+public abstract class Module implements Serializable, NotificationListener {
 
     private String name; //Name of the module
     private ModuleID id; //ModuleID
@@ -18,11 +19,12 @@ public abstract class AbstractModule implements Serializable {
     private int mnum; //Distinguishes same type modules
     private boolean muted; //Contains muted status of module notifications
 
-    public AbstractModule(String name, ModuleID id, Group group, Mdid mdid) {
+    public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
         this.id = id;
         this.group = group;
         this.mdid = mdid;
+        mnum = group.addModule(this);
     }
 
     public String getName() {
@@ -76,4 +78,8 @@ public abstract class AbstractModule implements Serializable {
     public String getLocatorString() {
         return getGroupIdString() + "/" + mdid + mnum;
     }
+
+    public abstract void toCache();
+
+    public abstract void fromCache();
 }

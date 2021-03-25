@@ -1,41 +1,39 @@
 package com.gmail.comcorecrew.comcore.drivers;
 
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
-import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class CacheDriver implements Module {
+public class CacheDriver extends Module {
 
     private ArrayList<Cacheable> data = null;
 
-    @Override
-    public Mdid getMdid() {
-        return Mdid.TEST;
-    }
-
-    @Override
-    public String getLocatorString() {
-        return null;
-    }
-
-    @Override
-    public String getGroupIdString() {
-        return "testid/test0";
+    public CacheDriver() {
+        super("TEST", new ChatID(new GroupID("grTEST"), "testID"),
+                new Group(new GroupID("grTEST")), Mdid.TEST);
     }
 
     public int getMnum() {
         return 0;
+    }
+
+    public void setData(ArrayList<Cacheable> data) {
+        this.data = data;
+    }
+
+    public ArrayList<Cacheable> getData() {
+        return data;
     }
 
     @Override
@@ -53,24 +51,6 @@ public class CacheDriver implements Module {
         for (char[] line : rawData) {
             data.add(new CacheableDriver(String.copyValueOf(line)));
         }
-    }
-
-    @Override
-    public void setMuted(boolean muted) {
-
-    }
-
-    @Override
-    public boolean isMuted() {
-        return false;
-    }
-
-    public ArrayList<Cacheable> getData() {
-        return data;
-    }
-
-    public void setData(ArrayList<Cacheable> data) {
-        this.data = data;
     }
 
     @Override
