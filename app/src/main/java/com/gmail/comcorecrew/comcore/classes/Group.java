@@ -1,13 +1,12 @@
 package com.gmail.comcorecrew.comcore.classes;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
-import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -30,6 +29,7 @@ public class Group implements Parcelable, NotificationListener {
 
     public Group(GroupID groupID) {
         this.groupID = groupID;
+        modules = new ArrayList<>();
     }
 
     public Group(String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {

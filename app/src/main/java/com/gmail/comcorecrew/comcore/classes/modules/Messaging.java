@@ -1,29 +1,29 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
 
-import com.gmail.comcorecrew.comcore.abstracts.AbstractModule;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
-import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
-import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.*;
-import com.gmail.comcorecrew.comcore.server.id.*;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
 
-public class Messaging extends AbstractModule implements Module {
+public class Messaging extends Module {
 
     public transient ArrayList<MsgCacheable> messages; //Messages
 
     public Messaging(String name, ChatID id, Group group) {
         super(name, id, group, Mdid.CMSG);
-        setMnum(group.addModule(this));
     }
 
     @Override
@@ -136,6 +136,26 @@ public class Messaging extends AbstractModule implements Module {
             messages.clear();
         }
         addMessage(message);
+        this.toCache();
+    }
+
+    public void deleteMessage(MessageID messageID) {
+        for (int i = 0; i < messages.size(); i++) {
+            if (messageID.id == messages.get(i).getId()) {
+                messages.remove(i);
+                break;
+            }
+        }
+        this.toCache();
+    }
+
+    public void editMessage(MessageID messageID, String newMsg) {
+        for (int i = 0; i < messages.size(); i++) {
+            if (messageID.id == messages.get(i).getId()) {
+                messages.get(i).setData(newMsg);
+                break;
+            }
+        }
         this.toCache();
     }
 }

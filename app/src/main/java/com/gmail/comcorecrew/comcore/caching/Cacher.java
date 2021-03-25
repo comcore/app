@@ -1,7 +1,7 @@
 package com.gmail.comcorecrew.comcore.caching;
 
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.interfaces.Module;
 
 import java.io.BufferedReader;
 import java.io.File;

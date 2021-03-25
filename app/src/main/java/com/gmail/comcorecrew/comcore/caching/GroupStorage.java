@@ -1,12 +1,11 @@
 package com.gmail.comcorecrew.comcore.caching;
 
-import com.gmail.comcorecrew.comcore.abstracts.AbstractModule;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
-import com.gmail.comcorecrew.comcore.interfaces.Module;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
@@ -193,9 +192,9 @@ public class GroupStorage {
 
                     ObjectInputStream stream = new ObjectInputStream(new FileInputStream(file));
                     Object o = stream.readObject();
-                    AbstractModule m = (AbstractModule) o;
+                    Module m = (Module) o;
                     m.setGroup(group);
-                    modules.add((Module) m);
+                    modules.add(m);
                     stream.close();
 
                 }

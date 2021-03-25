@@ -10,7 +10,6 @@ import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,13 +24,10 @@ import static org.junit.Assert.*;
  * NOTE: uncaching tests work under the assumption that the caching tests work.
  *
  */
-@RunWith(MockitoJUnitRunner.class)
 public class CachingUnitTest {
-    @Mock
-    Context context;
 
     File testDir = new File("src/test/java/com/gmail/comcorecrew/comcore/drivers/expected");
-    File cacheDir = context.getCacheDir();
+    File cacheDir = new File("src/test/java/com/gmail/comcorecrew/comcore/drivers/cacheDir");
 
     @Test
     public void cacheSingleLine() {
@@ -80,7 +76,7 @@ public class CachingUnitTest {
             driver.setData(data);
             driver.toCache();
 
-            File actualFile = new File(context.getCacheDir(), "0/test0");
+            File actualFile = new File(cacheDir, "0/test0");
             File expectedFile = new File(testDir, "test2.txt");
 
             PrintWriter writer = new PrintWriter(expectedFile);
@@ -124,7 +120,7 @@ public class CachingUnitTest {
             driver.setData(data);
             driver.toCache();
 
-            File actualFile = new File(context.getCacheDir(), "0/test0");
+            File actualFile = new File(cacheDir, "0/test0");
             File expectedFile = new File(testDir, "test3.txt");
 
             PrintWriter writer = new PrintWriter(expectedFile);
