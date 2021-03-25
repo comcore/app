@@ -28,8 +28,7 @@ public final class GroupUserEntry {
     /**
      * Create a GroupUserEntry from a GroupID, name, role, and muted status.
      *
-     * @param id    the GroupID of the group
-     * @param name  the name of the group
+     * @param id    the UserID of the user
      * @param role  the role of the user
      * @param muted the user's muted status
      */

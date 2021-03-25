@@ -62,7 +62,7 @@ public final class ServerMsg {
      */
     public static ServerMsg fromJson(JsonObject json) {
         String kind = json.get("kind").getAsString();
-        JsonObject data = json.get("data").getAsJsonObject();
+        JsonObject data = json.getAsJsonObject("data");
         return new ServerMsg(kind, data);
     }
 }

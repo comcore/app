@@ -2,8 +2,6 @@ package com.gmail.comcorecrew.comcore.server.id;
 
 import com.google.gson.JsonObject;
 
-import java.util.Objects;
-
 /**
  * Represents an identifier for a task in a task list.
  */

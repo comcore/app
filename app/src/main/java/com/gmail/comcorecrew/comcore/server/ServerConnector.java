@@ -860,7 +860,7 @@ public final class ServerConnector {
                                          Class<T> clazz, String field,
                                          Function<JsonObject, T> parser) {
         getConnection().send(message, handler, response -> {
-            JsonArray json = response.get(field).getAsJsonArray();
+            JsonArray json = response.getAsJsonArray(field);
             T[] array = (T[]) Array.newInstance(clazz, json.size());
             for (int i = 0; i < array.length; i++) {
                 array[i] = parser.apply(json.get(i).getAsJsonObject());

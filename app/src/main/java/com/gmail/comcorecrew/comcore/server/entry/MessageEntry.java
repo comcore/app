@@ -66,7 +66,7 @@ public final class MessageEntry {
      */
     public static MessageEntry fromJson(ChatID chat, JsonObject json) {
         MessageID id = MessageID.fromJson(chat, json);
-        UserInfo sender = UserInfo.fromJson(json.get("sender").getAsJsonObject());
+        UserInfo sender = UserInfo.fromJson(json.getAsJsonObject("sender"));
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
         return new MessageEntry(id, sender, timestamp, contents);
