@@ -15,16 +15,19 @@ import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
-        // Initialize the notification manager
+        // Get the application context
         Context context = getBaseContext();
+
+        // Initialize storage and caching
         try {
             AppData.init(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Initialize the notification manager
         NotificationHandler notificationHandler = new NotificationHandler(context);
 
         // Initialize the connection to the server using the application context
@@ -32,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         ServerConnector.addNotificationListener(notificationHandler);
 
         setContentView(R.layout.activity_main);
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
     }
 
