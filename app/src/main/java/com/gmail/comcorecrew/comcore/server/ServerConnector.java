@@ -12,6 +12,7 @@ import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.*;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.lang.reflect.Array;
@@ -385,6 +386,69 @@ public final class ServerConnector {
         data.addProperty("group", group.id);
         requestArray(new ServerMsg("getModules", data), handler, ModuleInfo.class,
                 "modules", json -> ModuleInfo.fromJson(group, json));
+    }
+
+    /**
+     * Create an invite link to join a group with a specific expiration timestamp. If the timestamp
+     * is 0, the link will never expire. Returns a URL which can be used to join the group.
+     *
+     * @param group           the group to create a link to
+     * @param expireTimestamp the timestamp for when the link will expire, or null
+     * @param handler         the handler for the response of the server
+     */
+    public static void createInviteLink(GroupID group, long expireTimestamp,
+                                        ResultHandler<String> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (expireTimestamp < 0) {
+            throw new IllegalArgumentException("expire timestamp cannot be negative");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("expire", expireTimestamp);
+        getConnection().send(new ServerMsg("createInviteLink", data), handler, response ->
+                response.get("link").getAsString());
+    }
+
+    /**
+     * Check if an invite link is valid, and retrieve the data associated with it. If the link is
+     * invalid, null will be returned instead of an InviteLinkEntry.
+     *
+     * @param inviteLink the URL of an invite link
+     * @param handler    the handler for the response of the server
+     * @see InviteLinkEntry
+     */
+    public static void checkInviteLink(String inviteLink, ResultHandler<InviteLinkEntry> handler) {
+        JsonObject data = new JsonObject();
+        data.addProperty("link", inviteLink);
+        getConnection().send(new ServerMsg("checkInviteLink", data), handler, response -> {
+            if (response.get("valid").getAsBoolean()) {
+                return InviteLinkEntry.fromJson(inviteLink, response);
+            } else {
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Use an invite link, joining the associated group. If the link is invalid or expired, null
+     * will be returned instead of a GroupID.
+     *
+     * @param inviteLink the URL of an invite link
+     * @param handler    the handler for the response of the server
+     */
+    public static void useInviteLink(String inviteLink, ResultHandler<GroupID> handler) {
+        JsonObject data = new JsonObject();
+        data.addProperty("link", inviteLink);
+        getConnection().send(new ServerMsg("useInviteLink", data), handler, response -> {
+            JsonElement id = response.get("id");
+            if (id.isJsonNull()) {
+                return null;
+            } else {
+                return new GroupID(id.getAsString());
+            }
+        });
     }
 
     /**
