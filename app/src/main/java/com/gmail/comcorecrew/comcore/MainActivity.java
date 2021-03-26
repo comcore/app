@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Initialize the notification manager
+        // Initialize the notification manager using the application context
         NotificationHandler notificationHandler = new NotificationHandler(context);
 
-        // Initialize the connection to the server using the application context
-        ServerConnector.setConnection(new ServerConnection(context));
+        // Initialize the connection to the server
+        ServerConnector.setConnection(new ServerConnection());
         ServerConnector.addNotificationListener(notificationHandler);
 
         setContentView(R.layout.activity_main);

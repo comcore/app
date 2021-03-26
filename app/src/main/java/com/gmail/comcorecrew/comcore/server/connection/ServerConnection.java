@@ -30,7 +30,7 @@ import javax.net.ssl.TrustManagerFactory;
  * Default implementation of the abstract ServerConnector class.
  */
 public final class ServerConnection implements Connection {
-    private static final String SERVER_URL = "ec2-18-188-151-48.us-east-2.compute.amazonaws.com";
+    private static final String SERVER_URL = "comcore.ml";
     private static final int SERVER_PORT = 4433;
 
     private final String url;
@@ -48,42 +48,25 @@ public final class ServerConnection implements Connection {
     private PrintWriter out;
 
     /**
-     * Create a new ServerConnector in the given context.
-     *
-     * @param context the application context to create the ServerConnector in
+     * Create a new ServerConnector with the default URL.
      */
-    public ServerConnection(Context context) {
-        this(context, SERVER_URL);
+    public ServerConnection() {
+        this(SERVER_URL);
     }
 
     /**
-     * Create a new ServerConnector in the given context attached to a certain URL.
+     * Create a new ServerConnector attached to a certain URL.
      *
-     * @param context the application context to create the ServerConnector in
-     * @param url     the URL to connect to
+     * @param url the URL to connect to
      */
-    public ServerConnection(Context context, String url) {
+    public ServerConnection(String url) {
         this.url = url;
 
         try {
-            // Load the server's certificate from the assets folder
-            Certificate certificate = CertificateFactory.getInstance("X.509")
-                    .generateCertificate(context.getAssets().open("cert.pem"));
+            // Initialize SSLContext
+            sslContext = SSLContext.getDefault();
 
-            // Create a KeyStore containing the certificate
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("server", certificate);
-
-            // Use the KeyStore to create a TrustManagerFactory
-            String defaultAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tfm = TrustManagerFactory.getInstance(defaultAlgorithm);
-            tfm.init(keyStore);
-
-            // Initialize the SSLContext with the TrustManagerFactory
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tfm.getTrustManagers(), null);
-
+            // Start threads for writing and reading
             writerThread = new ServerWriter(this);
             readerThread = new ServerReader(this);
         } catch (Exception e) {
