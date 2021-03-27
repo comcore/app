@@ -413,7 +413,8 @@ public final class ServerConnector {
 
     /**
      * Check if an invite link is valid, and retrieve the data associated with it. If the link is
-     * invalid, null will be returned instead of an InviteLinkEntry.
+     * invalid, null will be returned instead of an InviteLinkEntry. Expired links' data are still
+     * returned, so use InviteLinkEntry.hasExpired() to check if a link is expired.
      *
      * @param inviteLink the URL of an invite link
      * @param handler    the handler for the response of the server
@@ -433,7 +434,7 @@ public final class ServerConnector {
 
     /**
      * Use an invite link, joining the associated group. If the link is invalid or expired, null
-     * will be returned instead of a GroupID.
+     * will be returned instead of a GroupID, indicating failure to join the group.
      *
      * @param inviteLink the URL of an invite link
      * @param handler    the handler for the response of the server

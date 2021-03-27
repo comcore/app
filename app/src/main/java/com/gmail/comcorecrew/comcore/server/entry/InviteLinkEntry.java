@@ -17,7 +17,8 @@ public class InviteLinkEntry {
     public final String groupName;
 
     /**
-     * The timestamp after which the link will no longer be usable.
+     * The timestamp after which the link will no longer be usable. If the timestamp is 0, then the
+     * link will never expire and will always remain usable.
      */
     public final long expireTimestamp;
 
