@@ -44,7 +44,7 @@ public interface NotificationListener {
      * @param task      the task being updated
      * @param completed whether the task was completed
      */
-    default void onTaskUpdated(TaskEntry task, boolean completed) {}
+    default void onTaskUpdated(TaskID task, boolean completed) {}
 
     /**
      * Handle a task being deleted.

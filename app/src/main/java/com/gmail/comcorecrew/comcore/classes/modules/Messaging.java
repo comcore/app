@@ -68,7 +68,7 @@ public class Messaging extends Module {
      * Adds a message and saves the user data.
      */
     public boolean addMessage(MessageEntry entry) {
-        int internalId = UserStorage.getInternalId(entry.sender.id);
+        int internalId = UserStorage.getInternalId(entry.sender);
         if (internalId == -1) {/*
             try {
             } catch (IOException e) {
@@ -90,7 +90,7 @@ public class Messaging extends Module {
         ArrayList<MessageEntry> entries = new ArrayList<>();
         for (MsgCacheable msg : messages) {
             entries.add(new MessageEntry(new MessageID((ChatID) getId(), msg.getMessageid()),
-                    UserStorage.getUser(msg.getId()).toUserInfo(),
+                    UserStorage.getUser(msg.getId()).getID(),
                     msg.getTimestamp(), msg.getData()));
         }
         return entries;

@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
 
@@ -19,10 +20,10 @@ public final class MessageEntry {
     /**
      * The user that sent the message.
      */
-    public final UserInfo sender;
+    public final UserID sender;
 
     /**
-     * The UNIX timestamp representing when the message was sent.
+     * The UNIX timestamp representing when the message was sent or edited.
      */
     public final long timestamp;
 
@@ -39,7 +40,7 @@ public final class MessageEntry {
      * @param timestamp the timestamp from when the message was sent
      * @param contents  the contents of the message
      */
-    public MessageEntry(MessageID id, UserInfo sender, long timestamp, String contents) {
+    public MessageEntry(MessageID id, UserID sender, long timestamp, String contents) {
         if (id == null) {
             throw new IllegalArgumentException("MessageID cannot be null");
         } else if (sender == null) {
@@ -66,7 +67,7 @@ public final class MessageEntry {
      */
     public static MessageEntry fromJson(ChatID chat, JsonObject json) {
         MessageID id = MessageID.fromJson(chat, json);
-        UserInfo sender = UserInfo.fromJson(json.getAsJsonObject("sender"));
+        UserID sender = new UserID(json.get("sender").getAsString());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
         return new MessageEntry(id, sender, timestamp, contents);

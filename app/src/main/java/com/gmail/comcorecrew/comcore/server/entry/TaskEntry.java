@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -14,6 +15,16 @@ public final class TaskEntry {
      * The task's identifier.
      */
     public final TaskID id;
+
+    /**
+     * The user that created the task.
+     */
+    public final UserID owner;
+
+    /**
+     * The UNIX timestamp representing when the task was added.
+     */
+    public final long timestamp;
 
     /**
      * The description of the task.
@@ -32,14 +43,21 @@ public final class TaskEntry {
      * @param description the description of the task
      * @param completed   whether the task has been completed
      */
-    public TaskEntry(TaskID id, String description, boolean completed) {
+    public TaskEntry(TaskID id, UserID owner, long timestamp, String description,
+                     boolean completed) {
         if (id == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
+        } else if (owner == null) {
+            throw new IllegalArgumentException("task owner cannot be null");
+        } else if (timestamp < 1) {
+            throw new IllegalArgumentException("task timestamp cannot be less than 1");
         } else if (description == null || description.isEmpty()) {
             throw new IllegalArgumentException("task description cannot be null or empty");
         }
 
         this.id = id;
+        this.owner = owner;
+        this.timestamp = timestamp;
         this.description = description;
         this.completed = completed;
     }
@@ -54,9 +72,11 @@ public final class TaskEntry {
      */
     public static TaskEntry fromJson(TaskListID taskList, JsonObject json) {
         TaskID id = TaskID.fromJson(taskList, json);
+        UserID owner = new UserID(json.get("owner").getAsString());
+        long timestamp = json.get("timestamp").getAsLong();
         String description = json.get("description").getAsString();
         boolean completed = json.get("completed").getAsBoolean();
-        return new TaskEntry(id, description, completed);
+        return new TaskEntry(id, owner, timestamp, description, completed);
     }
 
     @Override

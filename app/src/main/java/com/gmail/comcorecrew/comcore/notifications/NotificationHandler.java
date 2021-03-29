@@ -20,23 +20,41 @@ import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.Collection;
 
+/**
+ * Handles displaying notifications by forwarding them to Android.
+ */
 public class NotificationHandler implements NotificationListener {
+    // Android notification channel identifiers
     private static final String CHANNEL_MESSAGE = "message";
     private static final String CHANNEL_TASK = "task";
     private static final String CHANNEL_INVITE = "invite";
     private static final String CHANNEL_STATUS = "status";
 
+    // A unique ID to give a notification
     private static int uniqueId = (int) System.currentTimeMillis();
 
+    // The context and notification manager for displaying notifications
     private final Context context;
     private final NotificationManagerCompat manager;
 
+    /**
+     * Create a NotificationHandler in a Context
+     * @param context the Context
+     */
     public NotificationHandler(Context context) {
         this.context = context;
         this.manager = NotificationManagerCompat.from(context);
         createNotificationChannels();
     }
 
+    /**
+     * Create an Android notification channel, registering it with the system.
+     *
+     * @param name        the name of the channel
+     * @param description the description of the channel
+     * @param channelID   the channel identifier
+     * @param importance  the importance level
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotificationChannel(int name, int description, String channelID, int importance) {
         CharSequence nameStr = context.getString(name);
@@ -48,6 +66,9 @@ public class NotificationHandler implements NotificationListener {
         notificationManager.createNotificationChannel(channel);
     }
 
+    /**
+     * Create all necessary notification channels before the app starts.
+     */
     private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return;
@@ -70,6 +91,11 @@ public class NotificationHandler implements NotificationListener {
                 CHANNEL_STATUS, NotificationManager.IMPORTANCE_LOW);
     }
 
+    /**
+     * Send a notification, giving it a unique identifier.
+     *
+     * @param notification the notification to send
+     */
     private void notify(Notification notification) {
         manager.notify(uniqueId++, notification);
     }
@@ -78,7 +104,7 @@ public class NotificationHandler implements NotificationListener {
     public void onReceiveMessage(MessageEntry message) {
         notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle(message.sender.name)
+                .setContentTitle("Message Received")
                 .setContentText(message.contents)
                 .setWhen(message.timestamp)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

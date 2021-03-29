@@ -68,17 +68,17 @@ public final class ServerReader extends ServerThread {
                             listener.onMessageUpdated(id, newContents, timestamp));
                     break;
                 }
-                case "taskAdded": {
+                case "task": {
                     TaskEntry entry = TaskEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
                             listener.onTaskAdded(entry));
                     break;
                 }
                 case "taskUpdated": {
-                    TaskEntry entry = TaskEntry.fromJson(null, message.data);
+                    TaskID id = TaskID.fromJson(null, message.data);
                     boolean completed = message.data.get("completed").getAsBoolean();
                     ServerConnector.sendNotification(listener ->
-                            listener.onTaskUpdated(entry, completed));
+                            listener.onTaskUpdated(id, completed));
                     break;
                 }
                 case "taskDeleted": {
