@@ -165,7 +165,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     public int getItemViewType(int position) {
  //       System.out.println("Inside getItemViewType");
-        UserMessage message = mMessageList.get(position).convert();
+        UserMessage message = new UserMessage(mMessageList.get(position));
 
         if (message.getUserInfo().id.equals(ServerConnector.getUser().id)) {
             // If the current user is the sender of the message
@@ -199,7 +199,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        UserMessage message = mMessageList.get(position).convert();
+        UserMessage message = new UserMessage(mMessageList.get(position));
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_SENT:

@@ -90,12 +90,4 @@ public final class MessageEntry {
     public int hashCode() {
         return Objects.hash(id, sender, timestamp, contents);
     }
-
-    /**
-     * Converts a MessageEntry into the chats UserMessage format easily
-     * @return
-     */
-    public UserMessage convert() {
-        return new UserMessage(this.id, this.sender, this.timestamp, this.contents);
-    }
 }

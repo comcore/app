@@ -119,13 +119,13 @@ public class ChatFragment5 extends Fragment {
 
 //        System.out.println(userMessage.getMessageID() + " " + userMessage.getUserInfo() + " " + userMessage.getTime2() + " " + "FIX ME PLEASE");
 
-        MessageEntry messageEntry = new MessageEntry(new MessageID(chatID, chatPosition + 1), new UserInfo(ServerConnector.getUser().id, ServerConnector.getUser().name), userMessage.getTime2(), "FIX ME PLEASE");
+//        MessageEntry messageEntry = new MessageEntry(new MessageID(chatID, chatPosition + 1), new UserInfo(ServerConnector.getUser().id, ServerConnector.getUser().name), userMessage.getTime2(), "FIX ME PLEASE");
 
  //       System.out.println("MESSAGE ENTRY STATS: " + messageEntry.contents + " " + messageEntry.id + " " + messageEntry.sender + " " + messageEntry.timestamp);
 
-        MessageEntry messageEntry2 = new MessageEntry(new MessageID(chatID, chatPosition + 2), new UserInfo(ServerConnector.getUser().id, ServerConnector.getUser().name), userMessage.getTime2(), "Is this it??");
+//        MessageEntry messageEntry2 = new MessageEntry(new MessageID(chatID, chatPosition + 2), new UserInfo(ServerConnector.getUser().id, ServerConnector.getUser().name), userMessage.getTime2(), "Is this it??");
 
-        int x = UserStorage.getInternalId(messageEntry.sender.id);
+//        int x = UserStorage.getInternalId(messageEntry.sender.id);
  //       System.out.println(x);
 
 //        try {
@@ -141,23 +141,23 @@ public class ChatFragment5 extends Fragment {
 
         final MessageID[] z = new MessageID[1];
 
-        if (messageEntry == null) {
+//        if (messageEntry == null) {
  //           System.out.println("WHY THE FUCK");
-        } else if (messageEntry != null) {
+//        } else if (messageEntry != null) {
 //            System.out.println("ADDING MESSAGE ENTRY");
-            ServerConnector.sendMessage(chatID, messageEntry.contents, result -> {
-                if (result.isFailure()) {
+//            ServerConnector.sendMessage(chatID, messageEntry.contents, result -> {
+//                if (result.isFailure()) {
  //                   System.out.println("FAILED");
-                } else {
-                    z[0] = result.data;
+//                } else {
+//                    z[0] = result.data;
  //                   System.out.println(z[0].module);
  //                   System.out.println(z[0].id);
-                }
-            });
-            messageEntryArrayList.add(messageEntry);
-            messageEntryArrayList.add(messageEntry2);
+//                }
+//            });
+//            messageEntryArrayList.add(messageEntry);
+//            messageEntryArrayList.add(messageEntry2);
  //           System.out.println("JUST ADDED MESSAGE ENTRY");
-        }
+//        }
 
 
 
@@ -229,7 +229,7 @@ public class ChatFragment5 extends Fragment {
             MessageID messageID= new MessageID(chatID, chatPosition + 1);
 
             UserMessage userMessage = new UserMessage(messageID, ServerConnector.getUser(), Instant.now().getEpochSecond(), messageToBeSent.getText().toString());
-            MessageEntry messageEntry = new MessageEntry(userMessage.getMessageID(), userMessage.getUserInfo(), userMessage.getTime2(), userMessage.getMessage());
+            MessageEntry messageEntry = new MessageEntry(userMessage.getMessageID(), userMessage.getUserInfo().id, userMessage.getTime2(), userMessage.getMessage());
 
             ServerConnector.getMessages(chatID, null, null, result1 -> {
                 if (result1.isFailure()) {

@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
@@ -19,6 +20,11 @@ public class UserMessage {
     ChatID chatID;
     Group currentGroup;
     MessageID messageID;
+
+    public UserMessage(MessageEntry entry) {
+        // TODO actually get the name from the User class
+        this(entry.id, new UserInfo(entry.sender, "<NAME>"), entry.timestamp, entry.contents);
+    }
 
     public UserMessage(String message, User sender, TemporalAccessor time, long time2, ChatID chatID, Group currentGroup) {
         super();
@@ -37,7 +43,7 @@ public class UserMessage {
         this.time = time;
     }
 
-        public UserMessage(MessageID messageID, UserInfo userInfo, long time, String message) {
+    public UserMessage(MessageID messageID, UserInfo userInfo, long time, String message) {
         this.messageID = messageID;
         this.userInfo = userInfo;
         this.time2 = time;
