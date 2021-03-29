@@ -24,6 +24,9 @@ import com.gmail.comcorecrew.comcore.server.id.GroupID;
  * create an instance of this fragment.
  */
 public class CreateGroupFragment extends Fragment {
+    private boolean chat = false;
+    private boolean list = false;
+    private boolean calendar = false;
 
     public CreateGroupFragment() {
         // Required empty public constructor
@@ -60,6 +63,10 @@ public class CreateGroupFragment extends Fragment {
                     .popBackStack();
         });
 
+        view.findViewById(R.id.switch_chat).setOnClickListener(clickedView -> {
+            chat = !chat;
+        });
+
         /**
          * If the "submit" button is clicked, try to create a group using the given information
          */
@@ -83,6 +90,14 @@ public class CreateGroupFragment extends Fragment {
 
                 //TextView text = (TextView) view.findViewById(R.id.label_create_group);
                 //text.setText(result.data.toString());
+                ServerConnector.createChat(result.data, groupName, result1 -> {
+                    if (result1.isFailure()) {
+                        new ErrorDialog(R.string.error_cannot_connect)
+                                .show(getParentFragmentManager(), null);
+                    } else {
+                        System.out.println("Chat created!");
+                    }
+                });
                 NavHostFragment.findNavController(this)
                         .popBackStack();
             });

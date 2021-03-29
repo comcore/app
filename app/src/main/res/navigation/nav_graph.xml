@@ -55,12 +55,12 @@
         android:label="fragment_group"
         tools:layout="@layout/fragment_group" >
         <action
-            android:id="@+id/action_groupFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            android:id="@+id/action_groupFragment_to_chatFragment5"
+            app:destination="@id/chatFragment5" />
     </fragment>
     <fragment
-        android:id="@+id/chatFragment"
-        android:name="com.gmail.comcorecrew.comcore.fragments.ChatFragment"
-        android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" />
+        android:id="@+id/chatFragment5"
+        android:name="com.gmail.comcorecrew.comcore.fragments.ChatFragment5"
+        android:label="fragment_chat5"
+        tools:layout="@layout/fragment_chat5" />
 </navigation>

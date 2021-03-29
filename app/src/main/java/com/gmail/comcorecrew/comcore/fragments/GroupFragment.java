@@ -4,9 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -19,7 +17,6 @@ import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
@@ -27,11 +24,7 @@ import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
-import com.gmail.comcorecrew.comcore.server.id.UserID;
-
-import java.util.ArrayList;
 
 public class GroupFragment extends Fragment {
     private MainFragment fragment;
@@ -88,14 +81,24 @@ public class GroupFragment extends Fragment {
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
             ServerConnector.getModules(currentGroup.getGroupId(), result -> {
                 if (result.isFailure() || result.data.length == 0) {
+                    System.out.println(result.data.length);
+                    System.out.println(currentGroup.getGroupId());
                     return;
                 }
 
                 ModuleID id = result.data[0].id;
                 if (id instanceof ChatID) {
-                    ChatFragment.chatID = (ChatID) id;
+                    /* Sends chatID and the current group to the chatFragment frame*/
+                    ChatFragment5.chatID = (ChatID) id;
+                    ChatFragment5.currentGroup = currentGroup;
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("currentGroup", currentGroup);
+//                    Intent i = new Intent(getActivity(), MessageListActivity.class);
+//                    startActivity(i);
+//                    ((Activity) getActivity()).overridePendingTransition(0, 0);
+
                     NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_groupFragment_to_chatFragment);
+                            .navigate(R.id.action_groupFragment_to_chatFragment5, bundle);
                 }
             });
         });
@@ -189,11 +192,11 @@ public class GroupFragment extends Fragment {
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.dis_enable_chat:
-                ServerConnector.getModules(currentGroup.getGroupId(), result -> {
-                    if (result.isSuccess() && result.data.length == 0) {
-                        ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
-                    }
-                });
+//                ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+//                    if (result.isSuccess() && result.data.length == 0) {
+//                        ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
+//                    }
+//                });
                 return true;
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/

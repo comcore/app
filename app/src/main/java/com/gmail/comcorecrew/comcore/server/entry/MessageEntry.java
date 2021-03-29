@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
+import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.classes.modules.UserMessage;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
@@ -86,5 +88,13 @@ public final class MessageEntry {
     @Override
     public int hashCode() {
         return Objects.hash(id, sender, timestamp, contents);
+    }
+
+    /**
+     * Converts a MessageEntry into the chats UserMessage format easily
+     * @return
+     */
+    public UserMessage convert() {
+        return new UserMessage(this.id, this.sender, this.timestamp, this.contents);
     }
 }
