@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.abstracts;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 
 import java.io.Serializable;
@@ -25,6 +26,67 @@ public abstract class Module implements Serializable, NotificationListener {
         this.id = id;
         this.group = group;
         this.mdid = mdid;
+        muted = false;
+        mentionMuted = false;
+        mnum = group.addModule(this);
+    }
+
+    /**
+     * Constructor for initializing a module
+     *
+     * @param name name of the group
+     * @param group group that the module is in
+     * @param mdid mdid of the group to add
+     */
+    public Module(String name, Group group, Mdid mdid) {
+        switch (mdid) {
+            case CMSG: {
+                ServerConnector.createChat(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                });
+                break;
+            }
+            case CTSK: {
+                ServerConnector.createTaskList(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                });
+                break;
+            }
+            default: {
+                throw new RuntimeException("Invalid MDID");
+            }
+        }
+        this.name = name;
+        this.group = group;
+        this.mdid = mdid;
+        muted = false;
+        mentionMuted = false;
+        mnum = group.addModule(this);
+    }
+
+    /**
+     * Constructor for initializing a custom module
+     *
+     * @param name name of the module
+     * @param group group that contains the module
+     * @param type custom type of the module
+     */
+    public Module(String name, Group group, String type) {
+        ServerConnector.createCustomModule(group.getGroupId(), name, type, result -> {
+            if (result.isFailure()) {
+                throw new RuntimeException(result.errorMessage);
+            }
+            this.id = result.data;
+        });
+        this.name = name;
+        this.group = group;
+        mdid = Mdid.CSTM;
         muted = false;
         mentionMuted = false;
         mnum = group.addModule(this);

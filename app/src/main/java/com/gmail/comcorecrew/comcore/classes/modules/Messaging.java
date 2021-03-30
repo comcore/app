@@ -13,7 +13,6 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
@@ -24,6 +23,12 @@ public class Messaging extends Module {
 
     public Messaging(String name, ChatID id, Group group) {
         super(name, id, group, Mdid.CMSG);
+        messages = new ArrayList<>();
+    }
+
+    public Messaging(String name, Group group) {
+        super(name, group, Mdid.CMSG);
+        messages = new ArrayList<>();
     }
 
     @Override

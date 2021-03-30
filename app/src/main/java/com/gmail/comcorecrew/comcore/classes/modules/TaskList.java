@@ -22,6 +22,11 @@ public class TaskList extends Module {
         tasks = new ArrayList<>();
     }
 
+    public TaskList(String name, Group group) {
+        super(name, group, Mdid.CTSK);
+        tasks = new ArrayList<>();
+    }
+
     public ArrayList<TaskItem> getTasks() {
         return tasks;
     }
