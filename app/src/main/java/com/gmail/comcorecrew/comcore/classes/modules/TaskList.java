@@ -108,4 +108,8 @@ public class TaskList extends Module {
             tasks.add(new TaskItem(line));
         }
     }
+
+    public void refreshTasks() {
+        //TODO Implement
+    }
 }
