@@ -20,6 +20,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private int mnum; //Distinguishes same type modules
     private boolean muted; //Contains muted status of module notifications
     private boolean mentionMuted; //Contains mention muted status of module notifications
+    private long lastUpdated; //Last time contents were updated
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
@@ -147,6 +148,14 @@ public abstract class Module implements Serializable, NotificationListener {
 
     public boolean isMentionMuted() {
         return mentionMuted;
+    }
+
+    public void markUpdated() {
+        lastUpdated = 0; //TODO implement
+    }
+
+    public long getLastUpdated() {
+        return lastUpdated;
     }
 
     public String getGroupIdString() {

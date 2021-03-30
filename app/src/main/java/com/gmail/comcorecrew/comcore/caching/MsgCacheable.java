@@ -1,6 +1,10 @@
 package com.gmail.comcorecrew.comcore.caching;
 
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 /*
  * Class for the standard cacheable format. Supports the caching of an int,
@@ -12,6 +16,13 @@ public class MsgCacheable implements Cacheable {
     private long messageid; //Message id
     private long timestamp; //Meta data for any use.
     private String data; //Data contained in the message.
+
+    public MsgCacheable(MessageEntry entry) {
+        id = UserStorage.getInternalId(entry.sender);
+        messageid = entry.id.id;
+        timestamp = entry.timestamp;
+        data = entry.contents;
+    }
 
     public MsgCacheable(int id, long messageid, long timestamp, String data) {
         if (data.length() > (AppData.maxData - 5)) {
@@ -41,6 +52,26 @@ public class MsgCacheable implements Cacheable {
         timestamp = (timestamp << 16) | cache[8];
         timestamp = (timestamp << 16) | cache[9];
         data = new String(cache, 10, cache.length - 10);
+    }
+
+    //Creates a new object from cache string.
+    public MsgCacheable(String cache) {
+        if (cache.length() < 10) { //Makes sure the array length is valid.
+            throw new IllegalArgumentException();
+        }
+
+        //Reads the array into the object.
+        id = cache.charAt(0);
+        id = (id << 16) | cache.charAt(1);
+        messageid = cache.charAt(2);
+        messageid = (messageid << 16) | cache.charAt(3);
+        messageid = (messageid << 16) | cache.charAt(4);
+        messageid = (messageid << 16) | cache.charAt(5);
+        timestamp = cache.charAt(6);
+        timestamp = (timestamp << 16) | cache.charAt(7);
+        timestamp = (timestamp << 16) | cache.charAt(8);
+        timestamp = (timestamp << 16) | cache.charAt(9);
+        data = cache.substring(10);
     }
 
     @Override
@@ -84,8 +115,13 @@ public class MsgCacheable implements Cacheable {
         data = new String(cache, 10, cache.length - 10);
     }
 
+    public MessageEntry toEntry(ChatID chatID) {
+        return new MessageEntry(new MessageID(chatID, messageid),
+                UserStorage.getUser(id).getID(), timestamp, data);
+    }
+
     public long getBytes() {
-        return 2 + 2 + 4 + 4 + (data.length() * 2);
+        return 4 + 4 + 8 + 8 + (data.length() * 2);
     }
 
     //Get and Set methods.
