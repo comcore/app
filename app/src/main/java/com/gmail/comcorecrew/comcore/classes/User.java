@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.classes;
 
+import androidx.annotation.NonNull;
+
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
@@ -17,6 +19,12 @@ public class User {
     private int internalId; //Internal id of the user
     private final UserID userID; //External userID of the user
     private final String userName; //Username of the user
+
+    public User(@NonNull UserInfo info) {
+        userID = info.id;
+        userName = info.name;
+        internalId = -1;
+    }
 
     public User (UserID userID, String userName) {
         if ((userID == null) || (userName == null)) {

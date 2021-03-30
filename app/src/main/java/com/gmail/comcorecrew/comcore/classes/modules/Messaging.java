@@ -163,4 +163,25 @@ public class Messaging extends Module {
         }
         this.toCache();
     }
+
+    public boolean pinMessage(MessageID messageID) {
+        for (Module m : getGroup().getModules()) {
+            if ((m instanceof PinnedMessages) &&
+                    (((PinnedMessages) m).getChatId().equals(getId().id))) {
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void createPinnedMessages(String name) {
+        for (Module m : getGroup().getModules()) {
+            if ((m instanceof PinnedMessages) &&
+                    (((PinnedMessages) m).getChatId().equals(getId().id))) {
+                return;
+            }
+        }
+        new PinnedMessages(name, getGroup(), (ChatID) getId());
+    }
 }

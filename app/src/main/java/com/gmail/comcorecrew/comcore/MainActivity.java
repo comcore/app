@@ -20,13 +20,6 @@ public class MainActivity extends AppCompatActivity {
         // Get the application context
         Context context = getBaseContext();
 
-        // Initialize storage and caching
-        try {
-            AppData.init(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // Initialize the notification manager using the application context
         NotificationHandler notificationHandler = new NotificationHandler(context);
 

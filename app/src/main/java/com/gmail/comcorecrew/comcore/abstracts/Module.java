@@ -20,6 +20,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private int mnum; //Distinguishes same type modules
     private boolean muted; //Contains muted status of module notifications
     private boolean mentionMuted; //Contains mention muted status of module notifications
+    private long lastUpdated; //Last time contents were updated
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
@@ -39,6 +40,7 @@ public abstract class Module implements Serializable, NotificationListener {
      * @param mdid mdid of the group to add
      */
     public Module(String name, Group group, Mdid mdid) {
+        this.mdid = mdid;
         switch (mdid) {
             case CMSG: {
                 ServerConnector.createChat(group.getGroupId(), name, result -> {
@@ -46,6 +48,11 @@ public abstract class Module implements Serializable, NotificationListener {
                         throw new RuntimeException(result.errorMessage);
                     }
                     id = result.data;
+                    this.name = name;
+                    this.group = group;
+                    muted = false;
+                    mentionMuted = false;
+                    mnum = group.addModule(this);
                 });
                 break;
             }
@@ -55,6 +62,11 @@ public abstract class Module implements Serializable, NotificationListener {
                         throw new RuntimeException(result.errorMessage);
                     }
                     id = result.data;
+                    this.name = name;
+                    this.group = group;
+                    muted = false;
+                    mentionMuted = false;
+                    mnum = group.addModule(this);
                 });
                 break;
             }
@@ -62,12 +74,6 @@ public abstract class Module implements Serializable, NotificationListener {
                 throw new RuntimeException("Invalid MDID");
             }
         }
-        this.name = name;
-        this.group = group;
-        this.mdid = mdid;
-        muted = false;
-        mentionMuted = false;
-        mnum = group.addModule(this);
     }
 
     /**
@@ -78,18 +84,18 @@ public abstract class Module implements Serializable, NotificationListener {
      * @param type custom type of the module
      */
     public Module(String name, Group group, String type) {
+        mdid = Mdid.CSTM;
         ServerConnector.createCustomModule(group.getGroupId(), name, type, result -> {
             if (result.isFailure()) {
                 throw new RuntimeException(result.errorMessage);
             }
             this.id = result.data;
+            this.name = name;
+            this.group = group;
+            muted = false;
+            mentionMuted = false;
+            mnum = group.addModule(this);
         });
-        this.name = name;
-        this.group = group;
-        mdid = Mdid.CSTM;
-        muted = false;
-        mentionMuted = false;
-        mnum = group.addModule(this);
     }
 
     public String getName() {
@@ -142,6 +148,14 @@ public abstract class Module implements Serializable, NotificationListener {
 
     public boolean isMentionMuted() {
         return mentionMuted;
+    }
+
+    public void markUpdated() {
+        lastUpdated = 0; //TODO implement
+    }
+
+    public long getLastUpdated() {
+        return lastUpdated;
     }
 
     public String getGroupIdString() {
