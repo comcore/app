@@ -18,12 +18,15 @@ public abstract class Module implements Serializable, NotificationListener {
     private final Mdid mdid; //Specific module identifier
     private int mnum; //Distinguishes same type modules
     private boolean muted; //Contains muted status of module notifications
+    private boolean mentionMuted; //Contains mention muted status of module notifications
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
         this.id = id;
         this.group = group;
         this.mdid = mdid;
+        muted = false;
+        mentionMuted = false;
         mnum = group.addModule(this);
     }
 
@@ -69,6 +72,14 @@ public abstract class Module implements Serializable, NotificationListener {
 
     public boolean isMuted() {
         return muted;
+    }
+
+    public void setMentionMuted(boolean mentionMuted) {
+        this.mentionMuted = mentionMuted;
+    }
+
+    public boolean isMentionMuted() {
+        return mentionMuted;
     }
 
     public String getGroupIdString() {
