@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
  */
 public class AppData {
 
+    public static User self;
     public static File cacheDir;
     public static File filesDir;
     public static File groupsDir;
@@ -27,10 +30,18 @@ public class AppData {
      *
      * @param context App context
      */
-    public static void init(Context context) throws IOException {
-        cacheDir = context.getCacheDir();
-        filesDir = context.getFilesDir();
+    public static void init(UserInfo user, Context context) throws IOException {
+        self = new User(user);
+        cacheDir = new File(context.getCacheDir(), self.getID().id);
+        filesDir = new File(context.getFilesDir(), self.getID().id);
+        boolean madeDir = filesDir.mkdir();
         UserStorage.init();
+        if ((madeDir) && (!UserStorage.addUser(self))) {
+            throw new StorageFileDisjunctionException("Impossible use storage state.");
+        }
+        if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
+            throw new IOException("Cannot create cache directory");
+        }
         groupsDir = new File(filesDir, "groups");
         if (!groupsDir.mkdir()) {
             GroupStorage.readAllGroups();

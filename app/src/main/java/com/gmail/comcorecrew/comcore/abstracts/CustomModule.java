@@ -13,8 +13,9 @@ public abstract class CustomModule extends Module {
 
     String type;
 
-    public CustomModule(String name, CustomModuleID id, Group group) {
+    public CustomModule(String name, CustomModuleID id, Group group, String type) {
         super(name, id, group, Mdid.CSTM);
+        this.type = type;
     }
 
     public CustomModule(String name, Group group, String type) {
@@ -25,7 +26,5 @@ public abstract class CustomModule extends Module {
     abstract public void viewInit(@NonNull View view);
 
     abstract public int getLayout();
-
-    abstract public String getType();
 
 }
