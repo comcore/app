@@ -601,7 +601,8 @@ public final class ServerConnector {
      * @param message the message to send
      * @param handler the handler for the response of the server
      */
-    public static void sendMessage(ChatID chat, String message, ResultHandler<MessageID> handler) {
+    public static void sendMessage(ChatID chat, String message,
+                                   ResultHandler<MessageEntry> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
         } else if (message == null) {
@@ -613,7 +614,7 @@ public final class ServerConnector {
         data.addProperty("chat", chat.id);
         data.addProperty("contents", message);
         getConnection().send(new ServerMsg("sendMessage", data), handler,
-                response -> new MessageID(chat, response.get("id").getAsLong()));
+                response -> MessageEntry.fromJson(chat, response));
     }
 
     /**
@@ -675,7 +676,7 @@ public final class ServerConnector {
      * @param handler     the handler for the response of the server
      */
     public static void addTask(TaskListID taskList, String description,
-                               ResultHandler<TaskID> handler) {
+                               ResultHandler<TaskEntry> handler) {
         if (taskList == null) {
             throw new IllegalArgumentException("TaskListID cannot be null");
         } else if (description == null) {
@@ -687,7 +688,7 @@ public final class ServerConnector {
         data.addProperty("taskList", taskList.id);
         data.addProperty("description", description);
         getConnection().send(new ServerMsg("addTask", data), handler,
-                response -> new TaskID(taskList, response.get("id").getAsLong()));
+                response -> TaskEntry.fromJson(taskList, response));
     }
 
     /**
@@ -716,7 +717,8 @@ public final class ServerConnector {
      * @param completed whether the task has been completed
      * @param handler   the handler for the response of the server
      */
-    public static void updateTask(TaskID task, boolean completed, ResultHandler<Void> handler) {
+    public static void updateTask(TaskID task, boolean completed,
+                                  ResultHandler<TaskEntry> handler) {
         if (task == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
         }
@@ -726,7 +728,8 @@ public final class ServerConnector {
         data.addProperty("taskList", task.module.id);
         data.addProperty("id", task.id);
         data.addProperty("completed", completed);
-        getConnection().send(new ServerMsg("updateTask", data), handler, response -> null);
+        getConnection().send(new ServerMsg("updateTask", data), handler,
+                response -> TaskEntry.fromJson(task.module, response));
     }
 
     /**

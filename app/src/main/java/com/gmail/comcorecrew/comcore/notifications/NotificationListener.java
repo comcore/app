@@ -4,6 +4,7 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.util.Collection;
 
@@ -25,11 +26,9 @@ public interface NotificationListener {
     /**
      * Handle a message's contents being updated. The new contents will never be null.
      *
-     * @param message     the message being updated
-     * @param newContents the new contents of the message
-     * @param timestamp   when the message was updated
+     * @param message the updated task
      */
-    default void onMessageUpdated(MessageID message, String newContents, long timestamp) {}
+    default void onMessageUpdated(MessageEntry message) {}
 
     /**
      * Handle a new task being added to a task list.
@@ -41,10 +40,9 @@ public interface NotificationListener {
     /**
      * Handle a task's completion status being updated.
      *
-     * @param task      the task being updated
-     * @param completed whether the task was completed
+     * @param task the updated task
      */
-    default void onTaskUpdated(TaskID task, boolean completed) {}
+    default void onTaskUpdated(TaskEntry task) {}
 
     /**
      * Handle a task being deleted.
@@ -81,7 +79,12 @@ public interface NotificationListener {
      *
      * @param group the group
      */
-    default void onKicked(GroupID group) {}
+    default void onKicked(GroupID group, String name) {}
+
+    /**
+     * Handle the user logging in successfully. This could be used to update the cached data.
+     */
+    default void onLoggedIn(UserInfo user) {}
 
     /**
      * Handle being logged out forcibly by the server. This could be used to go back to the login

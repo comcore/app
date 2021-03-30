@@ -52,6 +52,8 @@ public final class ServerReader extends ServerThread {
                 case "setUser": {
                     UserInfo userData = UserInfo.fromJson(message.data);
                     connection.setUserInfo(userData);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onLoggedIn(userData));
                     break;
                 }
                 case "message": {
@@ -61,11 +63,9 @@ public final class ServerReader extends ServerThread {
                     break;
                 }
                 case "messageUpdate": {
-                    MessageID id = MessageID.fromJson(null, message.data);
-                    String newContents = message.data.get("newContents").getAsString();
-                    long timestamp = message.data.get("timestamp").getAsLong();
+                    MessageEntry entry = MessageEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
-                            listener.onMessageUpdated(id, newContents, timestamp));
+                            listener.onMessageUpdated(entry));
                     break;
                 }
                 case "task": {
@@ -75,10 +75,9 @@ public final class ServerReader extends ServerThread {
                     break;
                 }
                 case "taskUpdated": {
-                    TaskID id = TaskID.fromJson(null, message.data);
-                    boolean completed = message.data.get("completed").getAsBoolean();
+                    TaskEntry entry = TaskEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
-                            listener.onTaskUpdated(id, completed));
+                            listener.onTaskUpdated(entry));
                     break;
                 }
                 case "taskDeleted": {
@@ -109,8 +108,9 @@ public final class ServerReader extends ServerThread {
                 }
                 case "kicked": {
                     GroupID group = new GroupID(message.data.get("group").getAsString());
+                    String name = message.data.get("name").getAsString();
                     ServerConnector.sendNotification(listener ->
-                        listener.onKicked(group));
+                        listener.onKicked(group, name));
                     break;
                 }
                 case "logout": {

@@ -4,6 +4,7 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
@@ -32,6 +33,41 @@ public class UserStorage {
         if ((!refreshLists())) {
             // TODO: Prompt user information to add to storage.
         }
+    }
+
+    /**
+     * Look up the User corresponding to a UserID, or fetch it from the server if it is not
+     * already in the UserStorage. If it succeeds, the callback will be called with the retrieved
+     * information about the user.
+     *
+     * @param id       the ID of the group
+     * @param callback what to do with the result
+     */
+    public static void lookup(UserID id, LookupCallback<User> callback) {
+        // Try to find the user in the UserStorage
+        int internalId = UserStorage.getInternalId(id);
+        if (internalId != -1) {
+            callback.accept(UserStorage.getUser(internalId));
+            return;
+        }
+
+        // Otherwise, get the info from the server and cache it
+        ServerConnector.getUserInfo(id, 0, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            try {
+                User user = new User(id, result.data.name);
+                if (!UserStorage.addUser(user)) {
+                    callback.accept(UserStorage.getUser(id));
+                } else {
+                    callback.accept(user);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

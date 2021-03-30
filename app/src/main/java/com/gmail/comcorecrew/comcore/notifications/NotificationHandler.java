@@ -11,12 +11,16 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
 
 import java.util.Collection;
 
@@ -102,23 +106,62 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onReceiveMessage(MessageEntry message) {
-        notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
-                .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle("Message Received")
-                .setContentText(message.contents)
-                .setWhen(message.timestamp)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .build());
+        ServerConnector.getModuleInfo(message.id.module, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            ModuleInfo module = result.data;
+            UserStorage.lookup(message.sender, user ->
+                notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
+                        .setSmallIcon(R.drawable.receivedmsg)
+                        .setContentTitle(module.name)
+                        .setContentText(user.getName() + ": " + message.contents)
+                        .setWhen(message.timestamp)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .build()));
+        });
     }
 
     @Override
     public void onTaskAdded(TaskEntry task) {
-        notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
-                .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle("Task Added")
-                .setContentText(task.description)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .build());
+        ServerConnector.getModuleInfo(task.id.module, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            ModuleInfo module = result.data;
+            UserStorage.lookup(task.owner, user ->
+                    notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
+                            .setSmallIcon(R.drawable.receivedmsg)
+                            .setContentTitle(module.name)
+                            .setContentText("Added: " + task.description)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .build()));
+        });
+    }
+
+    @Override
+    public void onTaskUpdated(TaskEntry task) {
+        if (!task.completed) {
+            // If the task was marked un-completed, don't send a notification
+            return;
+        }
+
+        ServerConnector.getModuleInfo(task.id.module, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            ModuleInfo module = result.data;
+            UserStorage.lookup(task.owner, user ->
+                    notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
+                            .setSmallIcon(R.drawable.receivedmsg)
+                            .setContentTitle(module.name)
+                            .setContentText("Completed: " + task.description)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .build()));
+        });
     }
 
     @Override
@@ -133,34 +176,38 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
-        notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
-                .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle("Role Changed")
-                .setContentText("You have become a " + role)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build());
+        GroupStorage.lookup(group, info ->
+            notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
+                    .setSmallIcon(R.drawable.receivedmsg)
+                    .setContentTitle(info.getName())
+                    .setContentText("You have become a " + role)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .build()));
     }
 
     @Override
     public void onMuteChanged(GroupID group, boolean muted) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
-            .setSmallIcon(R.drawable.receivedmsg)
-            .setPriority(NotificationCompat.PRIORITY_LOW);
+        GroupStorage.lookup(group, info -> {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
+                    .setSmallIcon(R.drawable.receivedmsg)
+                    .setContentTitle(info.getName())
+                    .setPriority(NotificationCompat.PRIORITY_LOW);
 
-        if (muted) {
-            builder.setContentTitle("Muted").setContentText("You have been muted");
-        } else {
-            builder.setContentTitle("Unmuted").setContentText("You have been unmuted");
-        }
+            if (muted) {
+                builder.setContentText("You have been muted");
+            } else {
+                builder.setContentText("You have been unmuted");
+            }
 
-        notify(builder.build());
+            notify(builder.build());
+        });
     }
 
     @Override
-    public void onKicked(GroupID group) {
+    public void onKicked(GroupID group, String name) {
         notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle("Kicked")
+                .setContentTitle(name)
                 .setContentText("You have been kicked")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build());

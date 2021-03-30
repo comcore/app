@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
@@ -26,6 +27,48 @@ import java.util.ArrayList;
  * NOTE: AppData.init() must be run before this module works!
  */
 public class GroupStorage {
+    /**
+     * Look up the Group corresponding to a GroupID, or fetch it from the server if it is not
+     * already in the GroupStorage. If it succeeds, the callback will be called with the retrieved
+     * information about the group.
+     *
+     * @param id       the ID of the group
+     * @param callback what to do with the result
+     */
+    public static void lookup(GroupID id, LookupCallback<Group> callback) {
+        // Try to find the group in the AppData
+        for (Group group : AppData.groups) {
+            if (group.getGroupId().equals(id)) {
+                callback.accept(group);
+                return;
+            }
+        }
+
+        // Otherwise, get the info from the server and cache it
+        ServerConnector.getGroupInfo(id, 0, result -> {
+            // Make sure it hasn't already been added
+            for (Group group : AppData.groups) {
+                if (group.getGroupId().equals(id)) {
+                    callback.accept(group);
+                    return;
+                }
+            }
+
+            // Make sure the request succeeded
+            if (result.isFailure()) {
+                return;
+            }
+
+            // Add the new group to the AppData
+            try {
+                Group group = new Group(result.data.name, id, result.data.role, result.data.muted);
+                AppData.groups.add(group);
+                callback.accept(group);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     /**
      * Stores all groups in AppData.groups to storage files.
