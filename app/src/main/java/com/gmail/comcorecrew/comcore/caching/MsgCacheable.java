@@ -45,7 +45,7 @@ public class MsgCacheable implements Cacheable {
 
     @Override
     public char[] toCache() {
-        char[] cache = new char[2 + 4 + data.length()];
+        char[] cache = new char[2 + 4 + 4 + data.length()];
 
         cache[0] = (char) (id >> 16);
         cache[1] = (char) id;
