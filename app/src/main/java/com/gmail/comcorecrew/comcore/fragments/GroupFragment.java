@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
@@ -27,7 +28,7 @@ import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 
 public class GroupFragment extends Fragment {
-    private MainFragment fragment;
+
     private Group currentGroup;
 
     public GroupFragment() {
@@ -44,15 +45,22 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            currentGroup = bundle.getParcelable("currentGroup");
+        /** Retrieve the GroupId passed from the main fragment and find
+         * the Group associated with it.
+         *
+         * For this to work, AppData.init() must be run first.
+         */
 
-        }
-        else {
-            new ErrorDialog(R.string.error_unknown)
-                    .show(getParentFragmentManager(), null);
-        }
+        /**GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
+            currentGroup = callback;
+        });*/
+
+        /** TODO Testing only
+         * A new group is created using the passed GroupID. This is only to test the functionality
+         * of the modules and menus and should be replaced with the lookup function above once
+         * AppData.init() is run in the app
+         */
+        currentGroup = new Group("Test Group", GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), GroupRole.OWNER, Boolean.FALSE);
     }
 
     @Override
@@ -91,14 +99,12 @@ public class GroupFragment extends Fragment {
                     /* Sends chatID and the current group to the chatFragment frame*/
                     ChatFragment5.chatID = (ChatID) id;
                     ChatFragment5.currentGroup = currentGroup;
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("currentGroup", currentGroup);
 //                    Intent i = new Intent(getActivity(), MessageListActivity.class);
 //                    startActivity(i);
 //                    ((Activity) getActivity()).overridePendingTransition(0, 0);
 
                     NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_groupFragment_to_chatFragment5, bundle);
+                            .navigate(R.id.action_groupFragment_to_chatFragment5);
                 }
             });
         });

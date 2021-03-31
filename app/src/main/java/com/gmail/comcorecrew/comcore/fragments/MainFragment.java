@@ -146,10 +146,12 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("currentGroup", currentGroup);
-
-                NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_mainFragment_to_groupFragment, bundle);
+                /** When a group box is clicked, pass its GroupId to the new group fragment instead
+                 * of passing the entire group.
+                 */
+                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(currentGroup.getGroupId());
+                action.setGroupID(currentGroup.getGroupId());
+                NavHostFragment.findNavController(MainFragment.this).navigate(action);
             }
         }
 

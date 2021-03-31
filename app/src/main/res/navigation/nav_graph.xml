@@ -26,7 +26,8 @@
             app:destination="@id/createGroupFragment" />
         <action
             android:id="@+id/action_mainFragment_to_groupFragment"
-            app:destination="@id/groupFragment" />
+            app:destination="@id/groupFragment"
+            />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -57,6 +58,9 @@
         <action
             android:id="@+id/action_groupFragment_to_chatFragment5"
             app:destination="@id/chatFragment5" />
+        <argument
+            android:name="Group_ID"
+            app:argType="com.gmail.comcorecrew.comcore.server.id.GroupID" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
