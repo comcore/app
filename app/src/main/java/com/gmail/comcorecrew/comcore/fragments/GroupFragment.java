@@ -23,11 +23,13 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
@@ -270,7 +272,15 @@ public class GroupFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
+                /** If the module is a task list, navigate to the TaskListFragment and pass the
+                 * ModuleId.
+                 */
+                if (currentModule.getMdid() == Mdid.CTSK) {
 
+                    GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment(null);
+                    action.setTaskList((TaskList) currentModule);
+                    NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                }
             }
         }
 
@@ -318,7 +328,17 @@ public class GroupFragment extends Fragment {
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
-            viewHolder.getTextView().setText(modules.get(position).getName());
+            /** Label each task item depending on its Mdid value **/
+            /** Task List **/
+            if (modules.get(position).getMdid() == Mdid.CTSK) {
+                viewHolder.getTextView().setText("Task List: " + modules.get(position).getName());
+            }
+            else if (modules.get(position).getMdid() == Mdid.CMSG) {
+                viewHolder.getTextView().setText("Chat: " + modules.get(position).getName());
+            }
+            else {
+                viewHolder.getTextView().setText(modules.get(position).getName());
+            }
             viewHolder.setModule(modules.get(position));
 
 

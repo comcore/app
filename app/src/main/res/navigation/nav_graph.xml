@@ -61,10 +61,21 @@
         <argument
             android:name="Group_ID"
             app:argType="com.gmail.comcorecrew.comcore.server.id.GroupID" />
+        <action
+            android:id="@+id/action_groupFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
         android:name="com.gmail.comcorecrew.comcore.fragments.ChatFragment5"
         android:label="fragment_chat5"
         tools:layout="@layout/fragment_chat5" />
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.TaskListFragment"
+        android:label="TaskListFragment" >
+        <argument
+            android:name="task_list"
+            app:argType="com.gmail.comcorecrew.comcore.classes.modules.TaskList" />
+    </fragment>
 </navigation>
