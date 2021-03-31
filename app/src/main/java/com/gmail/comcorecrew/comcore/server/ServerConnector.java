@@ -655,7 +655,7 @@ public final class ServerConnector {
      * @param handler     the handler for the response of the server
      */
     public static void updateMessage(MessageID message, String newContents,
-                                     ResultHandler<Void> handler) {
+                                     ResultHandler<MessageEntry> handler) {
         if (message == null) {
             throw new IllegalArgumentException("MessageID cannot be null");
         }
@@ -665,7 +665,8 @@ public final class ServerConnector {
         data.addProperty("chat", message.module.id);
         data.addProperty("id", message.id);
         data.addProperty("newContents", newContents);
-        getConnection().send(new ServerMsg("updateMessage", data), handler, response -> null);
+        getConnection().send(new ServerMsg("updateMessage", data), handler,
+                response -> MessageEntry.fromJson(message.module, response));
     }
 
     /**

@@ -62,7 +62,7 @@ public final class ServerReader extends ServerThread {
                             listener.onReceiveMessage(entry));
                     break;
                 }
-                case "messageUpdate": {
+                case "messageUpdated": {
                     MessageEntry entry = MessageEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
                             listener.onMessageUpdated(entry));
