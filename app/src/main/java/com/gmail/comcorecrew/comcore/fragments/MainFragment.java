@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 
 import java.util.ArrayList;
@@ -106,6 +107,14 @@ public class MainFragment extends Fragment {
                 return true;
             case R.id.refresh_button:
                 refresh();
+                return true;
+            case R.id.settingsFragment:
+                /** Handle moving to the settings page. The GroupID is passed as NO_GROUP, which
+                 * will not be treated like a real GroupID by SettingsFragment */
+                MainFragmentDirections.ActionMainFragmentToSettingsFragment action = MainFragmentDirections.actionMainFragmentToSettingsFragment(new GroupID("NO_GROUP"));
+                GroupID noGroup = new GroupID("NO_GROUP");
+                action.setGroupId(noGroup);
+                NavHostFragment.findNavController(MainFragment.this).navigate(action);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

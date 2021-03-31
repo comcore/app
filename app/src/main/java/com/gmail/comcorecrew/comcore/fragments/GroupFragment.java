@@ -73,6 +73,9 @@ public class GroupFragment extends Fragment {
             currentGroup = callback;
         });*/
 
+        /** TODO Testing only **/
+        currentGroup = new Group("Test Group", GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), GroupRole.OWNER, false);
+
     }
 
     @Override
@@ -229,6 +232,12 @@ public class GroupFragment extends Fragment {
                 transferOwnershipDialog.show(getParentFragmentManager(), null);
 
                 return true;
+            case R.id.settingsFragment:
+                /** Handle passing the current GroupID to the settings page */
+                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action = GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroup.getGroupId());
+                action.setGroupId(currentGroup.getGroupId());
+                NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -271,7 +280,7 @@ public class GroupFragment extends Fragment {
                  */
                 if (currentModule instanceof TaskList) {
 
-                    GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment(null);
+                    GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment((TaskList) currentModule);
                     action.setTaskList((TaskList) currentModule);
                     NavHostFragment.findNavController(GroupFragment.this).navigate(action);
                 }

@@ -111,12 +111,23 @@
     <string name="label_create_task_description">Enter the task description</string>
 
     <!-- Create Module Dialog -->
+    <string name="create_module">Create Module</string>
     <string name="create_module_name_label">Name the Module</string>
     <string name="create_module_type_label">Choose the Module Type</string>
     <string name="task_list_module_label">Task List</string>
     <string name="chat_module_label">Chat</string>
 
     <!-- Notification Settings -->
-    <string name="title_notifications_settings">Notification Settings</string>
+    <string name="all_switch_label">Change Settings For All Groups</string>
+    <string name="current_switch_label">Change Settings For The Current Group</string>
+    <string name="two_factor_switch">Enable two-factor authentication</string>
+    <string name="high_all_switch">Enable high priority notifications</string>
+    <string name="medium_all_switch">Enable medium priority notifications</string>
+    <string name="low_all_switch">Enable low priority notifications</string>
+    <string name="high_current_switch">Enable high priority notifications</string>
+    <string name="medium_current_switch">Enable medium priority notifications</string>
+    <string name="low_current_switch">Enable low priority notifications</string>
+
+
 
 </resources>
