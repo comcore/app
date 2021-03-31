@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
@@ -34,6 +35,7 @@ import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
+import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
 
@@ -71,12 +73,6 @@ public class GroupFragment extends Fragment {
             currentGroup = callback;
         });*/
 
-        /** TODO Testing only
-         * A new group is created using the passed GroupID. This is only to test the functionality
-         * of the modules and menus and should be replaced with the lookup function above once
-         * AppData.init() is run in the app
-         */
-        currentGroup = new Group("Test Group", GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), GroupRole.OWNER, Boolean.FALSE);
     }
 
     @Override
@@ -273,7 +269,7 @@ public class GroupFragment extends Fragment {
                 /** If the module is a task list, navigate to the TaskListFragment and pass the
                  * ModuleId.
                  */
-                if (currentModule.getMdid() == Mdid.CTSK) {
+                if (currentModule instanceof TaskList) {
 
                     GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment(null);
                     action.setTaskList((TaskList) currentModule);
@@ -287,15 +283,8 @@ public class GroupFragment extends Fragment {
         }
 
         private void refresh() {
-            /**
-             * The modules ArrayList should be updated. If ModuleInfo is updated to return the Mdid,
-             * then the commented out code can be run exactly like refresh() in MainFragment.
-             *
-             * If a single group can be updated from the server based on GroupId, then that
-             * could be used instead. The list of modules could be retrieved from the updated group.
-             */
 
-            /**ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
                             .show(getParentFragmentManager(), null);
@@ -303,15 +292,31 @@ public class GroupFragment extends Fragment {
                 }
 
                 ModuleInfo[] info = result.data;
-                ArrayList<Module> groupModules = new ArrayList<>();
-                for (int i = 0; i < result.data.length; i++) {
-                    Module nextModule = new Module(info[i].name,  info[i].id, info[i].mdid);
-                    groupModules.add(nextModule);
+                ArrayList<Module> userModules = new ArrayList<>();
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].id instanceof TaskListID) {
+                        TaskList nextTaskList = new TaskList(info[i].name, (TaskListID) info[i].id, currentGroup);
+                        userModules.add(nextTaskList);
+                    }
+                    else if (info[i].id instanceof ChatID) {
+                        Messaging nextMessaging = new Messaging(info[i].name, (ChatID) info[i].id, currentGroup);
+                        userModules.add(nextMessaging);
+                    }
+                    else {
+                        /** All possible types of modules should eventually be added. For now,
+                         *  an error dialog is shown if the module is not a task list or a chat. **/
+                        new ErrorDialog(R.string.error_unknown_module_type)
+                                .show(getParentFragmentManager(), null);
+                        return;
+                    }
                 }
-                modules = groupModules;
-
+                modules = userModules;
+                currentGroup.setModules(userModules);
                 notifyDataSetChanged();
-            });*/
+            });
+
+
+
         }
 
         @Override
@@ -328,10 +333,11 @@ public class GroupFragment extends Fragment {
 
             /** Label each task item depending on its Mdid value **/
             /** Task List **/
-            if (modules.get(position).getMdid() == Mdid.CTSK) {
+            if (modules.get(position) instanceof TaskList) {
                 viewHolder.getTextView().setText("Task List: " + modules.get(position).getName());
             }
-            else if (modules.get(position).getMdid() == Mdid.CMSG) {
+            /** Chat **/
+            else if (modules.get(position) instanceof Messaging) {
                 viewHolder.getTextView().setText("Chat: " + modules.get(position).getName());
             }
             else {

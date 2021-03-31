@@ -130,26 +130,18 @@ public class TaskListFragment extends Fragment {
         }
 
         private void refresh() {
-            /**
-             * The modules ArrayList should be updated. If ModuleInfo is updated to return the Mdid,
-             * then the commented out code can be run exactly like refresh() in MainFragment.
-             *
-             * If a single group can be updated from the server based on GroupId, then that
-             * could be used instead. The list of modules could be retrieved from the updated group.
-             */
-
             ServerConnector.getTasks((TaskListID) currentTaskList.getId(), result -> {
              if (result.isFailure()) {
-             new ErrorDialog(R.string.error_cannot_connect)
-             .show(getParentFragmentManager(), null);
-             return;
+                new ErrorDialog(R.string.error_cannot_connect)
+                    .show(getParentFragmentManager(), null);
+                return;
              }
 
              TaskEntry[] info = result.data;
              ArrayList<TaskItem> serverTasks = new ArrayList<>();
              for (int i = 0; i < result.data.length; i++) {
-             TaskItem nextTaskItem = new TaskItem(info[i]);
-             serverTasks.add(nextTaskItem);
+                TaskItem nextTaskItem = new TaskItem(info[i]);
+                serverTasks.add(nextTaskItem);
              }
              tasks = serverTasks;
 
