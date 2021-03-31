@@ -26,7 +26,7 @@
             android:id="@+id/unmute_member"
             android:title="@string/unmute_member" />
         <item
-            android:id="@+id/dis_enable_chat"
+            android:id="@+id/create_module"
             android:title="@string/dis_enable_chat"
             app:showAsAction="never" />
     </group>

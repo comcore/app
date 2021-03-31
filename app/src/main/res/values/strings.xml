@@ -72,6 +72,7 @@
     <string name="error_cannot_kick">The user could not be kicked.</string>
     <string name="error_cannot_mute">The user could not be muted.</string>
     <string name="error_cannot_unmute">The user could not be unmuted.</string>
+    <string name="error_cannot_create_module">The module could not be created.</string>
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
@@ -107,4 +108,10 @@
     <string name="tl_description_default">Default Task</string>
     <string name="title_create_task">Create A Task</string>
     <string name="label_create_task_description">Enter the task description</string>
+
+    <!-- Create Module Dialog -->
+    <string name="create_module_name_label">Name the Module</string>
+    <string name="create_module_type_label">Choose the Module Type</string>
+    <string name="task_list_module_label">Task List</string>
+    <string name="chat_module_label">Chat</string>
 </resources>

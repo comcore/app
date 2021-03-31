@@ -25,6 +25,7 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
@@ -221,12 +222,9 @@ public class GroupFragment extends Fragment {
                 ViewMembersDialog unmuteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 6);
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
-            case R.id.dis_enable_chat:
-//                ServerConnector.getModules(currentGroup.getGroupId(), result -> {
-//                    if (result.isSuccess() && result.data.length == 0) {
-//                        ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
-//                    }
-//                });
+            case R.id.create_module:
+                CreateModuleDialog newModuleDialog = new CreateModuleDialog(currentGroup.getGroupId());
+                newModuleDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/
