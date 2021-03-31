@@ -6,6 +6,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,9 +16,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
@@ -26,10 +31,18 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
+import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
+import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GroupFragment extends Fragment {
 
     private Group currentGroup;
+    public static ArrayList<Module> modules =  new ArrayList<>();
+
+    private CustomAdapter moduleAdapter;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -68,7 +81,16 @@ public class GroupFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_group, container, false);
+
+        // Create the RecyclerView
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.group_recycler);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+        moduleAdapter = new CustomAdapter();
+        rvGroups.setAdapter(moduleAdapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+        return rootView;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -213,6 +235,98 @@ public class GroupFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * The GroupFragment uses the same style of RecyclerView that the MainFragment does to display
+     * its list of groups.
+     *
+     * The CustomAdapter internal class sets up the RecyclerView, which displays
+     * the list of modules in the GUI
+     */
+    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private final TextView textView;
+            private Module currentModule;
+
+            public ViewHolder(View view) {
+                super(view);
+                view.setOnClickListener(this);
+                // Define click listener for the ViewHolder's View
+
+                textView = (TextView) view.findViewById(R.id.module_row_text);
+
+            }
+
+            public TextView getTextView() {
+                return textView;
+            }
+
+            public void setModule(Module currentModule) {
+                this.currentModule = currentModule;
+            }
+
+            @Override
+            public void onClick(View view) {
+
+            }
+        }
+
+        public CustomAdapter() {
+            refresh();
+        }
+
+        private void refresh() {
+            /**
+             * The modules ArrayList should be updated. If ModuleInfo is updated to return the Mdid,
+             * then the commented out code can be run exactly like refresh() in MainFragment.
+             *
+             * If a single group can be updated from the server based on GroupId, then that
+             * could be used instead. The list of modules could be retrieved from the updated group.
+             */
+
+            /**ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+                if (result.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                    return;
+                }
+
+                ModuleInfo[] info = result.data;
+                ArrayList<Module> groupModules = new ArrayList<>();
+                for (int i = 0; i < result.data.length; i++) {
+                    Module nextModule = new Module(info[i].name,  info[i].id, info[i].mdid);
+                    groupModules.add(nextModule);
+                }
+                modules = groupModules;
+
+                notifyDataSetChanged();
+            });*/
+        }
+
+        @Override
+        public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+            View view = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.module_row_item, viewGroup, false);
+
+            return new CustomAdapter.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
+
+            viewHolder.getTextView().setText(modules.get(position).getName());
+            viewHolder.setModule(modules.get(position));
+
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return modules.size();
         }
     }
 }
