@@ -64,9 +64,8 @@ public final class ModuleInfo {
     public static ModuleInfo fromJson(GroupID group, JsonObject json) {
         ModuleID id = ModuleID.fromJson(group, json);
         String name = json.get("name").getAsString();
-        // TODO remove this check when it becomes unnecessary
         JsonElement lastUpdateJson = json.get("lastUpdate");
-        long cacheClearTimestamp = lastUpdateJson == null ? 0 : json.get("lastUpdate").getAsLong();
+        long cacheClearTimestamp = lastUpdateJson == null ? 0 : lastUpdateJson.getAsLong();
         return new ModuleInfo(id, name, cacheClearTimestamp);
     }
 

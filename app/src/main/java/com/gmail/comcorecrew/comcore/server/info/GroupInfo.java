@@ -78,9 +78,8 @@ public final class GroupInfo {
         String name = json.get("name").getAsString();
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
         boolean muted = json.get("muted").getAsBoolean();
-        // TODO remove this check when it becomes unnecessary
         JsonElement lastUpdateJson = json.get("lastUpdate");
-        long lastUpdate = lastUpdateJson == null ? 0 : json.get("lastUpdate").getAsLong();
+        long lastUpdate = lastUpdateJson == null ? 0 : lastUpdateJson.getAsLong();
         return new GroupInfo(id, name, role, muted, lastUpdate);
     }
 
