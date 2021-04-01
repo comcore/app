@@ -190,7 +190,9 @@ public abstract class Module implements Serializable, NotificationListener {
     }
 
     public void didUpdate() {
-        onUpdate.run();
+        if (onUpdate != null) {
+            onUpdate.run();
+        }
     }
 
     /**
