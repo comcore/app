@@ -71,7 +71,7 @@ public class GroupFragment extends Fragment {
          * For this to work, AppData.init() must be run first.
          *
          * TODO
-         * Lookup currently returns null because AppData.init() has not been run.
+         * Lookup currently returns null
          *
 
         GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
@@ -79,7 +79,59 @@ public class GroupFragment extends Fragment {
         });
         */
 
+        /** findGroupByID will not necessary once a group can be found in the local files */
+        findGroupByID(GroupFragmentArgs.fromBundle(getArguments()).getGroupID());
+
         currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
+    }
+
+    /**
+     * TODO
+     *
+     * The function findGroupByID is a temporary function that retrieves a group from the server
+     * that has the same GroupID as the id passed to this function from the main fragment.
+     *
+     * It replicates the same server request that was made in MainFragment, and is redundant here.
+     *
+     * Once the cache is fully integrated with the client fragments and GroupFragment can find
+     * a group using the lookup function, this entire function will not be necessary.
+     */
+
+    public void findGroupByID (GroupID groupID) {
+
+        ServerConnector.getGroups(result -> {
+            if (result.isFailure()) {
+                new ErrorDialog(R.string.error_cannot_connect)
+                        .show(getParentFragmentManager(), null);
+                return;
+            }
+
+            ServerConnector.getGroupInfo(Arrays.asList(result.data), 0, result1 -> {
+                if (result1.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                    return;
+                }
+
+                ArrayList<Group> userGroups = new ArrayList<>();
+
+                GroupInfo[] info = result1.data;
+                for (int i = 0; i < result.data.length; i++) {
+                    Group nextGroup = new Group(info[i].name,  info[i].id,
+                            info[i].role, info[i].muted);
+                    userGroups.add(nextGroup);
+                }
+
+                for (int i = 0; i < userGroups.size(); i++) {
+                    if (userGroups.get(i).getGroupId().toString().equals(groupID.toString())) {
+                        currentGroup = userGroups.get(i);
+                        refresh();
+                    }
+                }
+
+            });
+        });
+
     }
 
     @Override
@@ -139,6 +191,21 @@ public class GroupFragment extends Fragment {
             });
         });
 
+    }
+
+    public void refresh() {
+        moduleAdapter.refresh();
+
+
+        /** Refresh the welcome text if the currentGroup was originally null
+         *
+         * Once the currentGroup is retrieved from the cache instead
+         * of through the server at the creation of GroupFragment, this will not be necessary
+         */
+        TextView welcomeText = (TextView) this.getView().findViewById(R.id.label_group_fragment);
+        if (currentGroup != null) {
+            welcomeText.setText(currentGroup.getName());
+        }
     }
 
     @Override
@@ -306,6 +373,10 @@ public class GroupFragment extends Fragment {
         }
 
         private void refresh() {
+
+            if (currentGroup == null) {
+                return;
+            }
 
             ServerConnector.getModules(currentGroupID, result -> {
                 if (result.isFailure()) {
