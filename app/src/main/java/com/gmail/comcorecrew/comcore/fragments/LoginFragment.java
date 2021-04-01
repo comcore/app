@@ -77,12 +77,6 @@ public class LoginFragment extends Fragment {
                     case SUCCESS:
                         // Navigate to the main fragment
 
-                        try {
-                            AppData.init(ServerConnector.getUser(), getContext());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;
