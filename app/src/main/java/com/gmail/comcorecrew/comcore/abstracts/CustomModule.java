@@ -25,9 +25,9 @@ import java.util.ArrayList;
 
 public abstract class CustomModule extends Module {
 
-    private View view;
-    private long cacheByteLimit;
-    private ArrayList<CustomItem> items;
+    private transient View view;
+    private transient long cacheByteLimit;
+    private transient ArrayList<CustomItem> items;
 
     public CustomModule(String name, CustomModuleID id, Group group) {
         super(name, id, group, Mdid.CSTM);
@@ -135,6 +135,10 @@ public abstract class CustomModule extends Module {
 
     protected View getView() {
         return view;
+    }
+
+    public void resetView() {
+        view = null;
     }
 
     protected void setItems(ArrayList<CustomItem> items) {
