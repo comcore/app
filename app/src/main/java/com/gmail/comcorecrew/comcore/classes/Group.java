@@ -311,9 +311,25 @@ public class Group implements NotificationListener {
     public int addModule(Module module) {
         int num = 0;
         Mdid mdid = module.getMdid();
-        for(Module m : modules) {
-            if ((m.getMdid() == mdid) && (m.getMnum() >= num)) {
-                num = m.getMnum() + 1;
+        Module m;
+        for (int i = 0; i < modules.size(); i++) {
+            m = modules.get(i);
+            if (m.getMdid() == mdid) {
+                if (module.getId().id.equals(m.getId().id)) {
+                    //Duplicate found! Replace module and store module!
+                    modules.set(i, module);
+                    module.setIndex(m.getIndex());
+                    module.setMnum(m.getMnum());
+                    try {
+                        GroupStorage.storeModule(module);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return module.getMnum();
+                }
+                else if (num <= m.getMnum()) {
+                    num = m.getMnum() + 1;
+                }
             }
         }
         modules.add(module);
