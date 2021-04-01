@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,12 +14,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Static class used to store user data into files.
  * Must call init before running.
  */
 public class UserStorage {
+    private UserStorage() {}
 
     private static ArrayList<User> userList; //List of users to fetch from
     private static uNode idList; //Sorted BST of internal ids
@@ -53,19 +56,58 @@ public class UserStorage {
 
         // Otherwise, get the info from the server and cache it
         ServerConnector.getUserInfo(id, 0, result -> {
-            if (result.isFailure()) {
+            if (result.isFailure() || result.data == null) {
                 return;
             }
 
             try {
                 User user = new User(id, result.data.name);
-                if (!UserStorage.addUser(user)) {
-                    callback.accept(UserStorage.getUser(id));
-                } else {
+                if (UserStorage.addUser(user)) {
                     callback.accept(user);
+                } else {
+                    callback.accept(UserStorage.getUser(id));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Refresh a list of UserIDs, calling the provided Runnable on completion.
+     *
+     * @param userIds  the UserIDs to refresh (or null)
+     * @param callback the callback to run
+     */
+    public static void refresh(List<UserID> userIds, Runnable callback) {
+        // Finish immediately if no users are being refreshed
+        if (userIds.isEmpty()) {
+            if (callback != null) {
+                callback.run();
+            }
+            return;
+        }
+
+        // Get the info of the users from the server
+        ServerConnector.getUserInfo(userIds, 0, result -> {
+            if (result.isSuccess()) {
+                // Create a User object for each user
+                ArrayList<User> users = new ArrayList<>();
+                for (UserInfo userInfo : result.data) {
+                    users.add(new User(userInfo.id, userInfo.name));
+                }
+
+                // Try to add all of the User objects to the UserStorage
+                try {
+                    addUser(users);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Finish by calling the callback
+            if (callback != null) {
+                callback.run();
             }
         });
     }

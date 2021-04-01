@@ -100,7 +100,7 @@ public abstract class Module implements Serializable, NotificationListener {
             mentionMuted = false;
             mnum = group.addModule(this);
             try {
-                GroupStorage.StoreModule(this);
+                GroupStorage.storeModule(this);
             } catch (IOException e) {
                 e.printStackTrace();
             }

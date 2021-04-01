@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.classes;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
@@ -9,6 +8,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.GroupUserEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -16,6 +16,7 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 public class Group implements NotificationListener {
 
@@ -40,15 +41,6 @@ public class Group implements NotificationListener {
         this.groupID = groupID;
         this.groupName = name;
         this.groupRole = groupRole;
-        users = new ArrayList<>();
-        ServerConnector.getUsers(groupID, result -> {
-            // TODO use cached user data with name
-            for (int i = 0; i < result.data.length; i++) {
-                User nextUser = new User(result.data[i].id, "<NAME>");
-                users.add(nextUser);
-            }
-        });
-
         this.isMuted = isMuted;
         modules = new ArrayList<>();
         users = new ArrayList<>();
@@ -58,12 +50,78 @@ public class Group implements NotificationListener {
 
         File cacheDir = new File(AppData.cacheDir, this.groupID.id);
         cacheDir.mkdir();
+
+        refreshUsers(null, null);
     }
 
     protected Group(Parcel in) {
         groupName = in.readString();
         byte tmpIsMuted = in.readByte();
         isMuted = tmpIsMuted == 0 ? null : tmpIsMuted == 1;
+    }
+
+    /**
+     * Refresh all of the users in a group. The already refreshed set is used to prevent fetching
+     * user information that was just fetched, and it will be updated to contain any users that
+     * were refreshed in addition to anything already in the set. The provided callback will be
+     * run on completion.
+     *
+     * @param alreadyRefreshed the already refreshed set (or null)
+     * @param callback         the callback to run (or null)
+     */
+    public void refreshUsers(Set<UserID> alreadyRefreshed, Runnable callback) {
+        // Iterate over every user in the group and update their information
+        ServerConnector.getUsers(groupID, resultUsers -> {
+            if (resultUsers.isFailure()) {
+                if (callback != null) {
+                    callback.run();
+                }
+                return;
+            }
+
+            // Find which users need to be refreshed still
+            GroupUserEntry[] entries = resultUsers.data;
+            ArrayList<UserID> toRefresh = new ArrayList<>();
+            for (GroupUserEntry entry : entries) {
+                if (alreadyRefreshed == null || alreadyRefreshed.add(entry.id)) {
+                    toRefresh.add(entry.id);
+                }
+            }
+
+            // Refresh all necessary user data
+            UserStorage.refresh(toRefresh, () -> {
+                // Find the users, moderators, and owner of the group
+                ArrayList<User> groupUsers = new ArrayList<>(entries.length);
+                ArrayList<UserID> groupModerators = new ArrayList<>();
+                UserID groupOwner = null;
+                for (GroupUserEntry entry : entries) {
+                    groupUsers.add(UserStorage.getUser(entry.id));
+
+                    if (entry.role == GroupRole.MODERATOR) {
+                        groupModerators.add(entry.id);
+                    } else if (entry.role == GroupRole.OWNER) {
+                        if (groupOwner != null) {
+                            throw new IllegalStateException("group has multiple owners");
+                        }
+
+                        groupOwner = entry.id;
+                    }
+                }
+
+                if (groupOwner == null) {
+                    throw new IllegalStateException("group has no owner");
+                }
+
+                // Update the user list of the group
+                users = groupUsers;
+                moderators = groupModerators;
+                owner = groupOwner;
+
+                if (callback != null) {
+                    callback.run();
+                }
+            });
+        });
     }
 
     public String getName() {
@@ -102,7 +160,7 @@ public class Group implements NotificationListener {
         this.groupRole = groupRole;
     }
 
-    public boolean getIsMuted() {
+    public boolean getMuted() {
         return isMuted;
     }
 
