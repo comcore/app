@@ -21,7 +21,8 @@ public class Group implements NotificationListener {
     private GroupID groupID;
     private String groupName;
     private GroupRole groupRole;
-    private Boolean isMuted;
+    private boolean isMuted;
+    private boolean isPinned;
     private ArrayList<Module> modules;
     private ArrayList<User> users;
     private ArrayList<UserID> moderators;
@@ -32,7 +33,7 @@ public class Group implements NotificationListener {
         modules = new ArrayList<>();
     }
 
-    public Group(String name, GroupID groupID, GroupRole groupRole, Boolean isMuted) {
+    public Group(String name, GroupID groupID, GroupRole groupRole, boolean isMuted) {
         this.groupID = groupID;
         this.groupName = name;
         this.groupRole = groupRole;
@@ -98,12 +99,20 @@ public class Group implements NotificationListener {
         this.groupRole = groupRole;
     }
 
-    public Boolean getIsMuted() {
+    public boolean getIsMuted() {
         return isMuted;
     }
 
-    public void setMuted(Boolean muted) {
+    public void setMuted(boolean muted) {
         isMuted = muted;
+    }
+
+    public boolean isPinned() {
+        return isPinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
     }
 
     public UserID getOwner() {

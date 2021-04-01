@@ -114,6 +114,7 @@ public class GroupStorage {
         AppData.writeString(group.getName(), writer);
         AppData.writeString(group.getGroupRole().toString(), writer);
         AppData.writeBool(group.getIsMuted(), writer);
+        AppData.writeBool(group.isPinned(), writer);
 
         AppData.writeInt(group.getUsers().size(), writer);
         for (User user : group.getUsers()) {
@@ -191,6 +192,7 @@ public class GroupStorage {
         group.setName(AppData.readString(reader));
         group.setGroupRole(GroupRole.fromString(AppData.readString(reader)));
         group.setMuted(AppData.readBool(reader));
+        group.setPinned(AppData.readBool(reader));
 
         int length = AppData.readInt(reader);
         ArrayList<User> users = new ArrayList<>();

@@ -39,14 +39,21 @@ public class PinnedMessages extends CustomChat {
     public static void pinUnpinMessage(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
+        String name = "ERROR";
         for (Group group : AppData.groups) {
             if (group.getGroupId().equals(groupID)) {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
-
+                        ((PinnedMessages) module).pinMessage(message);
+                        return;
+                    }
+                    else if (module.getId().id.equals(chatID.id)) {
+                        name = "Pinned" + module.getName();
                     }
                 }
+                PinnedMessages newPinned = new PinnedMessages(name, group, chatID);
+                newPinned.pinMessage(message);
             }
         }
     }
