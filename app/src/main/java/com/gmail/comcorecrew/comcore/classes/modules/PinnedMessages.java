@@ -1,21 +1,21 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.os.Message;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
-import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.TaskID;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,13 @@ public class PinnedMessages extends CustomChat {
 
     public PinnedMessages(String name, CustomModuleID id, Group group, ChatID chat) {
         super(name, id, group);
-        chatId = chat.id;
+        if (chat == null) {
+            chatId = null;
+            refreshChatID();
+        }
+        else {
+            chatId = chat.id;
+        }
         pinned = new ArrayList<>();
     }
 
@@ -82,6 +88,20 @@ public class PinnedMessages extends CustomChat {
         }
     }
 
+    public void refreshChatID() {
+        ServerConnector.getTasks(((CustomModuleID) getId()).asTaskList(), result -> {
+            if (result.isFailure()) {
+                return;
+            }
+            else if (result.data.length <= 0) {
+                getGroup().deleteModule(this);
+                return;
+            }
+
+            chatId = result.data[0].description;
+        });
+    }
+
     public void readPinned() {
         ChatID chId = new ChatID(getGroup().getGroupId(), chatId);
         pinned = new ArrayList<>();
@@ -107,6 +127,15 @@ public class PinnedMessages extends CustomChat {
     @Override
     public int getLayout() {
         return -1; //TODO Implement
+    }
+
+    @Override
+    public void afterCreate() {
+        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), chatId, result -> {
+            if (result.isFailure()) {
+                throw new RuntimeException("Critical PinnedMessages initialization error!");
+            }
+        });
     }
 
 }
