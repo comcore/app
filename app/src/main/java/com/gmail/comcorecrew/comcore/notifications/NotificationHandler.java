@@ -14,6 +14,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -179,31 +180,38 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
-        GroupStorage.lookup(group, info ->
-            notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
-                    .setSmallIcon(R.drawable.receivedmsg)
-                    .setContentTitle(info.getName())
-                    .setContentText("You have become a " + role)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    .build()));
+        Group info = GroupStorage.getGroup(group);
+        if (info == null) {
+            return;
+        }
+
+        notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
+                .setSmallIcon(R.drawable.receivedmsg)
+                .setContentTitle(info.getName())
+                .setContentText("You have become a " + role)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build());
     }
 
     @Override
     public void onMuteChanged(GroupID group, boolean muted) {
-        GroupStorage.lookup(group, info -> {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
-                    .setSmallIcon(R.drawable.receivedmsg)
-                    .setContentTitle(info.getName())
-                    .setPriority(NotificationCompat.PRIORITY_LOW);
+        Group info = GroupStorage.getGroup(group);
+        if (info == null) {
+            return;
+        }
 
-            if (muted) {
-                builder.setContentText("You have been muted");
-            } else {
-                builder.setContentText("You have been unmuted");
-            }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
+                .setSmallIcon(R.drawable.receivedmsg)
+                .setContentTitle(info.getName())
+                .setPriority(NotificationCompat.PRIORITY_LOW);
 
-            notify(builder.build());
-        });
+        if (muted) {
+            builder.setContentText("You have been muted");
+        } else {
+            builder.setContentText("You have been unmuted");
+        }
+
+        notify(builder.build());
     }
 
     @Override
@@ -227,6 +235,6 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public Collection<? extends NotificationListener> getChildren() {
-        return MainFragment.groups;
+        return AppData.groups;
     }
 }

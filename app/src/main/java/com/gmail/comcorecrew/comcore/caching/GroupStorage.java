@@ -9,6 +9,7 @@ import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +21,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Class for storing group and module data into device files.
@@ -27,46 +30,94 @@ import java.util.ArrayList;
  * NOTE: AppData.init() must be run before this module works!
  */
 public class GroupStorage {
+    private GroupStorage() {}
+
     /**
-     * Look up the Group corresponding to a GroupID, or fetch it from the server if it is not
-     * already in the GroupStorage. If it succeeds, the callback will be called with the retrieved
-     * information about the group.
+     * Refresh the list of groups, calling the provided Runnable on completion.
      *
-     * @param id       the ID of the group
-     * @param callback what to do with the result
+     * @param callback the callback to run (or null)
      */
-    public static void lookup(GroupID id, LookupCallback<Group> callback) {
-        // Try to find the group in the AppData
-        for (Group group : AppData.groups) {
-            if (group.getGroupId().equals(id)) {
-                callback.accept(group);
-                return;
+    public static void refresh(Runnable callback) {
+        // Get the group associated with each ID
+        HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.groups.size());
+        for (int i = 0; i < AppData.groups.size(); i++) {
+            Group group = AppData.groups.get(i);
+            GroupID id = group.getGroupId();
+
+            // Remove any duplicated groups
+            if (existingIds.containsKey(id)) {
+                AppData.groups.remove(i--);
+                continue;
             }
+
+            existingIds.put(id, group);
         }
 
-        // Otherwise, get the info from the server and cache it
-        ServerConnector.getGroupInfo(id, 0, result -> {
-            // Make sure it hasn't already been added
-            for (Group group : AppData.groups) {
-                if (group.getGroupId().equals(id)) {
-                    callback.accept(group);
+        // Get all of the groups that the user is part of
+        ServerConnector.getGroups(result -> {
+            HashMap<GroupID, Group> ids;
+            if (result.isSuccess()) {
+                // Update the list of groups if the request was successful
+                ids = new HashMap<>(existingIds.size());
+                AppData.groups.clear();
+                for (GroupID id : result.data) {
+                    // Check for an existing group object to reuse
+                    Group group = existingIds.get(id);
+                    if (group != null) {
+                        ids.put(id, group);
+                        AppData.groups.add(group);
+                        continue;
+                    }
+
+                    // Create a new group object for this new group since it wasn't present before
+                    group = new Group(id);
+                    AppData.groups.add(group);
+                    ids.put(id, group);
+                }
+            } else {
+                ids = existingIds;
+            }
+
+            // Update the group info of any existing groups
+            ServerConnector.getGroupInfo(ids.keySet(), 0, resultGroups -> {
+                if (resultGroups.isFailure()) {
+                    if (callback != null) {
+                        callback.run();
+                    }
                     return;
                 }
-            }
 
-            // Make sure the request succeeded
-            if (result.isFailure()) {
-                return;
-            }
+                // Iterate over every group and refresh their user information as well
+                HashSet<UserID> alreadyRefreshed = new HashSet<>();
+                for (GroupInfo info : resultGroups.data) {
+                    Group group = ids.get(info.id);
+                    if (group == null) {
+                        continue;
+                    }
 
-            // Add the new group to the AppData
-            try {
-                Group group = new Group(result.data.name, id, result.data.role, result.data.muted);
-                AppData.groups.add(group);
-                callback.accept(group);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                    // Update the group's info
+                    group.setName(info.name);
+                    group.setGroupRole(info.role);
+                    group.setMuted(info.muted);
+
+                    // Refresh the group's users
+                    group.refreshUsers(alreadyRefreshed, () -> {
+                        // Store the updated group data
+                        try {
+                            storeGroupData(group);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+                    // TODO refresh modules
+                }
+
+                // Run the callback after setting all of the info
+                if (callback != null) {
+                    callback.run();
+                }
+            });
         });
     }
 
@@ -75,9 +126,9 @@ public class GroupStorage {
      *
      * @throws IOException if an IO error occurs
      */
-    public static void StoreAllGroups() throws IOException {
+    public static void storeAllGroups() throws IOException {
         for (Group group : AppData.groups) {
-            StoreGroup(group);
+            storeGroup(group);
         }
     }
 
@@ -87,14 +138,14 @@ public class GroupStorage {
      * @param group group to store
      * @throws IOException if an IO error occurs
      */
-    public static void StoreGroup(Group group) throws IOException {
+    public static void storeGroup(Group group) throws IOException {
         File groupDir = new File(AppData.groupsDir, group.getGroupId().id);
         if ((!groupDir.exists()) && (!groupDir.mkdir())) {
             throw new IOException("Cannot store group: " + group.getGroupId().id);
         }
 
-        StoreGroupData(group);
-        StoreGroupModules(group);
+        storeGroupData(group);
+        storeGroupModules(group);
     }
 
     /**
@@ -103,7 +154,7 @@ public class GroupStorage {
      * @param group group to store info
      * @throws IOException if an IO error occurs
      */
-    public static void StoreGroupData(Group group) throws IOException {
+    public static void storeGroupData(Group group) throws IOException {
         File groupData = new File(AppData.groupsDir, group.getGroupId().id + "/grData");
         if ((!groupData.exists()) && (!groupData.createNewFile())) {
             throw new IOException("Cannot store group data: " + group.getGroupId().id);
@@ -113,7 +164,7 @@ public class GroupStorage {
 
         AppData.writeString(group.getName(), writer);
         AppData.writeString(group.getGroupRole().toString(), writer);
-        AppData.writeBool(group.getIsMuted(), writer);
+        AppData.writeBool(group.getMuted(), writer);
         AppData.writeBool(group.isPinned(), writer);
 
         AppData.writeInt(group.getUsers().size(), writer);
@@ -135,9 +186,9 @@ public class GroupStorage {
      * @param group group to store modules of
      * @throws IOException if an IO error occurs
      */
-    public static void StoreGroupModules(Group group) throws IOException {
+    public static void storeGroupModules(Group group) throws IOException {
         for (Module module : group.getModules()) {
-            StoreModule(module);
+            storeModule(module);
         }
     }
 
@@ -147,7 +198,7 @@ public class GroupStorage {
      * @param module module to store
      * @throws IOException if an IO error occurs
      */
-    public static void StoreModule(Module module) throws IOException {
+    public static void storeModule(Module module) throws IOException {
         File moduleData = new File(AppData.groupsDir, module.getGroupIdString() + "/"
                 + module.getLocatorString());
         if ((!moduleData.exists()) && (!moduleData.createNewFile())) {
@@ -261,14 +312,29 @@ public class GroupStorage {
      * @return true if group is added; false if group already exists in files
      * @throws IOException if an IO error occurs
      */
-    public boolean AddGroup(Group group) throws IOException {
+    public static boolean addGroup(Group group) throws IOException {
         for (Group g : AppData.groups) {
             if (g.getGroupId().id.equals(group.getGroupId().id)) {
                 return false;
             }
         }
         AppData.groups.add(group);
-        StoreGroup(group);
+        storeGroup(group);
         return true;
+    }
+
+    /**
+     * Gets the Group object corresponding to a GroupID
+     * @param id the ID of the group
+     * @return the Group object
+     */
+    public static Group getGroup(GroupID id) {
+        for (Group group : AppData.groups) {
+            if (group.getGroupId().equals(id)) {
+                return group;
+            }
+        }
+
+        return null;
     }
 }

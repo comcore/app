@@ -19,19 +19,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainFragment extends Fragment {
-    public static ArrayList<Group> groups =  new ArrayList<>();
-
     private CustomAdapter groupAdapter;
 
     public MainFragment() {
@@ -172,32 +167,7 @@ public class MainFragment extends Fragment {
         }
 
         private void refresh() {
-            ServerConnector.getGroups(result -> {
-                if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
-                    return;
-                }
-
-                ServerConnector.getGroupInfo(Arrays.asList(result.data), 0, result1 -> {
-                    if (result1.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
-                        return;
-                    }
-
-                    GroupInfo[] info = result1.data;
-                    ArrayList<Group> userGroups = new ArrayList<>();
-                    for (int i = 0; i < result.data.length; i++) {
-                        Group nextGroup = new Group(info[i].name,  info[i].id,
-                                info[i].role, info[i].muted);
-                        userGroups.add(nextGroup);
-                    }
-                    groups = userGroups;
-
-                    notifyDataSetChanged();
-                });
-            });
+            GroupStorage.refresh(this::notifyDataSetChanged);
         }
 
         // Create new views (invoked by the layout manager)
@@ -216,8 +186,8 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(groups.get(position).getName());
-            viewHolder.setGroup(groups.get(position));
+            viewHolder.getTextView().setText(AppData.groups.get(position).getName());
+            viewHolder.setGroup(AppData.groups.get(position));
 
             /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
@@ -226,7 +196,7 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            switch (groups.get(position).getGroupRole()) {
+            switch (AppData.groups.get(position).getGroupRole()) {
                 case OWNER:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
                     viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
@@ -244,7 +214,7 @@ public class MainFragment extends Fragment {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return groups.size();
+            return AppData.groups.size();
         }
     }
 

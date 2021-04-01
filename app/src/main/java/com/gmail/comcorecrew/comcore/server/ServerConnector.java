@@ -763,7 +763,7 @@ public final class ServerConnector {
      */
     public static void getGroupInfo(GroupID group, long lastRefresh,
                                     ResultHandler<GroupInfo> handler) {
-        getGroupInfo(Collections.singletonList(group), lastRefresh, result ->
+        getGroupInfo(Collections.singleton(group), lastRefresh, result ->
             handler.handleResult(result.map(groups -> {
                 switch (groups.length) {
                     case 0:
@@ -786,7 +786,7 @@ public final class ServerConnector {
      * @param handler     the handler for the response of the server
      * @see GroupInfo
      */
-    public static void getGroupInfo(List<GroupID> groups, long lastRefresh,
+    public static void getGroupInfo(Collection<GroupID> groups, long lastRefresh,
                                     ResultHandler<GroupInfo[]> handler) {
         getInfo(GroupInfo.class, "groups", "getGroupInfo", GroupInfo::fromJson,
                 groups, lastRefresh, handler);
@@ -804,7 +804,7 @@ public final class ServerConnector {
      */
     public static void getUserInfo(UserID user, long lastRefresh,
                                    ResultHandler<UserInfo> handler) {
-        getUserInfo(Collections.singletonList(user), lastRefresh, result ->
+        getUserInfo(Collections.singleton(user), lastRefresh, result ->
             handler.handleResult(result.map(users -> {
                 switch (users.length) {
                     case 0:
@@ -827,7 +827,7 @@ public final class ServerConnector {
      * @param handler     the handler for the response of the server
      * @see UserInfo
      */
-    public static void getUserInfo(List<UserID> users, long lastRefresh,
+    public static void getUserInfo(Collection<UserID> users, long lastRefresh,
                                    ResultHandler<UserInfo[]> handler) {
         getInfo(UserInfo.class, "users", "getUserInfo", UserInfo::fromJson,
                 users, lastRefresh, handler);
@@ -841,7 +841,7 @@ public final class ServerConnector {
      * @see ModuleInfo
      */
     public static void getModuleInfo(ModuleID module, ResultHandler<ModuleInfo> handler) {
-        getModuleInfo(Collections.singletonList(module), result ->
+        getModuleInfo(Collections.singleton(module), result ->
             handler.handleResult(result.map(modules -> {
                 switch (modules.length) {
                     case 0:
@@ -861,7 +861,8 @@ public final class ServerConnector {
      * @param handler the handler for the response of the server
      * @see ModuleInfo
      */
-    public static void getModuleInfo(List<ModuleID> modules, ResultHandler<ModuleInfo[]> handler) {
+    public static void getModuleInfo(Collection<ModuleID> modules,
+                                     ResultHandler<ModuleInfo[]> handler) {
         getInfo(ModuleInfo.class, "modules", "getModuleInfo",
                 json -> ModuleInfo.fromJson(null, json), modules, -1, handler);
     }
@@ -910,7 +911,7 @@ public final class ServerConnector {
     @SuppressWarnings("unchecked")
     private static <T, U extends ItemID> void getInfo(Class<T> clazz, String field, String request,
                                                       Function<JsonObject, T> parser,
-                                                      List<U> ids, long lastRefresh,
+                                                      Collection<U> ids, long lastRefresh,
                                                       ResultHandler<T[]> handler) {
         if (ids == null) {
             throw new IllegalArgumentException(field + " cannot be null");

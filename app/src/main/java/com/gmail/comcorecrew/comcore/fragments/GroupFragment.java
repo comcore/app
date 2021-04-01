@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
@@ -31,13 +30,11 @@ import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
-import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
 
 import java.util.ArrayList;
@@ -64,74 +61,8 @@ public class GroupFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        /** Retrieve the GroupId passed from the main fragment and find
-         * the Group associated with it.
-         *
-         * For this to work, AppData.init() must be run first.
-         *
-         * TODO
-         * Lookup currently returns null
-         *
-
-        GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
-            currentGroup = callback;
-        });
-        */
-
-        /** findGroupByID will not necessary once a group can be found in the local files */
-        findGroupByID(GroupFragmentArgs.fromBundle(getArguments()).getGroupID());
-
         currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
-    }
-
-    /**
-     * TODO
-     *
-     * The function findGroupByID is a temporary function that retrieves a group from the server
-     * that has the same GroupID as the id passed to this function from the main fragment.
-     *
-     * It replicates the same server request that was made in MainFragment, and is redundant here.
-     *
-     * Once the cache is fully integrated with the client fragments and GroupFragment can find
-     * a group using the lookup function, this entire function will not be necessary.
-     */
-
-    public void findGroupByID (GroupID groupID) {
-
-        ServerConnector.getGroups(result -> {
-            if (result.isFailure()) {
-                new ErrorDialog(R.string.error_cannot_connect)
-                        .show(getParentFragmentManager(), null);
-                return;
-            }
-
-            ServerConnector.getGroupInfo(Arrays.asList(result.data), 0, result1 -> {
-                if (result1.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
-                    return;
-                }
-
-                ArrayList<Group> userGroups = new ArrayList<>();
-
-                GroupInfo[] info = result1.data;
-                for (int i = 0; i < result.data.length; i++) {
-                    Group nextGroup = new Group(info[i].name,  info[i].id,
-                            info[i].role, info[i].muted);
-                    userGroups.add(nextGroup);
-                }
-
-                for (int i = 0; i < userGroups.size(); i++) {
-                    if (userGroups.get(i).getGroupId().toString().equals(groupID.toString())) {
-                        currentGroup = userGroups.get(i);
-                        refresh();
-                    }
-                }
-
-            });
-        });
-
+        currentGroup = GroupStorage.getGroup(currentGroupID);
     }
 
     @Override
