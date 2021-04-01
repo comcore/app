@@ -25,9 +25,11 @@ import java.util.ArrayList;
 public class CreateModuleDialog extends DialogFragment {
 
     private GroupID groupID;
+    private GroupFragment fragment;
 
-    public CreateModuleDialog (GroupID currentGroupId) {
+    public CreateModuleDialog(GroupID currentGroupId, GroupFragment fragment) {
         this.groupID = currentGroupId;
+        this.fragment = fragment;
     }
 
     @Override
@@ -62,30 +64,32 @@ public class CreateModuleDialog extends DialogFragment {
                 /** Try to create a chat module **/
 
                 ServerConnector.createChat(groupID, moduleName.getText().toString(), result -> {
-                    if (result.isSuccess()) {
-                        this.dismiss();
-                    }
-                    else {
+                    if (result.isFailure()) {
                         new ErrorDialog(R.string.error_cannot_connect)
                                 .show(getParentFragmentManager(), null);
+                        return;
                     }
+
+                    this.dismiss();
+                    fragment.refresh();
                 });
             }
             else if (tasklistRadio.isChecked()) {
                 /** Try to create a tasklist module **/
                 ServerConnector.createTaskList(groupID, moduleName.getText().toString(), result -> {
-                    if (result.isSuccess()) {
-                        this.dismiss();
-                    }
-                    else {
+                    if (result.isFailure()) {
                         new ErrorDialog(R.string.error_cannot_connect)
                                 .show(getParentFragmentManager(), null);
+                        return;
                     }
+
+                    this.dismiss();
+                    fragment.refresh();
                 });
             }
             else {
                 /** Throw an error if for some reason no radio button is checked **/
-                new ErrorDialog(R.string.error_cannot_create_module)
+                new ErrorDialog(R.string.error_module_not_selected)
                         .show(getParentFragmentManager(), null);
             }
 

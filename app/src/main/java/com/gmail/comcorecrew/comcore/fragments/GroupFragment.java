@@ -44,7 +44,6 @@ import java.util.Arrays;
 public class GroupFragment extends Fragment {
 
     private Group currentGroup;
-    public static ArrayList<Module> modules =  new ArrayList<>();
 
     private CustomAdapter moduleAdapter;
 
@@ -210,7 +209,7 @@ public class GroupFragment extends Fragment {
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.create_module:
-                CreateModuleDialog newModuleDialog = new CreateModuleDialog(currentGroup.getGroupId());
+                CreateModuleDialog newModuleDialog = new CreateModuleDialog(currentGroup.getGroupId(), this);
                 newModuleDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.transfer_ownership:
@@ -281,43 +280,7 @@ public class GroupFragment extends Fragment {
         }
 
         private void refresh() {
-
-            if (currentGroup == null) {
-                return;
-            }
-
-            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
-                if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
-                    return;
-                }
-
-                ModuleInfo[] info = result.data;
-                ArrayList<Module> userModules = new ArrayList<>();
-                for (int i = 0; i < info.length; i++) {
-                    if (info[i].id instanceof TaskListID) {
-                        TaskList nextTaskList = new TaskList(info[i].name, (TaskListID) info[i].id, currentGroup);
-                        userModules.add(nextTaskList);
-                    }
-                    else if (info[i].id instanceof ChatID) {
-                        Messaging nextMessaging = new Messaging(info[i].name, (ChatID) info[i].id, currentGroup);
-                        userModules.add(nextMessaging);
-                    }
-                    else {
-                        /** All possible types of modules should eventually be added. For now,
-                         *  an error dialog is shown if the module is not a task list or a chat. **/
-                        new ErrorDialog(R.string.error_unknown_module_type)
-                                .show(getParentFragmentManager(), null);
-                        return;
-                    }
-                }
-                modules = userModules;
-                notifyDataSetChanged();
-            });
-
-
-
+            currentGroup.refreshModules(this::notifyDataSetChanged);
         }
 
         @Override
@@ -331,27 +294,22 @@ public class GroupFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
+            Module module = currentGroup.getModules().get(position);
+            viewHolder.setModule(module);
 
-            /** Label each task item depending on its Mdid value **/
-            /** Task List **/
-            if (modules.get(position) instanceof TaskList) {
-                viewHolder.getTextView().setText("Task List: " + modules.get(position).getName());
+            String name = module.getName();
+            if (module instanceof Messaging) {
+                viewHolder.getTextView().setText("Chat: " + name);
+            } else if (module instanceof TaskList) {
+                viewHolder.getTextView().setText("Task List: " + name);
+            } else {
+                viewHolder.getTextView().setText(name);
             }
-            /** Chat **/
-            else if (modules.get(position) instanceof Messaging) {
-                viewHolder.getTextView().setText("Chat: " + modules.get(position).getName());
-            }
-            else {
-                viewHolder.getTextView().setText(modules.get(position).getName());
-            }
-            viewHolder.setModule(modules.get(position));
-
-
         }
 
         @Override
         public int getItemCount() {
-            return modules.size();
+            return currentGroup.getModules().size();
         }
     }
 }
