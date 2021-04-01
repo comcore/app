@@ -86,7 +86,7 @@ public class TaskItem implements Cacheable {
             cache[10] = 0;
         }
         for (int i = 0; i < data.length(); i++) {
-            cache[6 + i] = data.charAt(i);
+            cache[11 + i] = data.charAt(i);
         }
 
         return cache;

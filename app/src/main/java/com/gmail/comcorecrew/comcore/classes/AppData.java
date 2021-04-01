@@ -50,11 +50,6 @@ public class AppData {
         else {
             groups = new ArrayList<>();
         }
-        for (Group group : groups) {
-            for (Module module : group.getModules()) {
-                module.fromCache();
-            }
-        }
     }
 
     public static void refresh() {

@@ -28,56 +28,117 @@ public class TaskList extends Module {
         tasks = new ArrayList<>();
     }
 
+    /**
+     * Returns the data of task items in the object
+     *
+     * @return the array of task items in the task list.
+     */
     public ArrayList<TaskItem> getTasks() {
         return tasks;
     }
 
+    /**
+     * Sets the data in the object and the cache to the given list of task items.
+     *
+     * @param tasks list of task items to replace the tasks
+     */
     public void setTasks(ArrayList<TaskItem> tasks) {
         this.tasks = tasks;
+        toCache();
     }
 
-    public TaskItem getTask(TaskID taskID) {
+    /**
+     * Returns the index of the task with the given task id.
+     *
+     * @param taskID id of the requested task index
+     * @return       index of the task; -1 if it does not exist
+     */
+    public int getTaskIndex(TaskID taskID) {
         long tId = taskID.id;
-        for (TaskItem item : tasks) {
-            if (tId == item.getTaskid()) {
-                return item;
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tId == tasks.get(i).getTaskid()) {
+                return i;
             }
         }
-        return null;
+        return -1;
     }
 
+    /**
+     * Fetches the task entry of the task with the given task id.
+     *
+     * @param taskID id of the task to fetch
+     * @return       the TaskEntry corresponding to the task; null if it does not exist
+     */
     public TaskEntry getTaskEntry(TaskID taskID) {
-        TaskItem taskItem = getTask(taskID);
-        if (taskItem == null) {
+        int index = getTaskIndex(taskID);
+        if (index == -1) {
             return null;
         }
-        return taskItem.toEntry((TaskListID) getId());
+        return tasks.get(index).toEntry((TaskListID) getId());
     }
 
+    /**
+     * Toggles the completed state of the task with the given id.
+     *
+     * @param taskID id of the task to toggle
+     */
     public void toggleCompleted(TaskID taskID) {
-        TaskItem taskItem = getTask(taskID);
-        if (taskItem != null) {
-            taskItem.setCompleted(!taskItem.isCompleted());
-            toCache();
+        int index = getTaskIndex(taskID);
+        if (index != -1) {
+            boolean completed = !tasks.get(index).isCompleted();
+            ServerConnector.updateTask(taskID, completed, result -> {
+                tasks.set(index, new TaskItem(result.data));
+                toCache();
+            });
         }
     }
 
-    public void deleteTask(TaskID taskID) {
-        long tId = taskID.id;
-        for (TaskItem item : tasks) {
-            if (tId == item.getTaskid()) {
-                tasks.remove(item);
-                toCache();
+    /**
+     * Creates a new task with a given description and sends it to the server,
+     * object, and cache.
+     *
+     * @param description description of the task
+     */
+    public void sendTask(String description) {
+        ServerConnector.addTask((TaskListID) getId(), description, result -> {
+            if (result.isFailure()) {
                 return;
             }
+
+            addTask(result.data);
+        });
+    }
+
+    /**
+     * Deletes a task from the server, object, and cache.
+     *
+     * @param taskID id of the task to delete
+     */
+    public void deleteTask(TaskID taskID) {
+        int index = getTaskIndex(taskID);
+        if (index != -1) {
+            ServerConnector.deleteTask(taskID, result -> {
+                tasks.remove(index);
+                toCache();
+            });
         }
     }
 
+    /**
+     * Adds a TaskEntry to the object and the cache.
+     *
+     * @param entry entry to add
+     */
     public void addTask(TaskEntry entry) {
         tasks.add(new TaskItem(entry));
         toCache();
     }
 
+    /**
+     * Adds an array list of TaskEntry's to the object and the cache.
+     *
+     * @param entries the entries to add
+     */
     public void addTasks(ArrayList<TaskEntry> entries) {
         for (TaskEntry entry : entries) {
             tasks.add(new TaskItem(entry));
@@ -85,6 +146,11 @@ public class TaskList extends Module {
         toCache();
     }
 
+    /**
+     * Returns the data in the object as an array list of task entries.
+     *
+     * @return the task data as task entries
+     */
     public ArrayList<TaskEntry> getTaskEntries() {
         ArrayList<TaskEntry> entries = new ArrayList<>();
         for (TaskItem item : tasks) {
@@ -104,24 +170,27 @@ public class TaskList extends Module {
 
     @Override
     protected void readFromCache() {
+        tasks = new ArrayList<>();
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
         }
 
-        tasks = new ArrayList<>();
         for (char[] line : data) {
             tasks.add(new TaskItem(line));
         }
     }
 
-    public void refreshTasks() {
+    /**
+     * Refreshes data from the server into the object and the cache.
+     */
+    public void refresh() {
         ServerConnector.getTasks((TaskListID) getId(), result -> {
             if (result.isFailure()) {
-                //TODO Handle failure
                 return;
             }
 
+            tasks = new ArrayList<>();
             for (TaskEntry taskEntry : result.data) {
                 tasks.add(new TaskItem(taskEntry));
             }

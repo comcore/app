@@ -239,6 +239,7 @@ public class GroupStorage {
                     Object o = stream.readObject();
                     Module m = (Module) o;
                     m.setGroup(group);
+                    m.fromCache();
                     modules.add(m);
                     stream.close();
 
