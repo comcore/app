@@ -1,17 +1,21 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
+import android.os.Message;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.ArrayList;
 
@@ -32,24 +36,43 @@ public class PinnedMessages extends CustomChat {
         pinned = new ArrayList<>();
     }
 
+    public static void pinUnpinMessage(MessageEntry message) {
+        ChatID chatID = message.id.module;
+        GroupID groupID = chatID.group;
+        for (Group group : AppData.groups) {
+            if (group.getGroupId().equals(groupID)) {
+                for (Module module : group.getModules()) {
+                    if ((module instanceof PinnedMessages) &&
+                            (((PinnedMessages) module).chatId.equals(chatID.id))) {
+
+                    }
+                }
+            }
+        }
+    }
+
     public String getChatId() {
         return chatId;
     }
 
-    public void pinMessage(MessageEntry message) {
+    public boolean isPinned(MessageEntry message) {
         MsgCacheable cache;
         for (MessageEntry messageEntry : getMessages()) {
             cache = new MsgCacheable(messageEntry);
             if (message.id.id == cache.getMessageid()) {
-                return;
+                return true;
             }
         }
-        cache = new MsgCacheable(message);
-        sendMessage(String.copyValueOf(cache.toCache()));
+        return false;
     }
 
-    public void unpinMessage(MessageEntry message) {
-        //TODO Implement unpin
+    public void pinMessage(MessageEntry message) {
+        if (!isPinned(message)) {
+            sendMessage(String.copyValueOf(new MsgCacheable(message).toCache()));
+        }
+        else {
+            //TODO Delete pin
+        }
     }
 
     public void readPinned() {
@@ -73,6 +96,5 @@ public class PinnedMessages extends CustomChat {
     public int getLayout() {
         return -1; //TODO Implement
     }
-
 
 }

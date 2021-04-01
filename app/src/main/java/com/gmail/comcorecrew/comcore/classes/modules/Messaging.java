@@ -33,7 +33,7 @@ public class Messaging extends Module {
     }
 
     @Override
-    public void toCache() {
+    protected void readToCache() {
         if (messages.size() == 0) {
             return;
         }
@@ -58,26 +58,15 @@ public class Messaging extends Module {
     }
 
     @Override
-    public void fromCache() {
+    protected void readFromCache() {
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
         }
 
         messages = new ArrayList<>();
-        ArrayList<MessageEntry> x = getEntries();
-        for (int i = 0; i < x.size(); i++) {
-//            System.out.println("1. In Messaging message # " + i + ": " + x.get(i).contents);
-        }
-
         for (char[] line : data) {
             messages.add(new MsgCacheable(line));
-        }
-
-        x = getEntries();
-
-        for (int i = 0; i < x.size(); i++) {
- //           System.out.println("2. In Messaging message # " + i + ": " + x.get(i).contents);
         }
     }
 
@@ -131,25 +120,19 @@ public class Messaging extends Module {
         MessageID lastMessageId = latestMessageId();
         ServerConnector.getMessages((ChatID) getId(), lastMessageId, null, result -> {
             if (result.isFailure()) {
- //               System.out.println("Failed in refreshMessages");
                 return;
             }
 
             // If the message isn't immediately after the existing messages, clear the cache
             if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessageId)) {
- //               System.out.println("Clearing");
                 messages.clear();
             }
 
- //           System.out.println("Not clearing");
             for (MessageEntry entry : result.data) {
                 addMessage(entry);
             }
- //           System.out.println("Finished222");
             this.toCache();
         });
- //       System.out.println("Finished");
-  //      this.toCache();
     }
 
     @Override
