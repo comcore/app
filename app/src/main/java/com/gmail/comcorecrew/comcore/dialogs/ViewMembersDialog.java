@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class ViewMembersDialog extends DialogFragment {
     private RecyclerView recycleView;
-    private MainFragment.CustomAdapter adapter;
+    private CustomAdapter adapter;
     private ArrayList<User> userList;
     private GroupID currentGroup;
 
