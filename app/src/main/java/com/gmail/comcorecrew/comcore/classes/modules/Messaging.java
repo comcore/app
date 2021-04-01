@@ -162,26 +162,6 @@ public class Messaging extends Module {
         this.toCache();
     }
 
-    public void deleteMessage(MessageID messageID) {
-        for (int i = 0; i < messages.size(); i++) {
-            if (messageID.id == messages.get(i).getId()) {
-                messages.remove(i);
-                break;
-            }
-        }
-        this.toCache();
-    }
-
-    public void editMessage(MessageID messageID, String newMsg) {
-        for (int i = 0; i < messages.size(); i++) {
-            if (messageID.id == messages.get(i).getId()) {
-                messages.get(i).setData(newMsg);
-                break;
-            }
-        }
-        this.toCache();
-    }
-
     public void createPinnedMessages(String name) {
         for (Module m : getGroup().getModules()) {
             if ((m instanceof PinnedMessages) &&
