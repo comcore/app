@@ -68,9 +68,15 @@ public class Cacher {
     public static char[][] uncacheData(Module module) {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
+            File cacheDir = new File(AppData.cacheDir, module.getGroupIdString());
+            if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
+                return null;
+            }
             String filename = module.getLocatorString();
-//            System.out.println(filename);
             File cacheFile = new File(AppData.cacheDir, filename);
+            if ((!cacheFile.exists()) && (!cacheFile.createNewFile())) {
+                return null;
+            }
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
             size = (size << 16) | br.read();

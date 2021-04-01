@@ -32,12 +32,12 @@ public class CacheDriver extends Module {
     }
 
     @Override
-    public void toCache() {
+    public void readToCache() {
         Cacher.cacheData(data, this);
     }
 
     @Override
-    public void fromCache() {
+    public void readFromCache() {
         char[][] rawData = Cacher.uncacheData(this);
         if (rawData == null) {
             return;
