@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore.classes.modules;
+package com.gmail.comcorecrew.comcore.Helpers;
 
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.time.temporal.TemporalAccessor;
@@ -15,6 +16,7 @@ public class UserMessage {
     User sender;
     String senderName;
     UserInfo userInfo;
+    UserID userID;
     TemporalAccessor time;
     long time2;
     ChatID chatID;
@@ -23,6 +25,10 @@ public class UserMessage {
 
     public UserMessage(MessageEntry entry) {
         // TODO actually get the name from the User class
+//        this.messageID = entry.id;
+//        this.time2 = entry.timestamp;
+//        this.message = entry.contents;
+//        this.userID = entry.sender;
         this(entry.id, new UserInfo(entry.sender, "<NAME>"), entry.timestamp, entry.contents);
     }
 
