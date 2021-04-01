@@ -12,11 +12,15 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.EnterCodeDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InvalidPasswordDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+
+import java.io.IOException;
 
 public class LoginFragment extends Fragment {
 
@@ -72,6 +76,13 @@ public class LoginFragment extends Fragment {
                 switch (status) {
                     case SUCCESS:
                         // Navigate to the main fragment
+
+                        try {
+                            AppData.init(ServerConnector.getUser(), getContext());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;

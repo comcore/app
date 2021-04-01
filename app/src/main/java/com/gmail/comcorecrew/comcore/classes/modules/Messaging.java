@@ -16,6 +16,7 @@ import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Messaging extends Module {
 
@@ -104,7 +105,7 @@ public class Messaging extends Module {
     /*
      * Get the MessageID of the latest message
      */
-    private MessageID latestMessageId() {
+    public MessageID latestMessageId() {
         if (messages.isEmpty()) {
             return null;
         } else {

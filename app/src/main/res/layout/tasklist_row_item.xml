@@ -3,11 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
     android:background="@color/secondary_d1"
-    android:clickable="true"
     android:focusable="auto"
     android:gravity="center_vertical">
 
@@ -17,26 +16,29 @@
         android:clickable="false">
 
         <TextView
-            android:id="@+id/group_row_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="5dp"
+            android:id="@+id/task_description"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
             android:gravity="center"
-            android:text="@string/error_unknown"
+            android:text="@string/tl_description_default"
             android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/task_completed_status"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.888"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/group_row_tag"
-            android:layout_width="47dp"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/task_completed_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/not_completed"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/btn_star" />
+            app:layout_constraintTop_toBottomOf="@+id/task_description" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

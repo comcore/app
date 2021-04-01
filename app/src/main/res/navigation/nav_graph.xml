@@ -12,7 +12,11 @@
         android:id="@+id/settingsFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <argument
+            android:name="group_id"
+            app:argType="com.gmail.comcorecrew.comcore.server.id.GroupID" />
+    </fragment>
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.MainFragment"
@@ -26,7 +30,8 @@
             app:destination="@id/createGroupFragment" />
         <action
             android:id="@+id/action_mainFragment_to_groupFragment"
-            app:destination="@id/groupFragment" />
+            app:destination="@id/groupFragment"
+            />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -57,10 +62,30 @@
         <action
             android:id="@+id/action_groupFragment_to_chatFragment5"
             app:destination="@id/chatFragment5" />
+        <argument
+            android:name="Group_ID"
+            app:argType="com.gmail.comcorecrew.comcore.server.id.GroupID" />
+        <action
+            android:id="@+id/action_groupFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
         android:name="com.gmail.comcorecrew.comcore.fragments.ChatFragment5"
         android:label="fragment_chat5"
         tools:layout="@layout/fragment_chat5" />
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.TaskListFragment"
+        android:label="TaskListFragment" >
+        <argument
+            android:name="task_list"
+            app:argType="com.gmail.comcorecrew.comcore.classes.modules.TaskList" />
+        <action
+            android:id="@+id/action_taskListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 </navigation>

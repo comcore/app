@@ -26,8 +26,8 @@
             android:id="@+id/unmute_member"
             android:title="@string/unmute_member" />
         <item
-            android:id="@+id/dis_enable_chat"
-            android:title="@string/dis_enable_chat"
+            android:id="@+id/create_module"
+            android:title="@string/create_module"
             app:showAsAction="never" />
     </group>
     <group android:id="@+id/menu_group_owner_actions">
@@ -53,6 +53,10 @@
             android:title="@string/leave_group"
             app:showAsAction="never"
             />
+        <item
+            android:id="@+id/settingsFragment"
+            android:title="@string/action_settings"
+            app:showAsAction="never" />
     </group>
 
 </menu>

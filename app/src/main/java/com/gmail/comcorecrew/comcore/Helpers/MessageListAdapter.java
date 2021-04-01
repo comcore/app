@@ -1,13 +1,12 @@
-package com.gmail.comcorecrew.comcore.classes.modules;
+package com.gmail.comcorecrew.comcore.Helpers;
 
 
 import android.content.Context;
 import android.os.Build;
-import android.text.format.Time;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,23 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
-import com.gmail.comcorecrew.comcore.server.ServerConnector.*;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private ArrayList<MessageEntry> mMessageList = new ArrayList<MessageEntry>(3);
     private ArrayList<MessageEntry> messageEntryArrayList = new ArrayList<MessageEntry>(3);
-    private ArrayList<UserMessage> userMessageArraylist;
+    private ArrayList<UserMessage> userMessageArraylist = new ArrayList<UserMessage>(3);
     public ChatID chatID;
     public Group group;
 
@@ -163,6 +161,12 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         return 0;
     }
 
+//    public  convert(MessageEntry messageEntry) {
+//        for (int i = 0; i < ; i++) {
+//
+//        }
+//    }
+
     public int getItemViewType(int position) {
  //       System.out.println("Inside getItemViewType");
         UserMessage message = new UserMessage(mMessageList.get(position));
@@ -210,7 +214,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private class SentMessageHolder extends RecyclerView.ViewHolder {
+    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView messageText, timeText, nameText;
 
         SentMessageHolder(View itemView) {
@@ -224,15 +228,29 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         @RequiresApi(api = Build.VERSION_CODES.O)
         void bind(UserMessage message) {
 //            System.out.println("Inside BIND SENT MESSAGE");
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-            LocalDateTime now = LocalDateTime.now();
+//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+//            LocalDateTime now = LocalDateTime.now();
             messageText.setText(message.getMessage());
-            timeText.setText(dtf.format(now));
+            //timeText.setText(dtf.format(now));
+            timeText.setText(format(message.getTime2()));
             nameText.setText(ServerConnector.getUser().name);
+            messageText.setOnCreateContextMenuListener(this);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
         }
     }
 
-    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
+    public static String format(long mnSeconds) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date(mnSeconds));
+    }
+
+    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView messageText, timeText, nameText;
 
         ReceivedMessageHolder(View itemView) {
@@ -246,10 +264,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         @RequiresApi(api = Build.VERSION_CODES.O)
         void bind(UserMessage message) {
  //           System.out.println("Inside BIND RECEIVED MESSAGE");
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
             messageText.setText(message.getMessage());
-            timeText.setText(dtf.format(message.getTime()));
+//            timeText.setText(dtf.format(message.getTime()));
+            timeText.setText(format(message.getTime2()));
             nameText.setText(message.getSender().getName());
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
         }
     }
 }

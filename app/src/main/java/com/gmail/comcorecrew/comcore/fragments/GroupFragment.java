@@ -6,6 +6,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,22 +16,40 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
+import com.gmail.comcorecrew.comcore.server.id.TaskListID;
+import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
+import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GroupFragment extends Fragment {
-    private MainFragment fragment;
+
     private Group currentGroup;
+    private GroupID currentGroupID;
+    public static ArrayList<Module> modules =  new ArrayList<>();
+
+    private CustomAdapter moduleAdapter;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -44,15 +65,73 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            currentGroup = bundle.getParcelable("currentGroup");
+        /** Retrieve the GroupId passed from the main fragment and find
+         * the Group associated with it.
+         *
+         * For this to work, AppData.init() must be run first.
+         *
+         * TODO
+         * Lookup currently returns null
+         *
 
-        }
-        else {
-            new ErrorDialog(R.string.error_unknown)
-                    .show(getParentFragmentManager(), null);
-        }
+        GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
+            currentGroup = callback;
+        });
+        */
+
+        /** findGroupByID will not necessary once a group can be found in the local files */
+        findGroupByID(GroupFragmentArgs.fromBundle(getArguments()).getGroupID());
+
+        currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
+    }
+
+    /**
+     * TODO
+     *
+     * The function findGroupByID is a temporary function that retrieves a group from the server
+     * that has the same GroupID as the id passed to this function from the main fragment.
+     *
+     * It replicates the same server request that was made in MainFragment, and is redundant here.
+     *
+     * Once the cache is fully integrated with the client fragments and GroupFragment can find
+     * a group using the lookup function, this entire function will not be necessary.
+     */
+
+    public void findGroupByID (GroupID groupID) {
+
+        ServerConnector.getGroups(result -> {
+            if (result.isFailure()) {
+                new ErrorDialog(R.string.error_cannot_connect)
+                        .show(getParentFragmentManager(), null);
+                return;
+            }
+
+            ServerConnector.getGroupInfo(Arrays.asList(result.data), 0, result1 -> {
+                if (result1.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                    return;
+                }
+
+                ArrayList<Group> userGroups = new ArrayList<>();
+
+                GroupInfo[] info = result1.data;
+                for (int i = 0; i < result.data.length; i++) {
+                    Group nextGroup = new Group(info[i].name,  info[i].id,
+                            info[i].role, info[i].muted);
+                    userGroups.add(nextGroup);
+                }
+
+                for (int i = 0; i < userGroups.size(); i++) {
+                    if (userGroups.get(i).getGroupId().toString().equals(groupID.toString())) {
+                        currentGroup = userGroups.get(i);
+                        refresh();
+                    }
+                }
+
+            });
+        });
+
     }
 
     @Override
@@ -60,7 +139,16 @@ public class GroupFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_group, container, false);
+
+        // Create the RecyclerView
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.group_recycler);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+        moduleAdapter = new CustomAdapter();
+        rvGroups.setAdapter(moduleAdapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+        return rootView;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -68,7 +156,9 @@ public class GroupFragment extends Fragment {
 
         /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
-        welcomeText.setText(currentGroup.getName());
+        if (currentGroup != null) {
+            welcomeText.setText(currentGroup.getName());
+        }
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -79,10 +169,10 @@ public class GroupFragment extends Fragment {
         });
 
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
-            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+            ServerConnector.getModules(currentGroupID, result -> {
                 if (result.isFailure() || result.data.length == 0) {
                     System.out.println(result.data.length);
-                    System.out.println(currentGroup.getGroupId());
+                    System.out.println(currentGroupID);
                     return;
                 }
 
@@ -91,18 +181,31 @@ public class GroupFragment extends Fragment {
                     /* Sends chatID and the current group to the chatFragment frame*/
                     ChatFragment5.chatID = (ChatID) id;
                     ChatFragment5.currentGroup = currentGroup;
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("currentGroup", currentGroup);
 //                    Intent i = new Intent(getActivity(), MessageListActivity.class);
 //                    startActivity(i);
 //                    ((Activity) getActivity()).overridePendingTransition(0, 0);
 
                     NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_groupFragment_to_chatFragment5, bundle);
+                            .navigate(R.id.action_groupFragment_to_chatFragment5);
                 }
             });
         });
 
+    }
+
+    public void refresh() {
+        moduleAdapter.refresh();
+
+
+        /** Refresh the welcome text if the currentGroup was originally null
+         *
+         * Once the currentGroup is retrieved from the cache instead
+         * of through the server at the creation of GroupFragment, this will not be necessary
+         */
+        TextView welcomeText = (TextView) this.getView().findViewById(R.id.label_group_fragment);
+        if (currentGroup != null) {
+            welcomeText.setText(currentGroup.getName());
+        }
     }
 
     @Override
@@ -119,6 +222,14 @@ public class GroupFragment extends Fragment {
          * If the current user is an owner, display R.id.menu_group_owner_actions
          * and R.id.menu_group_moderator_actions
          */
+
+        /**  TODO
+         * If currentGroup is null, then there has been an error finding the group associated
+         * with the GroupID passed to this function
+         */
+        if (currentGroup == null) {
+            return;
+        }
         if (currentGroup.getGroupRole() == GroupRole.OWNER) {
             menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
             menu.setGroupVisible(R.id.menu_group_owner_actions, true);
@@ -165,7 +276,7 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.invite_member:
                 /** Handle inviting a new member **/
-                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
+                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroupID, R.string.invite_member);
                 addMemberDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
@@ -191,12 +302,9 @@ public class GroupFragment extends Fragment {
                 ViewMembersDialog unmuteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 6);
                 unmuteDialog.show(getParentFragmentManager(), null);
                 return true;
-            case R.id.dis_enable_chat:
-//                ServerConnector.getModules(currentGroup.getGroupId(), result -> {
-//                    if (result.isSuccess() && result.data.length == 0) {
-//                        ServerConnector.createChat(currentGroup.getGroupId(), "General Chat", null);
-//                    }
-//                });
+            case R.id.create_module:
+                CreateModuleDialog newModuleDialog = new CreateModuleDialog(currentGroup.getGroupId());
+                newModuleDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.transfer_ownership:
                 /** Handle transfer ownership **/
@@ -205,8 +313,137 @@ public class GroupFragment extends Fragment {
                 transferOwnershipDialog.show(getParentFragmentManager(), null);
 
                 return true;
+            case R.id.settingsFragment:
+                /** Handle passing the current GroupID to the settings page */
+                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action = GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroupID);
+                action.setGroupId(currentGroupID);
+                NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * The GroupFragment uses the same style of RecyclerView that the MainFragment does to display
+     * its list of groups.
+     *
+     * The CustomAdapter internal class sets up the RecyclerView, which displays
+     * the list of modules in the GUI
+     */
+    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private final TextView textView;
+            private Module currentModule;
+
+            public ViewHolder(View view) {
+                super(view);
+                view.setOnClickListener(this);
+                // Define click listener for the ViewHolder's View
+
+                textView = (TextView) view.findViewById(R.id.module_row_text);
+
+            }
+
+            public TextView getTextView() {
+                return textView;
+            }
+
+            public void setModule(Module currentModule) {
+                this.currentModule = currentModule;
+            }
+
+            @Override
+            public void onClick(View view) {
+                /** If the module is a task list, navigate to the TaskListFragment and pass the
+                 * ModuleId.
+                 */
+                if (currentModule instanceof TaskList) {
+
+                    GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment((TaskList) currentModule);
+                    action.setTaskList((TaskList) currentModule);
+                    NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                }
+            }
+        }
+
+        public CustomAdapter() {
+            refresh();
+        }
+
+        private void refresh() {
+
+            if (currentGroup == null) {
+                return;
+            }
+
+            ServerConnector.getModules(currentGroupID, result -> {
+                if (result.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                    return;
+                }
+
+                ModuleInfo[] info = result.data;
+                ArrayList<Module> userModules = new ArrayList<>();
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].id instanceof TaskListID) {
+                        TaskList nextTaskList = new TaskList(info[i].name, (TaskListID) info[i].id, currentGroup);
+                        userModules.add(nextTaskList);
+                    }
+                    else if (info[i].id instanceof ChatID) {
+                        Messaging nextMessaging = new Messaging(info[i].name, (ChatID) info[i].id, currentGroup);
+                        userModules.add(nextMessaging);
+                    }
+                    else {
+                        /** All possible types of modules should eventually be added. For now,
+                         *  an error dialog is shown if the module is not a task list or a chat. **/
+                        new ErrorDialog(R.string.error_unknown_module_type)
+                                .show(getParentFragmentManager(), null);
+                        return;
+                    }
+                }
+                modules = userModules;
+                notifyDataSetChanged();
+            });
+
+
+
+        }
+
+        @Override
+        public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+            View view = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.module_row_item, viewGroup, false);
+
+            return new CustomAdapter.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
+
+            /** Label each task item depending on its Mdid value **/
+            /** Task List **/
+            if (modules.get(position) instanceof TaskList) {
+                viewHolder.getTextView().setText("Task List: " + modules.get(position).getName());
+            }
+            /** Chat **/
+            else if (modules.get(position) instanceof Messaging) {
+                viewHolder.getTextView().setText("Chat: " + modules.get(position).getName());
+            }
+            else {
+                viewHolder.getTextView().setText(modules.get(position).getName());
+            }
+            viewHolder.setModule(modules.get(position));
+
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return modules.size();
         }
     }
 }
