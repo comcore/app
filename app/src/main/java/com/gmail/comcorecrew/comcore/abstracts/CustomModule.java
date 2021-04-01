@@ -25,18 +25,21 @@ import java.util.ArrayList;
 
 public abstract class CustomModule extends Module {
 
+    private View view;
     private long cacheByteLimit;
     private ArrayList<CustomItem> items;
 
     public CustomModule(String name, CustomModuleID id, Group group) {
         super(name, id, group, Mdid.CSTM);
         cacheByteLimit = -1;
+        view = null;
         items = new ArrayList<>();
     }
 
     public CustomModule(String name, CustomModuleID id, Group group, long cacheByteLimit) {
         super(name, id, group, Mdid.CSTM);
         this.cacheByteLimit = cacheByteLimit;
+        view = null;
         items = new ArrayList<>();
     }
 
@@ -130,6 +133,10 @@ public abstract class CustomModule extends Module {
         return items;
     }
 
+    protected View getView() {
+        return view;
+    }
+
     protected void setItems(ArrayList<CustomItem> items) {
         this.items = items;
         toCache();
@@ -177,7 +184,7 @@ public abstract class CustomModule extends Module {
     protected void sendMessage(String data) {
         ServerConnector.sendMessage(((CustomModuleID) getId()).asChat(), data, result -> {
             if (result.isFailure()) {
-                //TODO Implement failure
+                return;
             }
 
             addItem(new CustomItem(result.data));
@@ -187,7 +194,7 @@ public abstract class CustomModule extends Module {
     protected void sendTask(String data) {
         ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), data, result -> {
             if (result.isFailure()) {
-                //TODO Implement Failure
+                return;
             }
 
             addItem(new CustomItem(result.data));
@@ -197,7 +204,7 @@ public abstract class CustomModule extends Module {
     protected void modifyItem(ModuleItemID<ChatID> itemId, String data) {
         ServerConnector.updateMessage((MessageID) itemId, data, result -> {
             if (result.isFailure()) {
-                //TODO Handle failure
+                return;
             }
 
             updateItem(result.data);
@@ -208,18 +215,55 @@ public abstract class CustomModule extends Module {
         TaskListID taskListID = ((CustomModuleID) getId()).asTaskList();
         ServerConnector.updateTask((TaskID) itemId, completed, result -> {
             if (result.isFailure()) {
-                //TODO Handle failure
+                return;
             }
 
             updateItem(result.data);
         });
     }
 
-    protected void deleteMessage(long itemId) {
+    protected void deleteItem(MessageID messageID) {
+        ServerConnector.updateMessage(messageID, null, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getItemId() == messageID.id) {
+                    items.set(i, new CustomItem(result.data));
+                    items.remove(i);
+                    toCache();
+                    return;
+                }
+            }
+        });
     }
 
-    abstract public void viewInit(@NonNull View view);
+    protected void deleteItem(TaskID taskID) {
+        ServerConnector.deleteTask(taskID, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getItemId() == taskID.id) {
+                    items.remove(i);
+                    toCache();
+                    return;
+                }
+            }
+        });
+    }
+
+    public void onViewCreated(@NonNull View view) {
+        this.view = view;
+        viewInit(view);
+    }
+
+    abstract public void viewInit(View view);
 
     abstract public int getLayout();
+
+    abstract public void refreshView(View view);
 
 }

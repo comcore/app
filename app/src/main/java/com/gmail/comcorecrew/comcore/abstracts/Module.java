@@ -221,4 +221,6 @@ public abstract class Module implements Serializable, NotificationListener {
      * Abstract method for module to implement. Separate from fromCache for synchronization.
      */
     protected abstract void readFromCache();
+
+    public abstract void refresh();
 }

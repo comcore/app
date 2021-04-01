@@ -49,6 +49,18 @@ public abstract class CustomChat extends CustomModule {
         modifyItem(messageID, data);
     }
 
+    protected void editMessage(MessageEntry message, String data) {
+        modifyItem(message.id, data);
+    }
+
+    protected void deleteMessage(MessageID messageID) {
+        deleteItem(messageID);
+    }
+
+    protected void deleteMessage(MessageEntry message) {
+        deleteItem(message.id);
+    }
+
     protected void addMessage(MessageEntry message) {
         addItem(new CustomItem(message));
     }
@@ -61,6 +73,7 @@ public abstract class CustomChat extends CustomModule {
         addItems(items);
     }
 
+    @Override
     public void refresh() {
         MessageID lastMessage;
         if (!isEmpty()) {
@@ -88,5 +101,21 @@ public abstract class CustomChat extends CustomModule {
             }
 
         });
+    }
+
+    @Override
+    public void onReceiveMessage(MessageEntry message) {
+        addMessage(message);
+        if (getView() != null) {
+            refreshView(getView());
+        }
+    }
+
+    @Override
+    public void onMessageUpdated(MessageEntry message) {
+        updateItem(message);
+        if (getView() != null) {
+            refreshView(getView());
+        }
     }
 }

@@ -127,7 +127,8 @@ public class Messaging extends Module {
     /*
      * Gets messages from the server and caches them
      */
-    public void refreshMessages() {
+    @Override
+    public void refresh() {
         ServerConnector.getMessages((ChatID) getId(), latestMessageId(), null, result -> {
             if (result.isFailure()) {
                 return;

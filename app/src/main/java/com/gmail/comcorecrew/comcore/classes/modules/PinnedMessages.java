@@ -78,7 +78,7 @@ public class PinnedMessages extends CustomChat {
             sendMessage(String.copyValueOf(new MsgCacheable(message).toCache()));
         }
         else {
-            //TODO Delete pin
+            deleteMessage(message);
         }
     }
 
@@ -97,6 +97,11 @@ public class PinnedMessages extends CustomChat {
     @Override
     public void viewInit(@NonNull View view) {
         //TODO Implement
+    }
+
+    @Override
+    public void refreshView(View view) {
+
     }
 
     @Override

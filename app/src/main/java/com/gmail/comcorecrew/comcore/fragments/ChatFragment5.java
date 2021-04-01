@@ -100,7 +100,7 @@ public class ChatFragment5 extends Fragment {
 //                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
 //            }
 
-            messaging.refreshMessages();
+            messaging.refresh();
             try {
                 messaging.fromCache();
             } catch (Exception e) {
@@ -114,7 +114,7 @@ public class ChatFragment5 extends Fragment {
         }
 
         try {
-            messaging.refreshMessages();
+            messaging.refresh();
             messageList.clear();
             messageList = messaging.getEntries();
         } catch (Exception e) {
@@ -134,7 +134,7 @@ public class ChatFragment5 extends Fragment {
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
-        messaging.refreshMessages();
+        messaging.refresh();
         messageList = messaging.getEntries();
 
 //        registerForContextMenu(mMessageRecycler);

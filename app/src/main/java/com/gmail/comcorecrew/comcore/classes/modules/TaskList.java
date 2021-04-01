@@ -184,6 +184,7 @@ public class TaskList extends Module {
     /**
      * Refreshes data from the server into the object and the cache.
      */
+    @Override
     public void refresh() {
         ServerConnector.getTasks((TaskListID) getId(), result -> {
             if (result.isFailure()) {
