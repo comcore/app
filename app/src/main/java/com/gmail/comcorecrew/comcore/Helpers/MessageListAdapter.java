@@ -213,7 +213,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+//    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+//        TextView messageText, timeText, nameText;
+//
+//        SentMessageHolder(View itemView) {
+//            super(itemView);
+//
+//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
+//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
+//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
+//        }
+
+    private class SentMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText;
 
         SentMessageHolder(View itemView) {
@@ -233,15 +244,15 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             //timeText.setText(dtf.format(now));
             timeText.setText(format(message.getTime2()));
             nameText.setText(ServerConnector.getUser().name);
-            messageText.setOnCreateContextMenuListener(this);
+//            messageText.setOnCreateContextMenuListener(this);
         }
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
-        }
+//        @Override
+//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+//            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+//            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+//        }
     }
 
     public static String format(long mnSeconds) {
@@ -249,7 +260,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         return sdf.format(new Date(mnSeconds));
     }
 
-    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+//        TextView messageText, timeText, nameText;
+//
+//        ReceivedMessageHolder(View itemView) {
+//            super(itemView);
+//
+//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
+//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
+//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
+//        }
+
+    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText;
 
         ReceivedMessageHolder(View itemView) {
@@ -270,11 +292,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             nameText.setText(message.getSender().getName());
         }
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
-        }
+//        @Override
+//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+//            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+//            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+//        }
     }
 }
