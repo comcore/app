@@ -69,6 +69,7 @@ public class Cacher {
         try {
             //Retrieves cache file, opens cache file, and reads the number of cache lines.
             String filename = module.getLocatorString();
+//            System.out.println(filename);
             File cacheFile = new File(AppData.cacheDir, filename);
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
