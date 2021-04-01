@@ -117,8 +117,8 @@ public class ChatFragment5 extends Fragment {
 
         try {
             messaging.refresh();
-            messageList.clear();
-            messageList = messaging.getEntries();
+//            messageList.clear();
+//            messageList = messaging.getEntries();
         } catch (Exception e) {
             System.out.println("DNE");
         }
@@ -136,16 +136,16 @@ public class ChatFragment5 extends Fragment {
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
-        messaging.refresh();
-        messageList = messaging.getEntries();
+//        messaging.refresh();
+//        messageList = messaging.getEntries();
 
 //        registerForContextMenu(mMessageRecycler);
 
 //        manager.setStackFromEnd(true);
 
-        for (int i = 0; i < messageList.size(); i++) {
-            System.out.println("3. Message # " + i + ": " + messageList.get(i).contents);
-        }
+//        for (int i = 0; i < messageList.size(); i++) {
+//            System.out.println("3. Message # " + i + ": " + messageList.get(i).contents);
+//        }
 
 //        System.out.println("AFTER THE RECYCLER SHIT");
 
@@ -269,8 +269,8 @@ public class ChatFragment5 extends Fragment {
         }
 
         private void deleteMessage(MenuItem item) {
-        int x = messageList.size() - item.getGroupId();
-        messageID = messageList.get(x).id;
+        int x = messaging.getEntries().size() - item.getGroupId();
+        messageID = messaging.getEntries().get(x).id;
         messaging.deleteMessage(messageID);
 
 
@@ -283,13 +283,13 @@ public class ChatFragment5 extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void editMessage(MenuItem item) {
 //        System.out.println("Group id: " + item.getGroupId());
-//        System.out.println("Size: " + messageList.size());
-        messageID = messageList.get(item.getGroupId()).id;
-//        System.out.println("MessageID w/ item: " + messageID);
-        int x = messageList.size() - item.getGroupId() - 1;
-//        System.out.println("x: " + x);
-        messageID = messageList.get(x).id;
-        messageToBeSent.setText(messageList.get(x).contents);
+//        System.out.println("Size: " + messaging.getEntries().size());
+        messageID = messaging.getEntries().get(item.getGroupId()).id;
+ //       System.out.println("MessageID w/ item: " + messageID);
+ //       int x = messaging.getEntries().size() - item.getGroupId() - 1;
+ //       System.out.println("x: " + x);
+ //       messageID = messaging.getEntries().get(x).id;
+        messageToBeSent.setText(messaging.getEntries().get(item.getGroupId()).contents);
 //        for (int i = 0; i < messageList.size(); i++) {
 //            System.out.println("Index " + i + ": " + messageList.get(i).id + " " + messageList.get(i).contents);
 //        }
