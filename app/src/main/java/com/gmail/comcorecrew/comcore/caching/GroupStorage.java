@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.InvalidFileFormatException;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
 
@@ -319,6 +320,7 @@ public class GroupStorage {
 
     /**
      * Gets the Group object corresponding to a GroupID
+     *
      * @param id the ID of the group
      * @return the Group object
      */
@@ -327,6 +329,21 @@ public class GroupStorage {
             if (group.getGroupId().equals(id)) {
                 return group;
             }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the Module object corresponding to a ModuleID
+     *
+     * @param id the ID of the module
+     * @return the Module object
+     */
+    public static Module getModule(ModuleID id) {
+        Group group = getGroup(id.group);
+        if (group != null) {
+            return group.getModule(id);
         }
 
         return null;
