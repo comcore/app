@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -26,9 +27,10 @@ import java.util.ArrayList;
 public class CreateTaskDialog extends DialogFragment {
 
     private TaskListID tasklistID;
+    private TaskList currentTaskList;
 
-    public CreateTaskDialog (TaskListID currentTasklistId) {
-        this.tasklistID = currentTasklistId;
+    public CreateTaskDialog (TaskList currentTasklist) {
+        this.currentTaskList = currentTasklist;
     }
 
     @Override
@@ -57,15 +59,8 @@ public class CreateTaskDialog extends DialogFragment {
 
             EditText taskDesc = view.findViewById(R.id.create_task_name_edit);
 
-            ServerConnector.addTask(tasklistID, taskDesc.getText().toString(), result -> {
-                if (result.isSuccess()) {
-                    this.dismiss();
-                }
-                else {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
-                }
-            });
+            currentTaskList.sendTask(taskDesc.getText().toString());
+            this.dismiss();
         });
 
     }

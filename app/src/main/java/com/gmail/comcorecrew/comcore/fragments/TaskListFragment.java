@@ -26,6 +26,7 @@ import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -81,6 +82,7 @@ public class TaskListFragment extends Fragment {
     }
 
     public void refresh() {
+        currentTaskList.refresh();
         tasklistAdapter.refresh();
     }
 
@@ -128,12 +130,16 @@ public class TaskListFragment extends Fragment {
                 return true;
             case R.id.create_task:
                 /** Handle creating a new task **/
-                CreateTaskDialog addTaskDialog = new CreateTaskDialog((TaskListID) currentTaskList.getId());
+                CreateTaskDialog addTaskDialog = new CreateTaskDialog(currentTaskList);
                 addTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.delete_task:
+                ViewTasksDialog deleteTaskDialog = new ViewTasksDialog(currentTaskList, 0);
+                deleteTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.update_task:
+                ViewTasksDialog updateTaskDialog = new ViewTasksDialog(currentTaskList, 1);
+                updateTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -150,30 +156,18 @@ public class TaskListFragment extends Fragment {
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            private final TextView textView;
+        public class ViewHolder extends RecyclerView.ViewHolder {
             private TaskItem currentTaskItem;
 
             public ViewHolder(View view) {
                 super(view);
-                view.setOnClickListener(this);
-                // Define click listener for the ViewHolder's View
-                textView = (TextView) view.findViewById(R.id.task_description);
 
-            }
-
-            public TextView getTextView() {
-                return textView;
             }
 
             public void setTaskItem(TaskItem currentTaskItem) {
                 this.currentTaskItem = currentTaskItem;
             }
 
-            @Override
-            public void onClick(View view) {
-
-            }
         }
 
         public CustomAdapter() {
@@ -195,6 +189,7 @@ public class TaskListFragment extends Fragment {
                 serverTasks.add(nextTaskItem);
              }
              tasks = serverTasks;
+             currentTaskList.setTasks(tasks);
 
              notifyDataSetChanged();
              });
@@ -212,8 +207,9 @@ public class TaskListFragment extends Fragment {
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
+            TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
-            viewHolder.getTextView().setText(tasks.get(position).getData());
+            dataText.setText(tasks.get(position).getData());
             if (tasks.get(position).isCompleted()) {
                 completedText.setText(R.string.completed);
             }
