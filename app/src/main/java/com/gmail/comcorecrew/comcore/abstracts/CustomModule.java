@@ -137,6 +137,10 @@ public abstract class CustomModule extends Module {
         return view;
     }
 
+    public void resetView() {
+        view = null;
+    }
+
     protected void setItems(ArrayList<CustomItem> items) {
         this.items = items;
         toCache();
