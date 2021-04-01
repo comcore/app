@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.gmail.comcorecrew.comcore.helpers.UserMessage;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
@@ -50,7 +49,7 @@ public class ChatFragment5 extends Fragment {
     private MessageListAdapter mMessageAdapter;
 
     boolean isEditMode = false;
-    private UserMessage editMessage;
+    private MessageEntry editMessage;
 
     public ChatFragment5() {
         // Required empty public constructor
@@ -131,7 +130,7 @@ public class ChatFragment5 extends Fragment {
         mMessageRecycler.setLayoutManager(manager);
         //mMessageRecycler.setHasFixedSize(true);
 //        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
-        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+        mMessageAdapter = new MessageListAdapter(getContext(), messaging);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
@@ -249,6 +248,7 @@ public class ChatFragment5 extends Fragment {
 //            mMessageRecycler.setAdapter(mMessageAdapter);
 //            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
             mMessageAdapter.notifyDataSetChanged();
+            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
             messageToBeSent.getText().clear();
             // messageToBeSent.setHint("Enter Message");

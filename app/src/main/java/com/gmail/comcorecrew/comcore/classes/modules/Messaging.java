@@ -89,6 +89,17 @@ public class Messaging extends Module {
         return true;
     }
 
+    public int numEntries() {
+        return messages.size();
+    }
+
+    public MessageEntry getEntry(int i) {
+        MsgCacheable msg = messages.get(i);
+        return new MessageEntry(new MessageID((ChatID) getId(), msg.getMessageid()),
+                UserStorage.getUser(msg.getId()).getID(),
+                msg.getTimestamp(), msg.getData());
+    }
+
     /*
      * Returns a list of messages in oldest first order.
      */

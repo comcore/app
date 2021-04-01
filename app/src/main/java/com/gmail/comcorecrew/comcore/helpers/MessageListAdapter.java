@@ -13,161 +13,35 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
-import com.gmail.comcorecrew.comcore.server.id.ChatID;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
-    private Context mContext;
-    private ArrayList<MessageEntry> mMessageList = new ArrayList<MessageEntry>(3);
-    private ArrayList<UserMessage> userMessageArraylist = new ArrayList<UserMessage>(3);
-    public ChatID chatID;
-    public Group group;
+    private Context context;
+    public Messaging messaging;
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
-    public MessageListAdapter(Context context, ArrayList<MessageEntry> messageList) {
-        mContext = context;
-        mMessageList = messageList;
+    public MessageListAdapter(Context context, Messaging messaging) {
+        this.context = context;
+        this.messaging = messaging;
     }
-
-//    public MessageListAdapter(Context context, ArrayList<UserMessage> messageList) {
-//        mContext = context;
-//        userMessageArraylist = messageList;
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        try {
-//            return userMessageArraylist.size();
-//        } catch (Exception e) {
-//            System.out.println("FUCK YOU GUYS");
-//        }
-//        return 0;
-//    }
-//
-//    public int getItemViewType(int position) {
-//        System.out.println("Inside getItemViewType");
-//        UserMessage message = userMessageArraylist.get(position);
-//
-//        if (message.senderName.equals(ServerConnector.getUser().name)) {
-//            // If the current user is the sender of the message
-//            return VIEW_TYPE_MESSAGE_SENT;
-//        } else {
-//            // If some other user sent the message
-//            return VIEW_TYPE_MESSAGE_RECEIVED;
-//        }
-//    }
-//
-//    @NonNull
-//    @Override
-//    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        System.out.println("Inside onCreateViewHolder");
-//        System.out.println(parent.getContext());
-//        View view;
-//
-//        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
-//            view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.from_me, parent, false);
-//            return new SentMessageHolder(view);
-//        } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
-//            view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.from_them, parent, false);
-//            return new ReceivedMessageHolder(view);
-//        }
-//
-//        return null;
-//    }
-//
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    @Override
-//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-//        UserMessage message = userMessageArraylist.get(position);
-//
-//        switch (holder.getItemViewType()) {
-//            case VIEW_TYPE_MESSAGE_SENT:
-//                ((SentMessageHolder) holder).bind(message);
-//                break;
-//            case VIEW_TYPE_MESSAGE_RECEIVED:
-//                ((ReceivedMessageHolder) holder).bind(message);
-//        }
-//    }
-//
-//    private class SentMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText, nameText;
-//
-//        SentMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
-//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
-//        }
-//
-//        @RequiresApi(api = Build.VERSION_CODES.O)
-//        void bind(UserMessage message) {
-//            System.out.println("Inside BIND SENT MESSAGE");
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-//            LocalDateTime now = LocalDateTime.now();
-//            messageText.setText(message.getMessage());
-//            timeText.setText(dtf.format(now));
-//            nameText.setText(ServerConnector.getUser().name);
-//        }
-//    }
-//
-//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText, nameText;
-//
-//        ReceivedMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
-//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
-//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
-//        }
-//
-//        @RequiresApi(api = Build.VERSION_CODES.O)
-//        void bind(UserMessage message) {
-//            System.out.println("Inside BIND RECEIVED MESSAGE");
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-//            messageText.setText(message.getMessage());
-//            timeText.setText(dtf.format(message.getTime()));
-//            nameText.setText(message.getSenderName());
-//        }
-//    }
-//}
-
-
 
     @Override
     public int getItemCount() {
-        try {
-//            System.out.println("SIZE WINS ALL BABY");
-            return mMessageList.size();
-        } catch (Exception e) {
- //           System.out.println("FUCK YOU GUYS");
-        }
-        return 0;
+        return messaging.numEntries();
     }
 
-//    public  convert(MessageEntry messageEntry) {
-//        for (int i = 0; i < ; i++) {
-//
-//        }
-//    }
-
     public int getItemViewType(int position) {
- //       System.out.println("Inside getItemViewType");
-        UserMessage message = new UserMessage(mMessageList.get(position));
+        MessageEntry message = messaging.getEntry(position);
 
-        if (message.getUserInfo().id.equals(ServerConnector.getUser().id)) {
+        if (message.sender.equals(ServerConnector.getUser().id)) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;
         } else {
@@ -179,8 +53,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        System.out.println("Inside onCreateViewHolder");
-//        System.out.println(parent.getContext());
         View view;
 
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
@@ -199,7 +71,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        UserMessage message = new UserMessage(mMessageList.get(position));
+        MessageEntry message = messaging.getEntry(position);
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_SENT:
@@ -227,20 +99,21 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         SentMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
+            messageText = itemView.findViewById(R.id.text_gchat_message_me);
+            timeText = itemView.findViewById(R.id.text_gchat_timestamp_me);
+            nameText = itemView.findViewById(R.id.text_gchat_user_me);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        void bind(UserMessage message) {
+        void bind(MessageEntry message) {
 //            System.out.println("Inside BIND SENT MESSAGE");
 //            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
 //            LocalDateTime now = LocalDateTime.now();
-            messageText.setText(message.getMessage());
+            messageText.setText(message.contents);
             //timeText.setText(dtf.format(now));
-            timeText.setText(format(message.getTime2()));
-            nameText.setText(ServerConnector.getUser().name);
+            timeText.setText(format(message.timestamp));
+            UserStorage.lookup(message.sender, user -> {
+                nameText.setText(user.getName());
+            });
 //            messageText.setOnCreateContextMenuListener(this);
         }
 
@@ -274,19 +147,20 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         ReceivedMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
-            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
+            messageText = itemView.findViewById(R.id.text_gchat_message_other);
+            timeText = itemView.findViewById(R.id.text_gchat_timestamp_other);
+            nameText = itemView.findViewById(R.id.text_gchat_user_other);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        void bind(UserMessage message) {
+        void bind(MessageEntry message) {
  //           System.out.println("Inside BIND RECEIVED MESSAGE");
 //            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-            messageText.setText(message.getMessage());
+            messageText.setText(message.contents);
 //            timeText.setText(dtf.format(message.getTime()));
-            timeText.setText(format(message.getTime2()));
-            nameText.setText(message.getSender().getName());
+            timeText.setText(format(message.timestamp));
+            UserStorage.lookup(message.sender, user -> {
+                nameText.setText(user.getName());
+            });
         }
 
 //        @Override
