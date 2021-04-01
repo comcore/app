@@ -26,7 +26,6 @@ public class DummyButton extends CustomChat {
 
     public DummyButton(String name, Group group) {
         super(name, group, "dummy");
-        sendMessage("0");
     }
 
     @Override
@@ -58,5 +57,10 @@ public class DummyButton extends CustomChat {
         }
         sendMessage("0");
         return 0;
+    }
+
+    @Override
+    public void afterCreate() {
+        sendMessage("0");
     }
 }

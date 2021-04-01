@@ -100,17 +100,11 @@ public class GroupStorage {
                     group.setGroupRole(info.role);
                     group.setMuted(info.muted);
 
-                    // Refresh the group's users
-                    group.refreshUsers(alreadyRefreshed, () -> {
-                        // Store the updated group data
-                        try {
-                            storeGroupData(group);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    // Refresh the group's users (and store the group data)
+                    group.refreshUsers(alreadyRefreshed, null);
 
-                    // TODO refresh modules
+                    // Refresh the group's modules (and store the module data)
+                    group.refreshModules(null);
                 }
 
                 // Run the callback after setting all of the info

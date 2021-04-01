@@ -37,11 +37,7 @@ import java.util.ArrayList;
  */
 
 public class ChatFragment5 extends Fragment {
-    public static ChatID chatID;
-    public static Group currentGroup;
-    private Messaging messaging;
-    private ArrayList<MessageEntry> messageList = new ArrayList<>(0 );
-    private MessageEntry[] messageEntries;
+    public static Messaging messaging;
     private MessageID messageID;
 
     private Button sendButton;
@@ -91,37 +87,55 @@ public class ChatFragment5 extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//        if (messaging == null) {
+//            messaging = new Messaging(currentGroup.getName(), chatID, currentGroup);
+//
+//            //    System.out.println(currentGroup.getGroupId().id);
+//            //     System.out.println(chatID);
+////            for (int i = 0; i < messaging.getEntries().size(); i++) {
+////                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+////            }
+//
+//            messaging.refresh();
+//            try {
+//                messaging.fromCache();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+////            for (int i = 0; i < messaging.getEntries().size(); i++) {
+////                System.out.println("2. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+////            }
+////            System.out.println("Made a new one");
+//        }
+//
+//        try {
+//            messaging.refresh();
+////            messageList.clear();
+////            messageList = messaging.getEntries();
+//        } catch (Exception e) {
+//            System.out.println("DNE");
+//        }
+//        messaging.refresh();
+//
+//        initialize(view);
+//
+//        //       System.out.println("JUST FINISHED INITIALIZING");
+//
+//        LinearLayoutManager manager = new LinearLayoutManager(getContext());
+//        manager.setStackFromEnd(true);
+//        mMessageRecycler.setLayoutManager(manager);
+//        //mMessageRecycler.setHasFixedSize(true);
+////        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
+//        mMessageAdapter = new MessageListAdapter(getContext(), messaging);
+//        mMessageRecycler.setAdapter(mMessageAdapter);
+//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
         super.onViewCreated(view, savedInstanceState);
 
-        if (messaging == null) {
-            messaging = new Messaging(currentGroup.getName(), chatID, currentGroup);
-
-            //    System.out.println(currentGroup.getGroupId().id);
-            //     System.out.println(chatID);
-//            for (int i = 0; i < messaging.getEntries().size(); i++) {
-//                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//            }
-
-            messaging.refresh();
-            try {
-                messaging.fromCache();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-//            for (int i = 0; i < messaging.getEntries().size(); i++) {
-//                System.out.println("2. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//            }
-//            System.out.println("Made a new one");
-        }
-
-        try {
-            messaging.refresh();
-//            messageList.clear();
-//            messageList = messaging.getEntries();
-        } catch (Exception e) {
-            System.out.println("DNE");
-        }
+        messaging.refresh();
 
         initialize(view);
 
@@ -135,6 +149,7 @@ public class ChatFragment5 extends Fragment {
         mMessageAdapter = new MessageListAdapter(getContext(), messaging);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
 
 //        messaging.refresh();
 //        messageList = messaging.getEntries();
@@ -213,6 +228,7 @@ public class ChatFragment5 extends Fragment {
 
             System.out.println(messageToBeSent.getText().toString());
 
+        ChatID chatID = (ChatID) messaging.getId();
         ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
                 //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
@@ -270,7 +286,7 @@ public class ChatFragment5 extends Fragment {
 
         private void deleteMessage(MenuItem item) {
         int x = messaging.getEntries().size() - item.getGroupId();
-        messageID = messaging.getEntries().get(x).id;
+        MessageID messageID = messaging.getEntries().get(x).id;
         messaging.deleteMessage(messageID);
 
 
@@ -284,7 +300,7 @@ public class ChatFragment5 extends Fragment {
     private void editMessage(MenuItem item) {
 //        System.out.println("Group id: " + item.getGroupId());
 //        System.out.println("Size: " + messaging.getEntries().size());
-        messageID = messaging.getEntries().get(item.getGroupId()).id;
+        MessageID messageID = messaging.getEntries().get(item.getGroupId()).id;
  //       System.out.println("MessageID w/ item: " + messageID);
  //       int x = messaging.getEntries().size() - item.getGroupId() - 1;
  //       System.out.println("x: " + x);

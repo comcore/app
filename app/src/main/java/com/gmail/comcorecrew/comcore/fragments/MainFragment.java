@@ -62,7 +62,7 @@ public class MainFragment extends Fragment {
     }
 
     public void refresh() {
-        groupAdapter.refresh();
+        GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -157,17 +157,6 @@ public class MainFragment extends Fragment {
                 action.setGroupID(currentGroup.getGroupId());
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
             }
-        }
-
-        /**
-         * Initialize the dataset of the Adapter.
-         */
-        public CustomAdapter() {
-            refresh();
-        }
-
-        private void refresh() {
-            GroupStorage.refresh(this::notifyDataSetChanged);
         }
 
         // Create new views (invoked by the layout manager)

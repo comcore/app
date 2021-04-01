@@ -43,7 +43,7 @@ public class UserStorage {
      * already in the UserStorage. If it succeeds, the callback will be called with the retrieved
      * information about the user.
      *
-     * @param id       the ID of the group
+     * @param id       the ID of the user
      * @param callback what to do with the result
      */
     public static void lookup(UserID id, LookupCallback<User> callback) {
@@ -76,8 +76,8 @@ public class UserStorage {
     /**
      * Refresh a list of UserIDs, calling the provided Runnable on completion.
      *
-     * @param userIds  the UserIDs to refresh (or null)
-     * @param callback the callback to run
+     * @param userIds  the UserIDs to refresh
+     * @param callback the callback to run (or null)
      */
     public static void refresh(List<UserID> userIds, Runnable callback) {
         // Finish immediately if no users are being refreshed

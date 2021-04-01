@@ -148,6 +148,11 @@ public class Messaging extends Module {
     }
 
     @Override
+    public void clearCache() {
+        messages.clear();
+    }
+
+    @Override
     public void onReceiveMessage(MessageEntry message) {
         MessageID lastMessageId = latestMessageId();
         if (!message.id.immediatelyAfter(lastMessageId)) {
@@ -157,24 +162,22 @@ public class Messaging extends Module {
         this.toCache();
     }
 
-    public void deleteMessage(MessageID messageID) {
-        for (int i = 0; i < messages.size(); i++) {
-            if (messageID.id == messages.get(i).getId()) {
-                messages.remove(i);
-                break;
-            }
+    @Override
+    public void onMessageUpdated(MessageEntry message) {
+        if (messages.isEmpty()) {
+            return;
         }
-        this.toCache();
-    }
 
-    public void editMessage(MessageID messageID, String newMsg) {
-        for (int i = 0; i < messages.size(); i++) {
-            if (messageID.id == messages.get(i).getId()) {
-                messages.get(i).setData(newMsg);
-                break;
+        long id = message.id.id;
+        long index = id - messages.get(0).getMessageid();
+        if (index >= 0 && index < messages.size()) {
+            MsgCacheable msg = messages.get((int) index);
+            if (msg.getMessageid() == id) {
+                msg.setTimestamp(message.timestamp);
+                msg.setData(message.contents);
+                this.toCache();
             }
         }
-        this.toCache();
     }
 
     public void createPinnedMessages(String name) {
