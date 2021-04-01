@@ -148,6 +148,11 @@ public class Messaging extends Module {
     }
 
     @Override
+    public void clearCache() {
+        messages.clear();
+    }
+
+    @Override
     public void onReceiveMessage(MessageEntry message) {
         MessageID lastMessageId = latestMessageId();
         if (!message.id.immediatelyAfter(lastMessageId)) {

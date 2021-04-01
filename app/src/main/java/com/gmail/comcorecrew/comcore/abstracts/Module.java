@@ -159,8 +159,16 @@ public abstract class Module implements Serializable, NotificationListener {
         return mentionMuted;
     }
 
-    public void markUpdated() {
-        lastUpdated = 0; //TODO implement
+    /**
+     * Set the last updated timestamp, clearing the cache if it is newer than the stored timestamp
+     *
+     * @param cacheClearTimestamp the timestamp that the cache was cleared at
+     */
+    public void setLastUpdated(long cacheClearTimestamp) {
+        if (cacheClearTimestamp > lastUpdated) {
+            lastUpdated = cacheClearTimestamp;
+            clearCache();
+        }
     }
 
     public long getLastUpdated() {
@@ -223,4 +231,6 @@ public abstract class Module implements Serializable, NotificationListener {
     protected abstract void readFromCache();
 
     public abstract void refresh();
+
+    public abstract void clearCache();
 }

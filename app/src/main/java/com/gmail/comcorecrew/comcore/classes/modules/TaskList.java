@@ -198,4 +198,9 @@ public class TaskList extends Module {
             toCache();
         });
     }
+
+    @Override
+    public void clearCache() {
+        tasks.clear();
+    }
 }

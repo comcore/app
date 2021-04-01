@@ -31,6 +31,7 @@ import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
@@ -43,7 +44,6 @@ import java.util.Arrays;
 public class GroupFragment extends Fragment {
 
     private Group currentGroup;
-    private GroupID currentGroupID;
     public static ArrayList<Module> modules =  new ArrayList<>();
 
     private CustomAdapter moduleAdapter;
@@ -61,8 +61,8 @@ public class GroupFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
-        currentGroup = GroupStorage.getGroup(currentGroupID);
+        GroupID id = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
+        currentGroup = GroupStorage.getGroup(id);
     }
 
     @Override
@@ -98,30 +98,6 @@ public class GroupFragment extends Fragment {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
-
-        view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
-            ServerConnector.getModules(currentGroupID, result -> {
-                if (result.isFailure() || result.data.length == 0) {
-                    System.out.println(result.data.length);
-                    System.out.println(currentGroupID);
-                    return;
-                }
-
-                ModuleID id = result.data[0].id;
-                if (id instanceof ChatID) {
-                    /* Sends chatID and the current group to the chatFragment frame*/
-                    ChatFragment5.chatID = (ChatID) id;
-                    ChatFragment5.currentGroup = currentGroup;
-//                    Intent i = new Intent(getActivity(), MessageListActivity.class);
-//                    startActivity(i);
-//                    ((Activity) getActivity()).overridePendingTransition(0, 0);
-
-                    NavHostFragment.findNavController(this)
-                            .navigate(R.id.action_groupFragment_to_chatFragment5);
-                }
-            });
-        });
-
     }
 
     public void refresh() {
@@ -207,7 +183,7 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.invite_member:
                 /** Handle inviting a new member **/
-                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroupID, R.string.invite_member);
+                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
                 addMemberDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
@@ -246,8 +222,9 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.settingsFragment:
                 /** Handle passing the current GroupID to the settings page */
-                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action = GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroupID);
-                action.setGroupId(currentGroupID);
+                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action =
+                        GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroup.getGroupId());
+                action.setGroupId(currentGroup.getGroupId());
                 NavHostFragment.findNavController(GroupFragment.this).navigate(action);
                 return true;
             default:
@@ -287,11 +264,11 @@ public class GroupFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                /** If the module is a task list, navigate to the TaskListFragment and pass the
-                 * ModuleId.
-                 */
-                if (currentModule instanceof TaskList) {
-
+                if (currentModule instanceof Messaging) {
+                    ChatFragment5.messaging = (Messaging) currentModule;
+                    NavHostFragment.findNavController(GroupFragment.this)
+                            .navigate(R.id.action_groupFragment_to_chatFragment5);
+                } else if (currentModule instanceof TaskList) {
                     GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment((TaskList) currentModule);
                     action.setTaskList((TaskList) currentModule);
                     NavHostFragment.findNavController(GroupFragment.this).navigate(action);
@@ -309,7 +286,7 @@ public class GroupFragment extends Fragment {
                 return;
             }
 
-            ServerConnector.getModules(currentGroupID, result -> {
+            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
                             .show(getParentFragmentManager(), null);

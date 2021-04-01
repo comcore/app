@@ -104,6 +104,11 @@ public abstract class CustomChat extends CustomModule {
     }
 
     @Override
+    public void clearCache() {
+        getItems().clear();
+    }
+
+    @Override
     public void onReceiveMessage(MessageEntry message) {
         addMessage(message);
         if (getView() != null) {

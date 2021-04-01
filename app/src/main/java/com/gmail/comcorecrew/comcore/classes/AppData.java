@@ -51,6 +51,7 @@ public class AppData {
         else {
             groups = new ArrayList<>();
         }
+        GroupStorage.refresh(null);
     }
 
     /**
