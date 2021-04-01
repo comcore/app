@@ -18,6 +18,8 @@ import com.gmail.comcorecrew.comcore.dialogs.InvalidPasswordDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
+import java.io.IOException;
+
 public class LoginFragment extends Fragment {
 
     public LoginFragment() {

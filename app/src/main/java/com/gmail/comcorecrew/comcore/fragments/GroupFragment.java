@@ -34,6 +34,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.info.GroupInfo;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 public class GroupFragment extends Fragment {
 
     private Group currentGroup;
+    private GroupID currentGroupID;
     public static ArrayList<Module> modules =  new ArrayList<>();
 
     private CustomAdapter moduleAdapter;
@@ -67,15 +69,17 @@ public class GroupFragment extends Fragment {
          * the Group associated with it.
          *
          * For this to work, AppData.init() must be run first.
-         */
+         *
+         * TODO
+         * Lookup currently returns null because AppData.init() has not been run.
+         *
 
-        /**GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
+        GroupStorage.lookup(GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), callback -> {
             currentGroup = callback;
-        });*/
+        });
+        */
 
-        /** TODO Testing only **/
-        currentGroup = new Group("Test Group", GroupFragmentArgs.fromBundle(getArguments()).getGroupID(), GroupRole.OWNER, false);
-
+        currentGroupID = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
     }
 
     @Override
@@ -100,7 +104,9 @@ public class GroupFragment extends Fragment {
 
         /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
-        welcomeText.setText(currentGroup.getName());
+        if (currentGroup != null) {
+            welcomeText.setText(currentGroup.getName());
+        }
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -111,10 +117,10 @@ public class GroupFragment extends Fragment {
         });
 
         view.findViewById(R.id.open_chat_button).setOnClickListener(clickedView -> {
-            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+            ServerConnector.getModules(currentGroupID, result -> {
                 if (result.isFailure() || result.data.length == 0) {
                     System.out.println(result.data.length);
-                    System.out.println(currentGroup.getGroupId());
+                    System.out.println(currentGroupID);
                     return;
                 }
 
@@ -149,6 +155,14 @@ public class GroupFragment extends Fragment {
          * If the current user is an owner, display R.id.menu_group_owner_actions
          * and R.id.menu_group_moderator_actions
          */
+
+        /**  TODO
+         * If currentGroup is null, then there has been an error finding the group associated
+         * with the GroupID passed to this function
+         */
+        if (currentGroup == null) {
+            return;
+        }
         if (currentGroup.getGroupRole() == GroupRole.OWNER) {
             menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
             menu.setGroupVisible(R.id.menu_group_owner_actions, true);
@@ -195,7 +209,7 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.invite_member:
                 /** Handle inviting a new member **/
-                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
+                AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroupID, R.string.invite_member);
                 addMemberDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
@@ -234,8 +248,8 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.settingsFragment:
                 /** Handle passing the current GroupID to the settings page */
-                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action = GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroup.getGroupId());
-                action.setGroupId(currentGroup.getGroupId());
+                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action = GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroupID);
+                action.setGroupId(currentGroupID);
                 NavHostFragment.findNavController(GroupFragment.this).navigate(action);
                 return true;
             default:
@@ -293,7 +307,7 @@ public class GroupFragment extends Fragment {
 
         private void refresh() {
 
-            ServerConnector.getModules(currentGroup.getGroupId(), result -> {
+            ServerConnector.getModules(currentGroupID, result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
                             .show(getParentFragmentManager(), null);
@@ -320,7 +334,6 @@ public class GroupFragment extends Fragment {
                     }
                 }
                 modules = userModules;
-                currentGroup.setModules(userModules);
                 notifyDataSetChanged();
             });
 
