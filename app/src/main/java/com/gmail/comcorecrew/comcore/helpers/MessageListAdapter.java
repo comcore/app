@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.helpers;
 
 import android.content.Context;
 import android.os.Build;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,27 +83,28 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-//    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+        TextView messageText, timeText, nameText, dateText;
+
+        SentMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
+            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
+            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
+            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
+        }
+
+//    private class SentMessageHolder extends RecyclerView.ViewHolder {
 //        TextView messageText, timeText, nameText;
 //
 //        SentMessageHolder(View itemView) {
 //            super(itemView);
 //
-//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
-//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
+//            messageText = itemView.findViewById(R.id.text_gchat_message_me);
+//            timeText = itemView.findViewById(R.id.text_gchat_timestamp_me);
+//            nameText = itemView.findViewById(R.id.text_gchat_user_me);
 //        }
-
-    private class SentMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText, nameText;
-
-        SentMessageHolder(View itemView) {
-            super(itemView);
-
-            messageText = itemView.findViewById(R.id.text_gchat_message_me);
-            timeText = itemView.findViewById(R.id.text_gchat_timestamp_me);
-            nameText = itemView.findViewById(R.id.text_gchat_user_me);
-        }
 
         void bind(MessageEntry message) {
 //            System.out.println("Inside BIND SENT MESSAGE");
@@ -111,46 +113,54 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             messageText.setText(message.contents);
             //timeText.setText(dtf.format(now));
             timeText.setText(format(message.timestamp));
+            dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
                 nameText.setText(user.getName());
             });
-//            messageText.setOnCreateContextMenuListener(this);
+            messageText.setOnCreateContextMenuListener(this);
         }
 
-//        @Override
-//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-//            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-//            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
-//        }
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+        }
     }
 
-    public static String format(long mnSeconds) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return sdf.format(new Date(mnSeconds));
+    public static String format(long miliseconds) {
+        //  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        return sdf.format(new Date(miliseconds));
     }
 
-//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    public static String format2(long miliseconds) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+        return sdf.format(new Date(miliseconds));
+    }
+
+    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+        TextView messageText, timeText, nameText, dateText;
+
+        ReceivedMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
+            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
+            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
+            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
+        }
+
+//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
 //        TextView messageText, timeText, nameText;
 //
 //        ReceivedMessageHolder(View itemView) {
 //            super(itemView);
 //
-//            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
-//            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
-//            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
+//            messageText = itemView.findViewById(R.id.text_gchat_message_other);
+//            timeText = itemView.findViewById(R.id.text_gchat_timestamp_other);
+//            nameText = itemView.findViewById(R.id.text_gchat_user_other);
 //        }
-
-    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText, nameText;
-
-        ReceivedMessageHolder(View itemView) {
-            super(itemView);
-
-            messageText = itemView.findViewById(R.id.text_gchat_message_other);
-            timeText = itemView.findViewById(R.id.text_gchat_timestamp_other);
-            nameText = itemView.findViewById(R.id.text_gchat_user_other);
-        }
 
         void bind(MessageEntry message) {
  //           System.out.println("Inside BIND RECEIVED MESSAGE");
@@ -158,16 +168,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             messageText.setText(message.contents);
 //            timeText.setText(dtf.format(message.getTime()));
             timeText.setText(format(message.timestamp));
+            dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
                 nameText.setText(user.getName());
             });
+            messageText.setOnCreateContextMenuListener(this);
         }
 
-//        @Override
-//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-//            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-//            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
-//        }
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+        }
     }
 }
