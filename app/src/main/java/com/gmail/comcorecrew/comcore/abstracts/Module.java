@@ -1,11 +1,13 @@
 package com.gmail.comcorecrew.comcore.abstracts;
 
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -96,6 +98,11 @@ public abstract class Module implements Serializable, NotificationListener {
             muted = false;
             mentionMuted = false;
             mnum = group.addModule(this);
+            try {
+                GroupStorage.StoreModule(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 

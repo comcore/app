@@ -89,7 +89,7 @@ public class MsgCacheable implements Cacheable {
         cache[8] = (char) (timestamp >> 16);
         cache[9] = (char) timestamp;
         for (int i = 0; i < data.length(); i++) {
-            cache[6 + i] = data.charAt(i);
+            cache[10 + i] = data.charAt(i);
         }
 
         return cache;

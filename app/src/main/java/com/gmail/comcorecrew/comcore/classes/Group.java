@@ -53,7 +53,7 @@ public class Group implements NotificationListener {
         /** Commenting out this line so that the app will run **/
         //owner = UserStorage.getUser(0).getID();
 
-        File cacheDir = new File(AppData.cacheDir, "gr" + this.groupID);
+        File cacheDir = new File(AppData.cacheDir, this.groupID.id);
         cacheDir.mkdir();
     }
 
@@ -135,8 +135,8 @@ public class Group implements NotificationListener {
         int num = 0;
         Mdid mdid = module.getMdid();
         for(Module m : modules) {
-            if (m.getMdid() == mdid) {
-                num++;
+            if ((m.getMdid() == mdid) && (m.getMnum() >= num)) {
+                num = m.getMnum() + 1;
             }
         }
         modules.add(module);
