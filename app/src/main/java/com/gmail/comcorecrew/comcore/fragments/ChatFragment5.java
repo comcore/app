@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -141,9 +143,9 @@ public class ChatFragment5 extends Fragment {
 
 //        manager.setStackFromEnd(true);
 
-//        for (int i = 0; i < messageList.size(); i++) {
-//            System.out.println("3. Message # " + i + ": " + messageList.get(i).contents);
-//        }
+        for (int i = 0; i < messageList.size(); i++) {
+            System.out.println("3. Message # " + i + ": " + messageList.get(i).contents);
+        }
 
 //        System.out.println("AFTER THE RECYCLER SHIT");
 
@@ -151,44 +153,43 @@ public class ChatFragment5 extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                //       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
-//                if (!isEditMode) {
-//                    sendMessage(v, null);
-//                } else {
-//                    sendMessage(v, messageID);
-//                }
-                sendMessage();
+                       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
+                if (!isEditMode) {
+                    sendMessage();
+                } else {
+                    sendMessage(v, messageID);
+                }
             }
         });
     }
 
-//    @Override
-//    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-////        MenuInflater menuInflater = getContext().getMenuInflater();
-////        menuInflater.inflate(R.menu.chat_message_menu, menu);
-////        menu.setHeaderTitle("Menu");
-////        menu.add(0, v.getId(), 0, "Update");
-////        menu.add(0, v.getId(), 0, "Edit");
-//    }
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+//        MenuInflater menuInflater = getContext().getMenuInflater();
+//        menuInflater.inflate(R.menu.chat_message_menu, menu);
+//        menu.setHeaderTitle("Menu");
+//        menu.add(0, v.getId(), 0, "Update");
+//        menu.add(0, v.getId(), 0, "Edit");
+    }
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//
-//        switch (item.getItemId()) {
-//            case 121:
-//                deleteMessage(item);
-//                return true;
-//            case 122:
-//                editMessage(item);
-//                return true;
-//            case 123:
-//                pinMessage(item);
-//                return true;
-//            default:
-//                return true;
-//        }
-//    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case 121:
+                deleteMessage(item);
+                return true;
+            case 122:
+                editMessage(item);
+                return true;
+            case 123:
+                pinMessage(item);
+                return true;
+            default:
+                return true;
+        }
+    }
 
     public void initialize(View view) {
 //        System.out.println("INSIDE INITIALIZE");
@@ -227,16 +228,8 @@ public class ChatFragment5 extends Fragment {
 
             messaging.onReceiveMessage(result.data);
 
-
-//            boolean x = messaging.addMessage(result.data);
-//
-//            if (x) {
-//                //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
-//            }
-
             //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
 
-           // messaging.refreshMessages();
 
             System.out.println("After refreshMessages(): " + messaging.getEntries().size());
 
@@ -254,106 +247,64 @@ public class ChatFragment5 extends Fragment {
             // messageToBeSent.setHint("Enter Message");
         });
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void sendMessage(View v, MessageID messageId) {
+        System.out.println("editing");
+        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
+            return;
+        }
+
+      //  System.out.println("Inside sendMessage");
+            messaging.editMessage(messageId, messageToBeSent.getText().toString());
+        System.out.println("MessageID2: " + messageId);
+
+
+        mMessageAdapter.notifyDataSetChanged();
+            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
+            messageToBeSent.getText().clear();
+
+            isEditMode = false;
+        }
+
+        private void deleteMessage(MenuItem item) {
+        int x = messageList.size() - item.getGroupId();
+        messageID = messageList.get(x).id;
+        messaging.deleteMessage(messageID);
+
+
+        mMessageAdapter.notifyDataSetChanged();
+        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
+        messageToBeSent.getText().clear();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void editMessage(MenuItem item) {
+//        System.out.println("Group id: " + item.getGroupId());
+//        System.out.println("Size: " + messageList.size());
+        messageID = messageList.get(item.getGroupId()).id;
+//        System.out.println("MessageID w/ item: " + messageID);
+        int x = messageList.size() - item.getGroupId() - 1;
+//        System.out.println("x: " + x);
+        messageID = messageList.get(x).id;
+        messageToBeSent.setText(messageList.get(x).contents);
+//        for (int i = 0; i < messageList.size(); i++) {
+//            System.out.println("Index " + i + ": " + messageList.get(i).id + " " + messageList.get(i).contents);
+//        }
+        System.out.println("MessageID: " + messageID);
+        isEditMode = true;
+    }
+
+    private void pinMessage(MenuItem item) {
+//        item.getGroupId();
+//        MessageID messageID = messageList.get(item.getGroupId()).id;
+//        messaging.createPinnedMessages();
+//
+//        mMessageAdapter.notifyDataSetChanged();
+//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//
+//        messageToBeSent.getText().clear();
+    }
 }
-
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    public void sendMessage(View v, MessageID messageId) {
-//        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
-//            return;
-//        }
-//
-//      //  System.out.println("Inside sendMessage");
-//        if (!isEditMode) {
-//       //     System.out.println("Going to send that message");
-//            for (int i = 0; i < messaging.getEntries().size(); i++) {
-//         //       System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//            }
-//
-//        //    System.out.println(messageToBeSent.getText().toString());
-//
-//            ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
-//                if (result.isFailure()) {
-//          //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
-//                    new StringErrorDialog(result.errorMessage)
-//                            .show(getParentFragmentManager(), null);
-//                }
-//
-//                for (int i = 0; i < messaging.getEntries().size(); i++) {
-//            //        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//                }
-//
-//            //    System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
-//
-//                boolean x = this.messaging.addMessage(result.data);
-//
-//                if (x) {
-//             //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
-//                }
-//
-//             //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
-//
-//                messaging.refreshMessages();
-//
-//           //     System.out.println("After refreshMessages(): " + this.messaging.getEntries().size());
-//
-//                mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-//                mMessageRecycler.setAdapter(mMessageAdapter);
-//                mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-//
-//                messageToBeSent.getText().clear();
-//                // messageToBeSent.setHint("Enter Message");
-//
-//            });
-//        } else {
-//            this.messaging.editMessage(messageId, messageToBeSent.getText().toString());
-//
-//            messaging.refreshMessages();
-//
-//
-//            mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-//            mMessageRecycler.setAdapter(mMessageAdapter);
-//            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-//
-//            messageToBeSent.getText().clear();
-//
-//            isEditMode = false;
-//        }
-//    }
-
-//    private void deleteMessage(MenuItem item) {
-//        item.getGroupId();
-//        MessageID messageID = messageList.get(item.getGroupId()).id;
-//        messaging.deleteMessage(messageID);
-//
-//
-//        messaging.refreshMessages();
-//        messageList.clear();
-//        messageList = messaging.getEntries();
-//
-//        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-//        mMessageRecycler.setAdapter(mMessageAdapter);
-//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-//    }
-//
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    private void editMessage(MenuItem item) {
-//        item.getGroupId();
-//        messageID = messageList.get(item.getGroupId()).id;
-//        messageToBeSent.setText(messageList.get(item.getGroupId()).contents);
-//        isEditMode = true;
-//    }
-//
-//    private void pinMessage(MenuItem item) {
-//        item.getGroupId();
-//        MessageID messageID = messageList.get(item.getGroupId()).id;
-//        messaging.pinMessage(messageID);
-//
-//        messaging.refreshMessages();
-//        messageList.clear();
-//        messageList = messaging.getEntries();
-//
-//        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
-//        mMessageRecycler.setAdapter(mMessageAdapter);
-//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-//    }
-//}
