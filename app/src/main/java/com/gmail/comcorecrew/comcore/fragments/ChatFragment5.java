@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
@@ -27,8 +26,6 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -175,39 +172,23 @@ public class ChatFragment5 extends Fragment {
         if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
             return;
         }
-
-        //  System.out.println("Inside sendMessage");
              System.out.println("Going to send that message");
-//        for (int i = 0; i < messaging.getEntries().size(); i++) {
-//                   System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//        }
 
             System.out.println(messageToBeSent.getText().toString());
 
         ChatID chatID = (ChatID) messaging.getId();
         ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
-                //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
                 new StringErrorDialog(result.errorMessage)
                         .show(getParentFragmentManager(), null);
             }
-//
-//            for (int i = 0; i < messaging.getEntries().size(); i++) {
-//                        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//            }
 
                 System.out.println("Before addMessage(): " + messaging.getEntries().size());
 
             messaging.onReceiveMessage(result.data);
 
-            //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
-
 
             System.out.println("After refreshMessages(): " + messaging.getEntries().size());
-//
-//            for (int i = 0; i < messaging.getEntries().size(); i++) {
-//                System.out.println("33. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-//            }
 
             mMessageAdapter.notifyDataSetChanged();
             mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
@@ -218,18 +199,19 @@ public class ChatFragment5 extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendMessage(MessageEntry messageEntry1) {
-        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
-            return;
-        }
+        System.out.println("Starting her up");
         if (isEditMode) {
+
+            if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
+                return;
+            }
+
             System.out.println("editing");
-            //System.out.println(messageToBeSent.getText().toString());
-            //  System.out.println("Inside sendMessage");
-            MessageEntry messageEntry2 = new MessageEntry(messageEntry1.id, messageEntry1.sender, messageEntry1.timestamp, messageToBeSent.getText().toString());
 
             ServerConnector.updateMessage(messageEntry1.id, messageToBeSent.getText().toString(), result -> {
                 if (result.isFailure()) {
-                    System.out.println(result.errorMessage);
+                    new StringErrorDialog(result.errorMessage)
+                            .show(getParentFragmentManager(), null);
                 } else {
                     messaging.onMessageUpdated(result.data);
 
@@ -243,42 +225,40 @@ public class ChatFragment5 extends Fragment {
             isEditMode = false;
         } else {
             //  System.out.println("Inside sendMessage");
-            messaging.onMessageUpdated(messageEntry1);
-            mMessageAdapter.notifyDataSetChanged();
-            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+            System.out.println("In it now");
 
-            messageToBeSent.getText().clear();
-            isDeleteMode = false;
+            ServerConnector.updateMessage(messageEntry1.id, null, result -> {
+                if (result.isFailure()) {
+                    new StringErrorDialog(result.errorMessage)
+                            .show(getParentFragmentManager(), null);
+                } else {
+                    System.out.println("We in it boys");
+                    messaging.onMessageUpdated(result.data);
+
+                    mMessageAdapter.notifyDataSetChanged();
+                    mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
+                    messageToBeSent.getText().clear();
+                    isDeleteMode = false;
+                }
+            });
         }
     }
 
-        private void deleteMessage (MenuItem item){
-            messageEntry = messaging.getEntry(item.getGroupId());
-
-            isDeleteMode = true;
-
-            mMessageAdapter.notifyDataSetChanged();
-            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
-            messageToBeSent.getText().clear();
-        }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void editMessage(MenuItem item) {
+    private void deleteMessage (MenuItem item){
         messageEntry = messaging.getEntry(item.getGroupId());
-//        System.out.println("Group id: " + item.getGroupId());
-//        System.out.println("Size: " + messaging.getEntries().size());
- //       System.out.println("MessageID w/ item: " + messageID);
- //       int x = messaging.getEntries().size() - item.getGroupId() - 1;
- //       System.out.println("x: " + x);
- //       messageID = messaging.getEntries().get(x).id;
-        messageToBeSent.setText(messaging.getEntries().get(item.getGroupId()).contents);
+        isDeleteMode = true;
+        sendMessage(messageEntry);
+    }
 
-//        for (int i = 0; i < messageList.size(); i++) {
-//            System.out.println("Index " + i + ": " + messageList.get(i).id + " " + messageList.get(i).contents);
-//        }
+    private void editMessage(MenuItem item) {
+
+        messageEntry = messaging.getEntry(item.getGroupId());
+        messageToBeSent.setText(messaging.getEntries().get(item.getGroupId()).contents);
         System.out.println("MessageID: " + messageID);
         isEditMode = true;
+
     }
 
     private void pinMessage(MenuItem item) {
