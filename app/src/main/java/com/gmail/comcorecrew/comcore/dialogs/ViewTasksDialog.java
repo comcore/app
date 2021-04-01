@@ -22,6 +22,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.fragments.TaskListFragment;
@@ -33,20 +34,17 @@ import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import java.util.ArrayList;
 
 public class ViewTasksDialog extends DialogFragment {
-    private RecyclerView recycleView;
-    private CustomAdapter adapter;
-    private ArrayList<TaskItem> taskList;
-    private TaskListID currentTaskList;
+
+    private TaskList currentTaskList;
 
     /** 0 - Delete Task
      * 1 - Update Task
      */
     private int flag;
 
-    public ViewTasksDialog (ArrayList<TaskItem> taskList, TaskListID currentTaskList, int flag) {
-        this.taskList = taskList;
-        this.flag = flag;
+    public ViewTasksDialog (TaskList currentTaskList, int flag) {
         this.currentTaskList = currentTaskList;
+        this.flag = flag;
     }
 
     @Override
@@ -55,9 +53,9 @@ public class ViewTasksDialog extends DialogFragment {
         View rootView = inflater.inflate(R.layout.view_tasks, container, false);
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.tasklist_recycler);
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_tasks_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new CustomAdapter(taskList, flag);
+        ViewTasksDialog.CustomAdapter adapter = new ViewTasksDialog.CustomAdapter();
         rvGroups.setAdapter(adapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
@@ -91,9 +89,6 @@ public class ViewTasksDialog extends DialogFragment {
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        private ArrayList<TaskItem> taskList;
-        private int flag;
-
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private TaskItem currentTask;
@@ -115,23 +110,26 @@ public class ViewTasksDialog extends DialogFragment {
 
             @Override
             public void onClick(View view) {
-
+                if (flag == 0) {
+                    currentTaskList.deleteTask(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                } else if (flag == 1) {
+                    currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                }
+                dismiss();
             }
         }
 
         /**
          * Initialize the dataset of the Adapter.
          */
-        public CustomAdapter(ArrayList<TaskItem> tasks, int flag) {
+        public CustomAdapter() {
 
-            this.taskList = tasks;
-            this.flag = flag;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.member_row_item, viewGroup, false);
+                    .inflate(R.layout.tasklist_row_item, viewGroup, false);
 
             return new ViewHolder(view);
         }
@@ -139,21 +137,22 @@ public class ViewTasksDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
+            TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
-            viewHolder.getTextView().setText(taskList.get(position).getData());
-            if (taskList.get(position).isCompleted()) {
+            dataText.setText(currentTaskList.getTasks().get(position).getData());
+            if (currentTaskList.getTasks().get(position).isCompleted()) {
                 completedText.setText(R.string.completed);
             }
             else {
                 completedText.setText(R.string.not_completed);
             }
-            viewHolder.setCurrentTask(taskList.get(position));
+            viewHolder.setCurrentTask(currentTaskList.getTasks().get(position));
 
         }
 
         @Override
         public int getItemCount() {
-            return taskList.size();
+            return currentTaskList.getTasks().size();
         }
     }
 
