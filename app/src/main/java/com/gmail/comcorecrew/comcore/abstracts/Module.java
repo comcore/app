@@ -25,6 +25,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private long lastUpdated; //Last time contents were updated
     private transient final Object cacheLock = new Object(); //Allows caching synchronization
     private transient int index; //index of the module
+    private transient Runnable onUpdate;
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
@@ -184,6 +185,14 @@ public abstract class Module implements Serializable, NotificationListener {
         return index;
     }
 
+    public void setCallback(Runnable onUpdate) {
+        this.onUpdate = onUpdate;
+    }
+
+    public void didUpdate() {
+        onUpdate.run();
+    }
+
     /**
      * Gets an integer array containing the address of the module
      *
@@ -205,6 +214,7 @@ public abstract class Module implements Serializable, NotificationListener {
      * Send the data of the module to the cache
      */
     public void toCache() {
+        didUpdate();
         synchronized (cacheLock) {
             readToCache();
         }
