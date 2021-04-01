@@ -84,11 +84,7 @@ public class GroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current group */
-        TextView welcomeText = (TextView) view.findViewById(R.id.label_group_fragment);
-        if (currentGroup != null) {
-            welcomeText.setText(currentGroup.getName());
-        }
+        refresh();
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -100,15 +96,14 @@ public class GroupFragment extends Fragment {
     }
 
     public void refresh() {
-        moduleAdapter.refresh();
-
+        currentGroup.refreshModules(moduleAdapter::notifyDataSetChanged);
 
         /** Refresh the welcome text if the currentGroup was originally null
          *
          * Once the currentGroup is retrieved from the cache instead
          * of through the server at the creation of GroupFragment, this will not be necessary
          */
-        TextView welcomeText = (TextView) this.getView().findViewById(R.id.label_group_fragment);
+        TextView welcomeText = this.getView().findViewById(R.id.label_group_fragment);
         if (currentGroup != null) {
             welcomeText.setText(currentGroup.getName());
         }
@@ -273,14 +268,6 @@ public class GroupFragment extends Fragment {
                     NavHostFragment.findNavController(GroupFragment.this).navigate(action);
                 }
             }
-        }
-
-        public CustomAdapter() {
-            refresh();
-        }
-
-        private void refresh() {
-            currentGroup.refreshModules(this::notifyDataSetChanged);
         }
 
         @Override
