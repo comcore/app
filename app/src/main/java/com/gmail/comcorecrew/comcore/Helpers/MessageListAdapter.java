@@ -29,7 +29,6 @@ import java.util.Date;
 public class MessageListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private ArrayList<MessageEntry> mMessageList = new ArrayList<MessageEntry>(3);
-    private ArrayList<MessageEntry> messageEntryArrayList = new ArrayList<MessageEntry>(3);
     private ArrayList<UserMessage> userMessageArraylist = new ArrayList<UserMessage>(3);
     public ChatID chatID;
     public Group group;
