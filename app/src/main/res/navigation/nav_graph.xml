@@ -84,5 +84,8 @@
         <argument
             android:name="task_list"
             app:argType="com.gmail.comcorecrew.comcore.classes.modules.TaskList" />
+        <action
+            android:id="@+id/action_taskListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 </navigation>

@@ -2,6 +2,9 @@ package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,12 +22,16 @@ import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
+import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
@@ -73,6 +80,11 @@ public class TaskListFragment extends Fragment {
         return rootView;
     }
 
+    public void refresh() {
+        tasklistAdapter.refresh();
+    }
+
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -87,6 +99,45 @@ public class TaskListFragment extends Fragment {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.taskmenu, menu);
+    }
+
+    /**
+     * Handles click events for the option menu
+     * Most menu items are not visible unless viewing GroupFragment
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Handle item selection
+        switch (item.getItemId()) {
+
+            case R.id.refresh_button:
+                /** Handle refresh **/
+                refresh();
+                return true;
+            case R.id.settingsFragment:
+                /** Handle moving to the settings page. The GroupID is passed to settings. */
+                TaskListFragmentDirections.ActionTaskListFragmentToSettingsFragment action = TaskListFragmentDirections.actionTaskListFragmentToSettingsFragment(currentTaskList.getGroup().getGroupId());
+                action.setGroupId(currentTaskList.getGroup().getGroupId());
+                NavHostFragment.findNavController(TaskListFragment.this).navigate(action);
+                return true;
+            case R.id.create_task:
+                /** Handle creating a new task **/
+                CreateTaskDialog addTaskDialog = new CreateTaskDialog((TaskListID) currentTaskList.getId());
+                addTaskDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.delete_task:
+                return true;
+            case R.id.update_task:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
@@ -161,7 +212,14 @@ public class TaskListFragment extends Fragment {
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
+            TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             viewHolder.getTextView().setText(tasks.get(position).getData());
+            if (tasks.get(position).isCompleted()) {
+                completedText.setText(R.string.completed);
+            }
+            else {
+                completedText.setText(R.string.not_completed);
+            }
             viewHolder.setTaskItem(tasks.get(position));
 
         }

@@ -105,10 +105,15 @@
     <string name="ch_desc_status">Notifications for changes to your status in a group.</string>
 
     <!-- Tasklist Default -->
+    <string name="create_task">Create Task</string>
     <string name="tl_list_name_default">Default Tasklist Name</string>
     <string name="tl_description_default">Default Task</string>
     <string name="title_create_task">Create A Task</string>
     <string name="label_create_task_description">Enter the task description</string>
+    <string name="not_completed">Not Completed</string>
+    <string name="completed">Completed!</string>
+    <string name="delete_task">Delete A Task</string>
+    <string name="update_task">Mark A Task As Completed</string>
 
     <!-- Create Module Dialog -->
     <string name="create_module">Create Module</string>
