@@ -50,7 +50,7 @@ public class ChatFragment5 extends Fragment {
     public static ChatID chatID;
     public static Group currentGroup;
     private Messaging messaging;
-    private ArrayList<MessageEntry> messageList = new ArrayList<MessageEntry>(3);
+    private ArrayList<MessageEntry> messageList = new ArrayList<>(0 );
     private MessageEntry[] messageEntries;
     private MessageID messageID;
 
@@ -103,7 +103,6 @@ public class ChatFragment5 extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         if (messaging == null) {
             messaging = new Messaging(currentGroup.getName(), chatID, currentGroup);
 
@@ -133,6 +132,7 @@ public class ChatFragment5 extends Fragment {
         } catch (Exception e) {
             System.out.println("DNE");
         }
+
         initialize(view);
 
         //       System.out.println("JUST FINISHED INITIALIZING");
