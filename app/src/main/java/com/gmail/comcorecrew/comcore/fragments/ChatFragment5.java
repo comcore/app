@@ -297,11 +297,11 @@ public class ChatFragment5 extends Fragment {
 
             //    System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
 
-                boolean x = this.messaging.addMessage(result.data);
+                this.messaging.onReceiveMessage(result.data);
 
-                if (x) {
+//                if (x) {
              //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
-                }
+//                }
 
              //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
 
