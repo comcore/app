@@ -32,12 +32,16 @@
         android:layout_marginStart="45dp"
         android:layout_marginTop="19dp"
         android:layout_marginEnd="45dp"
+        android:layout_marginBottom="80dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Name"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_name_label" />
+        app:layout_constraintTop_toBottomOf="@+id/create_task_name_label"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/create_task_name_label"

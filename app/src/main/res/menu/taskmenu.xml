@@ -13,12 +13,12 @@
         />
     <item
         android:id="@+id/delete_task"
-        android:title="@string/create_task"
+        android:title="@string/delete_task"
         app:showAsAction="never"
         />
     <item
         android:id="@+id/update_task"
-        android:title="@string/create_task"
+        android:title="@string/update_task"
         app:showAsAction="never"
         />
     <item
