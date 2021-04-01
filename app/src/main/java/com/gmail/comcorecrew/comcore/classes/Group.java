@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Group implements Parcelable, NotificationListener {
+public class Group implements NotificationListener {
 
     private GroupID groupID;
     private String groupName;
@@ -49,7 +49,8 @@ public class Group implements Parcelable, NotificationListener {
         modules = new ArrayList<>();
         users = new ArrayList<>();
         moderators = new ArrayList<>();
-        owner = UserStorage.getUser(0).getID();
+        /** Commenting out this line so that the app will run **/
+        //owner = UserStorage.getUser(0).getID();
 
         File cacheDir = new File(AppData.cacheDir, "gr" + this.groupID);
         cacheDir.mkdir();
@@ -60,18 +61,6 @@ public class Group implements Parcelable, NotificationListener {
         byte tmpIsMuted = in.readByte();
         isMuted = tmpIsMuted == 0 ? null : tmpIsMuted == 1;
     }
-
-    public static final Creator<Group> CREATOR = new Creator<Group>() {
-        @Override
-        public Group createFromParcel(Parcel in) {
-            return new Group(in);
-        }
-
-        @Override
-        public Group[] newArray(int size) {
-            return new Group[size];
-        }
-    };
 
     public String getName() {
         return groupName;
@@ -143,17 +132,6 @@ public class Group implements Parcelable, NotificationListener {
         }
         modules.add(module);
         return num;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(groupName);
-        dest.writeByte((byte) (isMuted == null ? 0 : isMuted ? 1 : 2));
     }
 
     @Override
