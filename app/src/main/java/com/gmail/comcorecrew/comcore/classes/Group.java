@@ -10,6 +10,7 @@ import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.io.File;
@@ -27,10 +28,12 @@ public class Group implements NotificationListener {
     private ArrayList<User> users;
     private ArrayList<UserID> moderators;
     private UserID owner;
+    private transient int index;
 
     public Group(GroupID groupID) {
         this.groupID = groupID;
         modules = new ArrayList<>();
+        index = -1;
     }
 
     public Group(String name, GroupID groupID, GroupRole groupRole, boolean isMuted) {
@@ -131,6 +134,14 @@ public class Group implements NotificationListener {
         this.modules = modules;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     public int addModule(Module module) {
         int num = 0;
         Mdid mdid = module.getMdid();
@@ -141,6 +152,70 @@ public class Group implements NotificationListener {
         }
         modules.add(module);
         return num;
+    }
+
+    /**
+     * Gets the requested module
+     *
+     * @param moduleID module id of the module to return
+     * @return         the requested module; null if it does not exist
+     */
+    public Module getModule(ModuleID moduleID) {
+        for (Module module : modules) {
+            if (moduleID.id.equals(module.getId().id)) {
+                return module;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the requested module
+     *
+     * @param index the index of the module
+     * @return      the requested module; null if it does not exist
+     */
+    public Module getModule(int index) {
+        if ((index < 0) || (index > modules.size())) {
+            return null;
+        }
+        return modules.get(index);
+    }
+
+    /**
+     * Removes the module from the module list
+     *
+     * @param module the module to remove
+     */
+    public void deleteModule(Module module) {
+        deleteModule(module.getIndex());
+    }
+
+    /**
+     * Removes the module from the module list
+     *
+     * @param moduleID the module to remove
+     */
+    public void deleteModule(ModuleID moduleID) {
+        for (int i = 0; i < modules.size(); i++) {
+            if (moduleID.equals(modules.get(i).getId())) {
+                deleteModule(i);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Removes the module from the module list
+     *
+     * @param index the index of the module to remove
+     */
+    public void deleteModule(int index) {
+        for (int i = index; i < modules.size() - 1; i++) {
+            modules.set(i, modules.get(i + 1));
+            modules.get(i).setIndex(i);
+        }
+        modules.remove(modules.size());
     }
 
     @Override

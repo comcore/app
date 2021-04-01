@@ -173,6 +173,7 @@ public class GroupStorage {
         for (File file : files) {
             AppData.groups.add(new Group(new GroupID(file.getName())));
             readGroup(AppData.groups.get(AppData.groups.size() - 1));
+            AppData.groups.get(AppData.groups.size() - 1).setIndex(AppData.groups.size() - 1);
         }
     }
 
@@ -240,6 +241,7 @@ public class GroupStorage {
                     Module m = (Module) o;
                     m.setGroup(group);
                     m.fromCache();
+                    m.setIndex(modules.size());
                     modules.add(m);
                     stream.close();
 

@@ -24,6 +24,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private boolean mentionMuted; //Contains mention muted status of module notifications
     private long lastUpdated; //Last time contents were updated
     private transient final Object cacheLock = new Object(); //Allows caching synchronization
+    private transient int index; //index of the module
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
@@ -164,6 +165,23 @@ public abstract class Module implements Serializable, NotificationListener {
 
     public long getLastUpdated() {
         return lastUpdated;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Gets an integer array containing the address of the module
+     *
+     * @return the address of the module
+     */
+    public int[] getAddress() {
+        return new int[] {group.getIndex(), index};
     }
 
     public String getGroupIdString() {
