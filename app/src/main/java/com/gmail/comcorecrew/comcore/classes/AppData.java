@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.classes;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
@@ -48,6 +49,11 @@ public class AppData {
         }
         else {
             groups = new ArrayList<>();
+        }
+        for (Group group : groups) {
+            for (Module module : group.getModules()) {
+                module.fromCache();
+            }
         }
     }
 
