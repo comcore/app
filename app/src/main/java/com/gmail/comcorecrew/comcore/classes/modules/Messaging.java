@@ -32,7 +32,7 @@ public class Messaging extends Module {
     }
 
     @Override
-    public void toCache() {
+    protected void readToCache() {
         if (messages.size() == 0) {
             return;
         }
@@ -57,7 +57,7 @@ public class Messaging extends Module {
     }
 
     @Override
-    public void fromCache() {
+    protected void readFromCache() {
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
@@ -130,8 +130,8 @@ public class Messaging extends Module {
             for (MessageEntry entry : result.data) {
                 addMessage(entry);
             }
+            this.toCache();
         });
-        this.toCache();
     }
 
     @Override

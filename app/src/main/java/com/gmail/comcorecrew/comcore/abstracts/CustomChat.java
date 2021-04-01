@@ -45,8 +45,8 @@ public abstract class CustomChat extends CustomModule {
         setItems(items);
     }
 
-    protected void editMessage(MessageID messageID, String data, long timestamp) {
-        modifyItem(messageID.id, data, timestamp);
+    protected void editMessage(MessageID messageID, String data) {
+        modifyItem(messageID, data);
     }
 
     protected void addMessage(MessageEntry message) {
@@ -61,7 +61,32 @@ public abstract class CustomChat extends CustomModule {
         addItems(items);
     }
 
-    protected void sendMessage(String message) {
+    public void refresh() {
+        MessageID lastMessage;
+        if (!isEmpty()) {
+            lastMessage = new MessageID(getChatID(), getLastItem().getItemId());
+        } else {
+            lastMessage = null;
+        }
 
+        ServerConnector.getMessages((ChatID) getId(), lastMessage, null, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+
+            ArrayList<CustomItem> items = new ArrayList<>();
+
+            for (MessageEntry entry : result.data) {
+                items.add(new CustomItem(entry));
+            }
+
+            // If the message isn't immediately after the existing messages, clear the cache
+            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessage)) {
+                setItems(items);
+            } else {
+                addItems(items);
+            }
+
+        });
     }
 }

@@ -7,6 +7,7 @@ import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
@@ -93,7 +94,7 @@ public class TaskList extends Module {
     }
 
     @Override
-    public void toCache() {
+    protected void readToCache() {
         if (tasks.size() == 0) {
             return;
         }
@@ -102,7 +103,7 @@ public class TaskList extends Module {
     }
 
     @Override
-    public void fromCache() {
+    protected void readFromCache() {
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
@@ -115,6 +116,16 @@ public class TaskList extends Module {
     }
 
     public void refreshTasks() {
-        //TODO Implement
+        ServerConnector.getTasks((TaskListID) getId(), result -> {
+            if (result.isFailure()) {
+                //TODO Handle failure
+                return;
+            }
+
+            for (TaskEntry taskEntry : result.data) {
+                tasks.add(new TaskItem(taskEntry));
+            }
+            toCache();
+        });
     }
 }

@@ -21,6 +21,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private boolean muted; //Contains muted status of module notifications
     private boolean mentionMuted; //Contains mention muted status of module notifications
     private long lastUpdated; //Last time contents were updated
+    private transient final Object cacheLock = new Object();
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
         this.name = name;
@@ -166,7 +167,33 @@ public abstract class Module implements Serializable, NotificationListener {
         return getGroupIdString() + "/" + mdid + mnum;
     }
 
-    public abstract void toCache();
+    /**
+     * Send the data of the module to the cache
+     */
+    public void toCache() {
+        synchronized (cacheLock) {
+            readToCache();
+        }
+    }
 
-    public abstract void fromCache();
+    /**
+     * Reads the data of the module from the cache
+     */
+    public void fromCache() {
+        synchronized (cacheLock) {
+            readFromCache();
+        }
+    }
+
+    /**
+     * DO NOT USE, ONLY IMPLEMENT
+     * Abstract method for module to implement. Separate from toCache for synchronization.
+     */
+    protected abstract void readToCache();
+
+    /**
+     * DO NOT USE, ONLY IMPLEMENT
+     * Abstract method for module to implement. Separate from fromCache for synchronization.
+     */
+    protected abstract void readFromCache();
 }

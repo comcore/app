@@ -3,11 +3,19 @@ package com.gmail.comcorecrew.comcore.abstracts;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
+import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.id.ModuleItemID;
+import com.gmail.comcorecrew.comcore.server.id.TaskID;
+import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
 import android.view.View;
 
@@ -49,7 +57,7 @@ public abstract class CustomModule extends Module {
     }
 
     @Override
-    public void toCache() {
+    protected void readToCache() {
         if (items.size() == 0) {
             return;
         }
@@ -80,7 +88,7 @@ public abstract class CustomModule extends Module {
     }
 
     @Override
-    public void fromCache() {
+    protected void readFromCache() {
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
@@ -90,6 +98,32 @@ public abstract class CustomModule extends Module {
         for (char[] line : data) {
             items.add(new CustomItem(line));
         }
+    }
+
+    protected CustomItem getFirstItem() {
+        if (items.isEmpty()) {
+            return null;
+        }
+        return items.get(0);
+    }
+
+    protected CustomItem getLastItem() {
+        if (items.isEmpty()) {
+            return null;
+        }
+        return items.get(items.size() - 1);
+    }
+
+    protected boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    protected ChatID getChatID() {
+        return ((CustomModuleID) getId()).asChat();
+    }
+
+    protected TaskListID getTaskID() {
+        return ((CustomModuleID) getId()).asTaskList();
     }
 
     protected ArrayList<CustomItem> getItems() {
@@ -111,34 +145,77 @@ public abstract class CustomModule extends Module {
         toCache();
     }
 
-    protected void modifyItem(long itemId, String data, long timestamp) {
+    protected void updateItem(MessageEntry entry) {
+        long itemId = entry.id.id;
         for (CustomItem item : items) {
             if (item.getItemId() == itemId) {
-                item.setData(data);
-                item.setTimestamp(timestamp);
+                item.setId(UserStorage.getInternalId(entry.sender));
+                item.setItemId(entry.id.id);
+                item.setTimestamp(entry.timestamp);
+                item.setData(entry.contents);
                 toCache();
                 return;
             }
         }
     }
 
-    protected void modifyItem(long itemId, boolean completed, long timestamp) {
+    protected void updateItem(TaskEntry entry) {
+        long itemId = entry.id.id;
         for (CustomItem item : items) {
             if (item.getItemId() == itemId) {
-                item.setCompleted(completed);
-                item.setTimestamp(timestamp);
+                item.setId(UserStorage.getInternalId(entry.owner));
+                item.setItemId(entry.id.id);
+                item.setTimestamp(entry.timestamp);
+                item.setCompleted(entry.completed);
+                item.setData(entry.description);
                 toCache();
                 return;
             }
         }
     }
 
-    protected void sendItem(String data) {
+    protected void sendMessage(String data) {
         ServerConnector.sendMessage(((CustomModuleID) getId()).asChat(), data, result -> {
             if (result.isFailure()) {
                 //TODO Implement failure
             }
+
+            addItem(new CustomItem(result.data));
         });
+    }
+
+    protected void sendTask(String data) {
+        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), data, result -> {
+            if (result.isFailure()) {
+                //TODO Implement Failure
+            }
+
+            addItem(new CustomItem(result.data));
+        });
+    }
+
+    protected void modifyItem(ModuleItemID<ChatID> itemId, String data) {
+        ServerConnector.updateMessage((MessageID) itemId, data, result -> {
+            if (result.isFailure()) {
+                //TODO Handle failure
+            }
+
+            updateItem(result.data);
+        });
+    }
+
+    protected void modifyItem(ModuleItemID<TaskListID> itemId, boolean completed) {
+        TaskListID taskListID = ((CustomModuleID) getId()).asTaskList();
+        ServerConnector.updateTask((TaskID) itemId, completed, result -> {
+            if (result.isFailure()) {
+                //TODO Handle failure
+            }
+
+            updateItem(result.data);
+        });
+    }
+
+    protected void deleteMessage(long itemId) {
     }
 
     abstract public void viewInit(@NonNull View view);
