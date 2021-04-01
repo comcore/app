@@ -162,24 +162,6 @@ public class Messaging extends Module {
         this.toCache();
     }
 
-    @Override
-    public void onMessageUpdated(MessageEntry message) {
-        if (messages.isEmpty()) {
-            return;
-        }
-
-        long id = message.id.id;
-        long index = id - messages.get(0).getMessageid();
-        if (index >= 0 && index < messages.size()) {
-            MsgCacheable msg = messages.get((int) index);
-            if (msg.getMessageid() == id) {
-                msg.setTimestamp(message.timestamp);
-                msg.setData(message.contents);
-                this.toCache();
-            }
-        }
-    }
-
     public void createPinnedMessages(String name) {
         for (Module m : getGroup().getModules()) {
             if ((m instanceof PinnedMessages) &&
