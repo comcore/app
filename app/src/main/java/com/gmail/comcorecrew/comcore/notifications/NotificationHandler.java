@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
@@ -27,6 +28,7 @@ import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Handles displaying notifications by forwarding them to Android.
@@ -110,39 +112,53 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onReceiveMessage(MessageEntry message) {
-        ServerConnector.getModuleInfo(message.id.module, result -> {
-            if (result.isFailure()) {
-                return;
-            }
+        Module module = GroupStorage.getModule(message.id.module);
+        if (module == null) {
+            return;
+        }
 
-            ModuleInfo module = result.data;
-            UserStorage.lookup(message.sender, user ->
-                notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
-                        .setSmallIcon(R.drawable.receivedmsg)
-                        .setContentTitle(module.name)
-                        .setContentText(user.getName() + ": " + message.contents)
-                        .setWhen(message.timestamp)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .build()));
-        });
+        // Check for mentions for the current user in the notification
+        String name = ServerConnector.getUser().name;
+        boolean mentioned = false;
+        for (ChatMention mention : ChatMention.parseChatMentions(message.contents)) {
+            if (mention.mentionsUser(name)) {
+                if (module.isMentionMuted()) {
+                    return;
+                }
+                mentioned = true;
+                break;
+            }
+        }
+
+        // If there were no mentions, use the plain muted status
+        if (!mentioned && module.isMuted()) {
+            return;
+        }
+
+        UserStorage.lookup(message.sender, user ->
+            notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
+                    .setSmallIcon(R.drawable.receivedmsg)
+                    .setContentTitle(module.getName())
+                    .setContentText(user.getName() + ": " + message.contents)
+                    .setWhen(message.timestamp)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .build()));
     }
 
     @Override
     public void onTaskAdded(TaskEntry task) {
-        ServerConnector.getModuleInfo(task.id.module, result -> {
-            if (result.isFailure()) {
-                return;
-            }
+        Module module = GroupStorage.getModule(task.id.module);
+        if (module == null || module.isMuted()) {
+            return;
+        }
 
-            ModuleInfo module = result.data;
-            UserStorage.lookup(task.owner, user ->
-                    notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
-                            .setSmallIcon(R.drawable.receivedmsg)
-                            .setContentTitle(module.name)
-                            .setContentText("Added: " + task.description)
-                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-                            .build()));
-        });
+        UserStorage.lookup(task.owner, user ->
+            notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
+                    .setSmallIcon(R.drawable.receivedmsg)
+                    .setContentTitle(module.getName())
+                    .setContentText("Added: " + task.description)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .build()));
     }
 
     @Override
@@ -152,20 +168,18 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
-        ServerConnector.getModuleInfo(task.id.module, result -> {
-            if (result.isFailure()) {
-                return;
-            }
+        Module module = GroupStorage.getModule(task.id.module);
+        if (module == null || module.isMuted()) {
+            return;
+        }
 
-            ModuleInfo module = result.data;
-            UserStorage.lookup(task.owner, user ->
-                    notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
-                            .setSmallIcon(R.drawable.receivedmsg)
-                            .setContentTitle(module.name)
-                            .setContentText("Completed: " + task.description)
-                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-                            .build()));
-        });
+        UserStorage.lookup(task.owner, user ->
+            notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
+                    .setSmallIcon(R.drawable.receivedmsg)
+                    .setContentTitle(module.getName())
+                    .setContentText("Completed: " + task.description)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .build()));
     }
 
     @Override
