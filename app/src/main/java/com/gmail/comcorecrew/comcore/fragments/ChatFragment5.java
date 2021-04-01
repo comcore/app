@@ -135,7 +135,7 @@ public class ChatFragment5 extends Fragment {
         if (messaging == null) {
             this.messaging = new Messaging(currentGroup.getName(), chatID,  currentGroup);
 
-            System.out.println(currentGroup.getGroupId().id);
+        //    System.out.println(currentGroup.getGroupId().id);
 
 //            606560fe76011cb710928ce0
 //            606560fe76011cb710928ce1
@@ -144,14 +144,17 @@ public class ChatFragment5 extends Fragment {
 //            606568cc76011cb710928cff
 //            606568cc76011cb710928d00
 
-//            System.out.println(chatID);
+       //     System.out.println(chatID);
 //            for (int i = 0; i < messaging.getEntries().size(); i++) {
 //                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
 //            }
 
             messaging.refreshMessages();
-
-            messaging.fromCache();
+            try {
+                messaging.fromCache();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 //            for (int i = 0; i < messaging.getEntries().size(); i++) {
 //                System.out.println("2. Message # " + i + ": " + messaging.getEntries().get(i).contents);
@@ -170,12 +173,12 @@ public class ChatFragment5 extends Fragment {
 
  //       System.out.println("JUST FINISHED INITIALIZING");
 
-        LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        LinearLayoutManager manager = new LinearLayoutManager(this.getContext());
         manager.setStackFromEnd(true);
         mMessageRecycler.setLayoutManager(manager);
         //mMessageRecycler.setHasFixedSize(true);
 //        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
-        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
@@ -196,7 +199,7 @@ public class ChatFragment5 extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
+         //       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
                 if (!isEditMode) {
                     sendMessage(v, null);
                 } else {
@@ -272,45 +275,45 @@ public class ChatFragment5 extends Fragment {
             return;
         }
 
-        System.out.println("Inside sendMessage");
+      //  System.out.println("Inside sendMessage");
         if (!isEditMode) {
-            System.out.println("Going to send that message");
+       //     System.out.println("Going to send that message");
             for (int i = 0; i < messaging.getEntries().size(); i++) {
-                System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+         //       System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
             }
 
-            System.out.println(messageToBeSent.getText().toString());
+        //    System.out.println(messageToBeSent.getText().toString());
 
             ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
                 if (result.isFailure()) {
-                    System.out.println("FAILURE OF THE MESSAGE BEING SENT");
+          //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
                     new StringErrorDialog(result.errorMessage)
                             .show(getParentFragmentManager(), null);
                 }
 
                 for (int i = 0; i < messaging.getEntries().size(); i++) {
-                    System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+            //        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
                 }
 
-                System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
+            //    System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
 
                 boolean x = this.messaging.addMessage(result.data);
 
                 if (x) {
-                    System.out.println("SENDING MESSAGES DIDN'T FAIL");
+             //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
                 }
 
-                System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
+             //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
 
                 messaging.refreshMessages();
 
-                System.out.println("After refreshMessages(): " + this.messaging.getEntries().size());
+           //     System.out.println("After refreshMessages(): " + this.messaging.getEntries().size());
 
                 mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
                 mMessageRecycler.setAdapter(mMessageAdapter);
                 mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
-                messageToBeSent.setText(null);
+                messageToBeSent.getText().clear();
                 // messageToBeSent.setHint("Enter Message");
 
             });
@@ -320,11 +323,11 @@ public class ChatFragment5 extends Fragment {
             messaging.refreshMessages();
 
 
-            mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+            mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
             mMessageRecycler.setAdapter(mMessageAdapter);
             mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
-            messageToBeSent.setText(null);
+            messageToBeSent.getText().clear();
 
             isEditMode = false;
         }
@@ -340,7 +343,7 @@ public class ChatFragment5 extends Fragment {
         messageList.clear();
         messageList = messaging.getEntries();
 
-        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
     }

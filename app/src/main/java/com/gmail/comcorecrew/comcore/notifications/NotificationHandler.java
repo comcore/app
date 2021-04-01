@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -21,7 +22,9 @@ import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -211,6 +214,15 @@ public class NotificationHandler implements NotificationListener {
                 .setContentText("You have been kicked")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build());
+    }
+
+    @Override
+    public void onLoggedIn(UserInfo user) {
+        try {
+            AppData.init(user, context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

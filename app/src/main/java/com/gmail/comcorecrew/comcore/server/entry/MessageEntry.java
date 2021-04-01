@@ -1,7 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.classes.User;
-import com.gmail.comcorecrew.comcore.classes.modules.UserMessage;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
