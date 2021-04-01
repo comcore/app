@@ -89,52 +89,6 @@ public class ChatFragment5 extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        if (messaging == null) {
-//            messaging = new Messaging(currentGroup.getName(), chatID, currentGroup);
-//
-//            //    System.out.println(currentGroup.getGroupId().id);
-//            //     System.out.println(chatID);
-////            for (int i = 0; i < messaging.getEntries().size(); i++) {
-////                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-////            }
-//
-//            messaging.refresh();
-//            try {
-//                messaging.fromCache();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-////            for (int i = 0; i < messaging.getEntries().size(); i++) {
-////                System.out.println("2. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-////            }
-////            System.out.println("Made a new one");
-//        }
-//
-//        try {
-//            messaging.refresh();
-////            messageList.clear();
-////            messageList = messaging.getEntries();
-//        } catch (Exception e) {
-//            System.out.println("DNE");
-//        }
-//        messaging.refresh();
-//
-//        initialize(view);
-//
-//        //       System.out.println("JUST FINISHED INITIALIZING");
-//
-//        LinearLayoutManager manager = new LinearLayoutManager(getContext());
-//        manager.setStackFromEnd(true);
-//        mMessageRecycler.setLayoutManager(manager);
-//        //mMessageRecycler.setHasFixedSize(true);
-////        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
-//        mMessageAdapter = new MessageListAdapter(getContext(), messaging);
-//        mMessageRecycler.setAdapter(mMessageAdapter);
-//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
         super.onViewCreated(view, savedInstanceState);
 
         messaging.refresh();
@@ -224,9 +178,9 @@ public class ChatFragment5 extends Fragment {
 
         //  System.out.println("Inside sendMessage");
              System.out.println("Going to send that message");
-        for (int i = 0; i < messaging.getEntries().size(); i++) {
-                   System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-        }
+//        for (int i = 0; i < messaging.getEntries().size(); i++) {
+//                   System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+//        }
 
             System.out.println(messageToBeSent.getText().toString());
 
@@ -237,10 +191,10 @@ public class ChatFragment5 extends Fragment {
                 new StringErrorDialog(result.errorMessage)
                         .show(getParentFragmentManager(), null);
             }
-
-            for (int i = 0; i < messaging.getEntries().size(); i++) {
-                        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-            }
+//
+//            for (int i = 0; i < messaging.getEntries().size(); i++) {
+//                        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+//            }
 
                 System.out.println("Before addMessage(): " + messaging.getEntries().size());
 
@@ -250,10 +204,10 @@ public class ChatFragment5 extends Fragment {
 
 
             System.out.println("After refreshMessages(): " + messaging.getEntries().size());
-
-            for (int i = 0; i < messaging.getEntries().size(); i++) {
-                System.out.println("33. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-            }
+//
+//            for (int i = 0; i < messaging.getEntries().size(); i++) {
+//                System.out.println("33. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+//            }
 
             mMessageAdapter.notifyDataSetChanged();
             mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
@@ -264,18 +218,27 @@ public class ChatFragment5 extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendMessage(MessageEntry messageEntry1) {
-        System.out.println("editing");
         if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
             return;
         }
         if (isEditMode) {
+            System.out.println("editing");
+            //System.out.println(messageToBeSent.getText().toString());
             //  System.out.println("Inside sendMessage");
-            MessageEntry messageEntry2 = new MessageEntry(messageEntry1.id, messageEntry1.sender, messageEntry1.timestamp, messageToBeSent.toString());
-            messaging.onMessageUpdated(messageEntry2);
-            mMessageAdapter.notifyDataSetChanged();
-            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+            MessageEntry messageEntry2 = new MessageEntry(messageEntry1.id, messageEntry1.sender, messageEntry1.timestamp, messageToBeSent.getText().toString());
 
-            messageToBeSent.getText().clear();
+            ServerConnector.updateMessage(messageEntry1.id, messageToBeSent.getText().toString(), result -> {
+                if (result.isFailure()) {
+                    System.out.println(result.errorMessage);
+                } else {
+                    messaging.onMessageUpdated(result.data);
+
+                    mMessageAdapter.notifyDataSetChanged();
+                    mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
+                    messageToBeSent.getText().clear();
+                }
+            });
 
             isEditMode = false;
         } else {
@@ -285,11 +248,12 @@ public class ChatFragment5 extends Fragment {
             mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
             messageToBeSent.getText().clear();
+            isDeleteMode = false;
         }
     }
 
         private void deleteMessage (MenuItem item){
-            MessageEntry messageEntry = messaging.getEntry(item.getGroupId());
+            messageEntry = messaging.getEntry(item.getGroupId());
 
             isDeleteMode = true;
 
@@ -301,7 +265,7 @@ public class ChatFragment5 extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void editMessage(MenuItem item) {
-        MessageEntry messageEntry = messaging.getEntry(item.getGroupId());
+        messageEntry = messaging.getEntry(item.getGroupId());
 //        System.out.println("Group id: " + item.getGroupId());
 //        System.out.println("Size: " + messaging.getEntries().size());
  //       System.out.println("MessageID w/ item: " + messageID);
