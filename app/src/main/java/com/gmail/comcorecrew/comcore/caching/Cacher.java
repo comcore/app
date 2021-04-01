@@ -79,8 +79,12 @@ public class Cacher {
             }
             BufferedReader br = new BufferedReader(new FileReader(cacheFile));
             int size = br.read();
-            size = (size << 16) | br.read();
-
+            if (size == -1) {
+                size = 0;
+            }
+            else {
+                size = (size << 16) | br.read();
+            }
             //Creates array of chars and reads each line into the array.
             char[][] data = new char[size][];
             for (int i = 0; i < size; i++) {
