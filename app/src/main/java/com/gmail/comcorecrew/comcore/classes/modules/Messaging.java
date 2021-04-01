@@ -117,20 +117,20 @@ public class Messaging extends Module {
      * Gets messages from the server and caches them
      */
     public void refreshMessages() {
-        MessageID lastMessageId = latestMessageId();
-        ServerConnector.getMessages((ChatID) getId(), lastMessageId, null, result -> {
+        ServerConnector.getMessages((ChatID) getId(), latestMessageId(), null, result -> {
             if (result.isFailure()) {
                 return;
             }
 
             // If the message isn't immediately after the existing messages, clear the cache
-            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessageId)) {
+            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
                 messages.clear();
             }
 
             for (MessageEntry entry : result.data) {
                 addMessage(entry);
             }
+
             this.toCache();
         });
     }
