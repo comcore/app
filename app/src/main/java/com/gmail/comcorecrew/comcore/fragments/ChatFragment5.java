@@ -71,7 +71,7 @@ public class ChatFragment5 extends Fragment {
         ChatFragment5 fragment = new ChatFragment5();
         Bundle args = new Bundle();
         fragment.setArguments(args);
- //       System.out.println("CREATED CHAT FRAG 5");
+        //       System.out.println("CREATED CHAT FRAG 5");
         return fragment;
     }
 
@@ -79,16 +79,16 @@ public class ChatFragment5 extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            bundle.getClassLoader();
-            currentGroup = bundle.getParcelable("currentGroup");
-  //          messaging = bundle.getParcelableArray("messaging");
-
-        }
-        else {
-            new ErrorDialog(R.string.error_unknown)
-                    .show(getParentFragmentManager(), null);
-        }
+//        if (bundle != null) {
+//            bundle.getClassLoader();
+//            currentGroup = bundle.getParcelable("currentGroup");
+//  //          messaging = bundle.getParcelableArray("messaging");
+//
+//        }
+//        else {
+//            new ErrorDialog(R.string.error_unknown)
+//                    .show(getParentFragmentManager(), null);
+//        }
 
     }
 
@@ -96,15 +96,6 @@ public class ChatFragment5 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-
-        // Inflate the layout for this fragment
- //       System.out.println("DISPLAY CHAT FRAG 5 with id: " + chatID);
-
-//        View viewHolder= LayoutInflater.from(parent.getContext())
-//                .inflate(R.layout.item, null, false);
-//        viewHolder.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-//        return new ViewOffersHolder(viewHolder);
-
         return inflater.inflate(R.layout.fragment_chat5, container, false);
     }
 
@@ -112,39 +103,12 @@ public class ChatFragment5 extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        for (int i = 0; i < currentGroup.getUsers().size(); i++) {
-//            System.out.println(currentGroup.getUsers().get(i).getID().id);
-//        }
-
-        try {
-//            User user = new User(ServerConnector.getUser().id, ServerConnector.getUser().name, -1);
-//            System.out.println();
-//            System.out.println(user.getID());
-//            System.out.println(ServerConnector.getUser().id);
-//            System.out.println(UserStorage.getInternalId(ServerConnector.getUser().id));
-////            user.setInternalId(0);
-//            UserStorage.addUser(user);
-//            System.out.println(UserStorage.getUser(ServerConnector.getUser().id));
-//            System.out.println(user.toUserInfo().name);
-//            System.out.println(user.getInternalId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
 
         if (messaging == null) {
-            this.messaging = new Messaging(currentGroup.getName(), chatID,  currentGroup);
+            messaging = new Messaging(currentGroup.getName(), chatID, currentGroup);
 
-        //    System.out.println(currentGroup.getGroupId().id);
-
-//            606560fe76011cb710928ce0
-//            606560fe76011cb710928ce1
-//            606568cc76011cb710928cff
-//            606568cc76011cb710928d00
-//            606568cc76011cb710928cff
-//            606568cc76011cb710928d00
-
-       //     System.out.println(chatID);
+            //    System.out.println(currentGroup.getGroupId().id);
+            //     System.out.println(chatID);
 //            for (int i = 0; i < messaging.getEntries().size(); i++) {
 //                System.out.println("1. Message # " + i + ": " + messaging.getEntries().get(i).contents);
 //            }
@@ -171,21 +135,21 @@ public class ChatFragment5 extends Fragment {
         }
         initialize(view);
 
- //       System.out.println("JUST FINISHED INITIALIZING");
+        //       System.out.println("JUST FINISHED INITIALIZING");
 
-        LinearLayoutManager manager = new LinearLayoutManager(this.getContext());
+        LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setStackFromEnd(true);
         mMessageRecycler.setLayoutManager(manager);
         //mMessageRecycler.setHasFixedSize(true);
 //        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
-        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
+        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
 
-//        messaging.refreshMessages();
-//        messageList = messaging.getEntries();
+        messaging.refreshMessages();
+        messageList = messaging.getEntries();
 
-        registerForContextMenu(mMessageRecycler);
+//        registerForContextMenu(mMessageRecycler);
 
 //        manager.setStackFromEnd(true);
 
@@ -199,65 +163,44 @@ public class ChatFragment5 extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-         //       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
-                if (!isEditMode) {
-                    sendMessage(v, null);
-                } else {
-                    sendMessage(v, messageID);
-                }
+                //       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
+//                if (!isEditMode) {
+//                    sendMessage(v, null);
+//                } else {
+//                    sendMessage(v, messageID);
+//                }
+                sendMessage();
             }
         });
     }
 
-    @Override
-    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-//        MenuInflater menuInflater = getContext().getMenuInflater();
-//        menuInflater.inflate(R.menu.chat_message_menu, menu);
-//        menu.setHeaderTitle("Menu");
-//        menu.add(0, v.getId(), 0, "Update");
-//        menu.add(0, v.getId(), 0, "Edit");
-    }
+//    @Override
+//    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+////        MenuInflater menuInflater = getContext().getMenuInflater();
+////        menuInflater.inflate(R.menu.chat_message_menu, menu);
+////        menu.setHeaderTitle("Menu");
+////        menu.add(0, v.getId(), 0, "Update");
+////        menu.add(0, v.getId(), 0, "Edit");
+//    }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case 121:
-                deleteMessage(item);
-                return true;
-            case 122:
-                editMessage(item);
-                return true;
-            case 123:
-                pinMessage(item);
-                return true;
-            default:
-                return true;
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.chat_message_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.chat_message_delete:
-//                deleteMessage();
-                return true;
-            case R.id.chat_message_edit:
-//                updateMesage;
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-//        return true;
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//
+//        switch (item.getItemId()) {
+//            case 121:
+//                deleteMessage(item);
+//                return true;
+//            case 122:
+//                editMessage(item);
+//                return true;
+//            case 123:
+//                pinMessage(item);
+//                return true;
+//            default:
+//                return true;
+//        }
+//    }
 
     public void initialize(View view) {
 //        System.out.println("INSIDE INITIALIZE");
@@ -268,105 +211,160 @@ public class ChatFragment5 extends Fragment {
 //        System.out.println("After Recycler");
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void sendMessage(View v, MessageID messageId) {
+    public void sendMessage() {
         if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
             return;
         }
 
-      //  System.out.println("Inside sendMessage");
-        if (!isEditMode) {
-       //     System.out.println("Going to send that message");
-            for (int i = 0; i < messaging.getEntries().size(); i++) {
-         //       System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+        //  System.out.println("Inside sendMessage");
+             System.out.println("Going to send that message");
+        for (int i = 0; i < messaging.getEntries().size(); i++) {
+                   System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+        }
+
+            System.out.println(messageToBeSent.getText().toString());
+
+        ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
+            if (result.isFailure()) {
+                //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
+                new StringErrorDialog(result.errorMessage)
+                        .show(getParentFragmentManager(), null);
             }
 
-        //    System.out.println(messageToBeSent.getText().toString());
+            for (int i = 0; i < messaging.getEntries().size(); i++) {
+                        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+            }
 
-            ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
-                if (result.isFailure()) {
-          //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
-                    new StringErrorDialog(result.errorMessage)
-                            .show(getParentFragmentManager(), null);
-                }
+                System.out.println("Before addMessage(): " + messaging.getEntries().size());
 
-                for (int i = 0; i < messaging.getEntries().size(); i++) {
-            //        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
-                }
-
-            //    System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
-
-                this.messaging.onReceiveMessage(result.data);
-
-//                if (x) {
-             //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
-//                }
-
-             //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
-
-                messaging.refreshMessages();
-
-           //     System.out.println("After refreshMessages(): " + this.messaging.getEntries().size());
-
-                mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-                mMessageRecycler.setAdapter(mMessageAdapter);
-                mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
-                messageToBeSent.getText().clear();
-                // messageToBeSent.setHint("Enter Message");
-
-            });
-        } else {
-            this.messaging.editMessage(messageId, messageToBeSent.getText().toString());
-
-            messaging.refreshMessages();
+            messaging.onReceiveMessage(result.data);
 
 
-            mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-            mMessageRecycler.setAdapter(mMessageAdapter);
-            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//            boolean x = messaging.addMessage(result.data);
+//
+//            if (x) {
+//                //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
+//            }
+
+            //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
+
+           // messaging.refreshMessages();
+
+            System.out.println("After refreshMessages(): " + messaging.getEntries().size());
+
+            for (int i = 0; i < messaging.getEntries().size(); i++) {
+                System.out.println("33. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+            }
+
+//            mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+//            mMessageRecycler.setAdapter(mMessageAdapter);
+//            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+            mMessageAdapter.notifyDataSetChanged();
 
             messageToBeSent.getText().clear();
-
-            isEditMode = false;
-        }
-    }
-
-    private void deleteMessage(MenuItem item) {
-        item.getGroupId();
-        MessageID messageID = messageList.get(item.getGroupId()).id;
-        messaging.deleteMessage(messageID);
-
-
-        messaging.refreshMessages();
-        messageList.clear();
-        messageList = messaging.getEntries();
-
-        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
-        mMessageRecycler.setAdapter(mMessageAdapter);
-        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void editMessage(MenuItem item) {
-        item.getGroupId();
-        messageID = messageList.get(item.getGroupId()).id;
-        messageToBeSent.setText(messageList.get(item.getGroupId()).contents);
-        isEditMode = true;
-    }
-
-    private void pinMessage(MenuItem item) {
-        item.getGroupId();
-        MessageID messageID = messageList.get(item.getGroupId()).id;
-        messaging.pinMessage(messageID);
-
-        messaging.refreshMessages();
-        messageList.clear();
-        messageList = messaging.getEntries();
-
-        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
-        mMessageRecycler.setAdapter(mMessageAdapter);
-        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+            // messageToBeSent.setHint("Enter Message");
+        });
     }
 }
+
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    public void sendMessage(View v, MessageID messageId) {
+//        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
+//            return;
+//        }
+//
+//      //  System.out.println("Inside sendMessage");
+//        if (!isEditMode) {
+//       //     System.out.println("Going to send that message");
+//            for (int i = 0; i < messaging.getEntries().size(); i++) {
+//         //       System.out.println("11. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+//            }
+//
+//        //    System.out.println(messageToBeSent.getText().toString());
+//
+//            ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
+//                if (result.isFailure()) {
+//          //          System.out.println("FAILURE OF THE MESSAGE BEING SENT");
+//                    new StringErrorDialog(result.errorMessage)
+//                            .show(getParentFragmentManager(), null);
+//                }
+//
+//                for (int i = 0; i < messaging.getEntries().size(); i++) {
+//            //        System.out.println("22. Message # " + i + ": " + messaging.getEntries().get(i).contents);
+//                }
+//
+//            //    System.out.println("Before addMessage(): " + this.messaging.getEntries().size());
+//
+//                boolean x = this.messaging.addMessage(result.data);
+//
+//                if (x) {
+//             //       System.out.println("SENDING MESSAGES DIDN'T FAIL");
+//                }
+//
+//             //   System.out.println("Before refreshMessages(): " + this.messaging.getEntries().size());
+//
+//                messaging.refreshMessages();
+//
+//           //     System.out.println("After refreshMessages(): " + this.messaging.getEntries().size());
+//
+//                mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
+//                mMessageRecycler.setAdapter(mMessageAdapter);
+//                mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//
+//                messageToBeSent.getText().clear();
+//                // messageToBeSent.setHint("Enter Message");
+//
+//            });
+//        } else {
+//            this.messaging.editMessage(messageId, messageToBeSent.getText().toString());
+//
+//            messaging.refreshMessages();
+//
+//
+//            mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
+//            mMessageRecycler.setAdapter(mMessageAdapter);
+//            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//
+//            messageToBeSent.getText().clear();
+//
+//            isEditMode = false;
+//        }
+//    }
+
+//    private void deleteMessage(MenuItem item) {
+//        item.getGroupId();
+//        MessageID messageID = messageList.get(item.getGroupId()).id;
+//        messaging.deleteMessage(messageID);
+//
+//
+//        messaging.refreshMessages();
+//        messageList.clear();
+//        messageList = messaging.getEntries();
+//
+//        mMessageAdapter = new MessageListAdapter(this.getContext(), messageList);
+//        mMessageRecycler.setAdapter(mMessageAdapter);
+//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//    }
+//
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    private void editMessage(MenuItem item) {
+//        item.getGroupId();
+//        messageID = messageList.get(item.getGroupId()).id;
+//        messageToBeSent.setText(messageList.get(item.getGroupId()).contents);
+//        isEditMode = true;
+//    }
+//
+//    private void pinMessage(MenuItem item) {
+//        item.getGroupId();
+//        MessageID messageID = messageList.get(item.getGroupId()).id;
+//        messaging.pinMessage(messageID);
+//
+//        messaging.refreshMessages();
+//        messageList.clear();
+//        messageList = messaging.getEntries();
+//
+//        mMessageAdapter = new MessageListAdapter(getContext(), messageList);
+//        mMessageRecycler.setAdapter(mMessageAdapter);
+//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+//    }
+//}
