@@ -99,6 +99,7 @@ public abstract class Module implements Serializable, NotificationListener {
             muted = false;
             mentionMuted = false;
             mnum = group.addModule(this);
+            afterCreate();
             try {
                 GroupStorage.storeModule(this);
             } catch (IOException e) {
@@ -223,4 +224,10 @@ public abstract class Module implements Serializable, NotificationListener {
     protected abstract void readFromCache();
 
     public abstract void refresh();
+
+    /**
+     * Run after the module is initialized to the server to avoid
+     * race conditions
+     */
+    public void afterCreate() {}
 }
