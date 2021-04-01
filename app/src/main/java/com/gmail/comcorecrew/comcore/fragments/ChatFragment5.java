@@ -10,27 +10,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.support.v4.media.session.IMediaSession;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.gmail.comcorecrew.comcore.Helpers.UserMessage;
+import com.gmail.comcorecrew.comcore.helpers.UserMessage;
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.Helpers.MessageListAdapter;
+import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -38,7 +28,6 @@ import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.

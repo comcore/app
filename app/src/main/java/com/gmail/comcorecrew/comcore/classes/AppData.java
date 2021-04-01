@@ -57,6 +57,10 @@ public class AppData {
         }
     }
 
+    public static void refresh() {
+
+    }
+
     public static void writeBool(boolean b, Writer writer) throws IOException {
         if (b) {
             writer.write('1');

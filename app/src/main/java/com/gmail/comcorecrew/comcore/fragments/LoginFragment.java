@@ -76,7 +76,6 @@ public class LoginFragment extends Fragment {
                 switch (status) {
                     case SUCCESS:
                         // Navigate to the main fragment
-
                         NavHostFragment.findNavController(LoginFragment.this)
                                 .navigate(R.id.action_loginFragment_to_mainFragment);
                         break;

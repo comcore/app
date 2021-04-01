@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore.Helpers;
+package com.gmail.comcorecrew.comcore.helpers;
 
 public class ChatMessage {
     public boolean left;

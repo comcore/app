@@ -1,9 +1,8 @@
-package com.gmail.comcorecrew.comcore.Helpers;
+package com.gmail.comcorecrew.comcore.helpers;
 
 
 import android.content.Context;
 import android.os.Build;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,6 @@ import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 

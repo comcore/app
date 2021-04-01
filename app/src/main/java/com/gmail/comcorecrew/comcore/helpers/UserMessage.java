@@ -1,8 +1,7 @@
-package com.gmail.comcorecrew.comcore.Helpers;
+package com.gmail.comcorecrew.comcore.helpers;
 
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
