@@ -9,6 +9,8 @@ import android.text.style.TextAppearanceSpan;
 
 import androidx.annotation.NonNull;
 
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +152,7 @@ public class ChatMention {
      * @param message the message to parse
      * @return the formatted string
      */
-    public static CharSequence formatMentions(String message) {
+    public static CharSequence formatMentions(String message, Messaging messaging) {
         if (message == null || message.isEmpty()) {
             return "[deleted]";
         }
@@ -159,11 +161,29 @@ public class ChatMention {
         List<ChatMention> mentions = parseMentions(message);
         Collections.reverse(mentions);
         for (ChatMention mention : mentions) {
-            int start = mention.index;
-            int end = start + mention.length();
-            ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
-            builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            builder.replace(start, end, mention.toString());
+            if (mention.mentionName.equals("all")) {
+                int start = mention.index;
+                int end = start + mention.length();
+                ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
+                builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                builder.replace(start, end, mention.toString());
+            } else {
+                for (int i = 0; i < messaging.getGroup().getUsers().size(); i++) {
+                    if (mention.mentionName.equals(messaging.getGroup().getUsers().get(i).getName())) {
+                        int start = mention.index;
+                        int end = start + mention.length();
+                        ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
+                        builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        builder.replace(start, end, mention.toString());
+                        break;
+                    }
+                }
+            }
+//            int start = mention.index;
+//            int end = start + mention.length();
+//            ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
+//            builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//            builder.replace(start, end, mention.toString());
         }
 
         return builder;

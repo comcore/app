@@ -103,7 +103,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents));
+            messageText.setText(ChatMention.formatMentions(message.contents, messaging));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
@@ -130,7 +130,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     public String format2(long miliseconds) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
         String x = sdf.format(new Date(miliseconds));
-
         for (int i = 0; i < numericMonths.length; i++) {
             if (x.substring(0, 2).equals(numericMonths[i])) {
                 return semanticMonths[i] + " " + x.substring(3, 5);
@@ -153,7 +152,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents));
+            messageText.setText(ChatMention.formatMentions(message.contents, messaging));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
