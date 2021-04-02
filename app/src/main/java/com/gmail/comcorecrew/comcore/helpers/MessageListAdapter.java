@@ -29,6 +29,10 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
+    public String[] numericMonths = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+    public String[] semanticMonths = {"January", "February", "March", "April", "May", "June", "July",
+                                        "August", "September", "October", "November", "December"};
+
     public MessageListAdapter(Context context, Messaging messaging) {
         this.context = context;
         this.messaging = messaging;
@@ -95,23 +99,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
         }
 
-//    private class SentMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText, nameText;
-//
-//        SentMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = itemView.findViewById(R.id.text_gchat_message_me);
-//            timeText = itemView.findViewById(R.id.text_gchat_timestamp_me);
-//            nameText = itemView.findViewById(R.id.text_gchat_user_me);
-//        }
-
         void bind(MessageEntry message) {
-//            System.out.println("Inside BIND SENT MESSAGE");
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-//            LocalDateTime now = LocalDateTime.now();
             messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-            //timeText.setText(dtf.format(now));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
@@ -128,14 +117,21 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static String format(long miliseconds) {
-        //  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public String format(long miliseconds) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         return sdf.format(new Date(miliseconds));
     }
 
-    public static String format2(long miliseconds) {
+    public String format2(long miliseconds) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+        String x = sdf.format(new Date(miliseconds));
+
+        for (int i = 0; i < numericMonths.length; i++) {
+            if (x.substring(0, 2).equals(numericMonths[i])) {
+                return semanticMonths[i] + " " + x.substring(3, 5);
+            }
+        }
+
         return sdf.format(new Date(miliseconds));
     }
 
@@ -151,22 +147,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
         }
 
-//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText, nameText;
-//
-//        ReceivedMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = itemView.findViewById(R.id.text_gchat_message_other);
-//            timeText = itemView.findViewById(R.id.text_gchat_timestamp_other);
-//            nameText = itemView.findViewById(R.id.text_gchat_user_other);
-//        }
-
         void bind(MessageEntry message) {
- //           System.out.println("Inside BIND RECEIVED MESSAGE");
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
             messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-//            timeText.setText(dtf.format(message.getTime()));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
@@ -175,6 +157,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             messageText.setOnCreateContextMenuListener(this);
         }
 
+        // Creates menu for each message with 3 options
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(this.getAdapterPosition(), 121, 0, "Delete");
