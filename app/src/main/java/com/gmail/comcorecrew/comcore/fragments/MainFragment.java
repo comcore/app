@@ -63,7 +63,7 @@ public class MainFragment extends Fragment {
         rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         groupLayout = new LinearLayoutManager(getActivity());
         rvGroups.setLayoutManager(groupLayout);
-        groupAdapter = new CustomAdapter(pinGroupList, this);
+        groupAdapter = new CustomAdapter(pinGroupList);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
         refresh();
@@ -139,104 +139,99 @@ public class MainFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
-}
 
-/** The CustomAdapter internal class sets up the RecyclerView, which displays
- * the list of groups in the GUI
- */
- class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+    /** The CustomAdapter internal class sets up the RecyclerView, which displays
+     * the list of groups in the GUI
+     */
+    class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-    private ArrayList<Group> sortedList;
-    private MainFragment fragment;
+        private ArrayList<Group> sortedList;
 
-    CustomAdapter(ArrayList<Group> sortedList, MainFragment fragment) {
-        this.fragment = fragment;
-        this.sortedList = sortedList;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final TextView textView;
-        private ImageView viewTag;
-        private Group currentGroup;
-
-        public ViewHolder(View view) {
-            super(view);
-            view.setOnClickListener(this);
-            // Define click listener for the ViewHolder's View
-
-            textView = (TextView) view.findViewById(R.id.group_row_text);
-            viewTag = (ImageView) view.findViewById(R.id.group_row_tag);
-
+        CustomAdapter(ArrayList<Group> sortedList) {
+            this.sortedList = sortedList;
         }
 
-        public TextView getTextView() {
-            return textView;
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private final TextView textView;
+            private ImageView viewTag;
+            private Group currentGroup;
+
+            public ViewHolder(View view) {
+                super(view);
+                view.setOnClickListener(this);
+                // Define click listener for the ViewHolder's View
+
+                textView = (TextView) view.findViewById(R.id.group_row_text);
+                viewTag = (ImageView) view.findViewById(R.id.group_row_tag);
+
+            }
+
+            public TextView getTextView() {
+                return textView;
+            }
+
+            public void setGroup(Group currentGroup) {
+                this.currentGroup = currentGroup;
+            }
+
+            @Override
+            public void onClick(View view) {
+
+                /** When a group box is clicked, pass its GroupId to the new group fragment instead
+                 * of passing the entire group.
+                 */
+                MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(currentGroup.getGroupId());
+                action.setGroupID(currentGroup.getGroupId());
+                NavHostFragment.findNavController(MainFragment.this).navigate(action);
+            }
         }
 
-        public void setGroup(Group currentGroup) {
-            this.currentGroup = currentGroup;
-        }
-
+        // Create new views (invoked by the layout manager)
         @Override
-        public void onClick(View view) {
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+            // Create a new view, which defines the UI of the list item
+            View view = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.group_row_item, viewGroup, false);
 
-            /** When a group box is clicked, pass its GroupId to the new group fragment instead
-             * of passing the entire group.
+            return new ViewHolder(view);
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+
+            // Get element from your dataset at this position and replace the
+            // contents of the view with that element
+            viewHolder.getTextView().setText(sortedList.get(position).getName());
+            viewHolder.setGroup(sortedList.get(position));
+
+            /* Changes or removes the image on each group list item based on whether
+             * the user is the owner, moderator, or neither. If the user is both owner and moderator,
+             * the owner tag will take preference.
+             *
+             * The shape of the image tag can be changed in group_row_item.xml
+             * The colors can be changed in colors.xml
              */
-            MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(currentGroup.getGroupId());
-            action.setGroupID(currentGroup.getGroupId());
-            NavHostFragment.findNavController(fragment).navigate(action);
-        }
-    }
-
-    // Create new views (invoked by the layout manager)
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        // Create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.group_row_item, viewGroup, false);
-
-        return new ViewHolder(view);
-    }
-
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-
-        // Get element from your dataset at this position and replace the
-        // contents of the view with that element
-        viewHolder.getTextView().setText(sortedList.get(position).getName());
-        viewHolder.setGroup(sortedList.get(position));
-
-        /* Changes or removes the image on each group list item based on whether
-         * the user is the owner, moderator, or neither. If the user is both owner and moderator,
-         * the owner tag will take preference.
-         *
-         * The shape of the image tag can be changed in group_row_item.xml
-         * The colors can be changed in colors.xml
-         */
-        switch (sortedList.get(position).getGroupRole()) {
-            case OWNER:
-                viewHolder.viewTag.setVisibility(View.VISIBLE);
-                viewHolder.viewTag.setColorFilter(fragment.getResources().getColor(R.color.owner_color));
-                break;
-            case MODERATOR:
-                viewHolder.viewTag.setVisibility(View.VISIBLE);
-                viewHolder.viewTag.setColorFilter(fragment.getResources().getColor(R.color.moderator_color));
-                break;
-            case USER:
-                viewHolder.viewTag.setVisibility(View.INVISIBLE);
-                break;
+            switch (sortedList.get(position).getGroupRole()) {
+                case OWNER:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
+                    break;
+                case MODERATOR:
+                    viewHolder.viewTag.setVisibility(View.VISIBLE);
+                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    break;
+                case USER:
+                    viewHolder.viewTag.setVisibility(View.INVISIBLE);
+                    break;
+            }
         }
 
-        if (sortedList.get(position).isPinned()) {
-            viewHolder.textView.setTextColor(fragment.getResources().getColor(R.color.primary_d2));
+        // Return the size of your dataset (invoked by the layout manager)
+        @Override
+        public int getItemCount() {
+            return sortedList.size();
         }
-    }
-
-    // Return the size of your dataset (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return sortedList.size();
     }
 }
+
