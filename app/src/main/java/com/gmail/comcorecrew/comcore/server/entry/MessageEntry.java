@@ -34,12 +34,13 @@ public final class MessageEntry {
     public final String contents;
 
     /**
-     * Create a MessageEntry with information about who sent it and when.
+     * Create a MessageEntry with information about who sent it and when. An empty contents
+     * represents a deleted message.
      *
      * @param id        the MessageID of the message
      * @param sender    the user that sent the message
      * @param timestamp the timestamp from when the message was sent
-     * @param contents  the contents of the message
+     * @param contents  the contents of the message (or empty)
      */
     public MessageEntry(MessageID id, UserID sender, long timestamp, String contents) {
         if (id == null) {
@@ -48,8 +49,8 @@ public final class MessageEntry {
             throw new IllegalArgumentException("message sender cannot be null");
         } else if (timestamp < 1) {
             throw new IllegalArgumentException("message timestamp cannot be less than 1");
-        } else if (contents == null || contents.isEmpty()) {
-            throw new IllegalArgumentException("message contents cannot be null or empty");
+        } else if (contents == null) {
+            throw new IllegalArgumentException("message contents cannot be null");
         }
 
         this.id = id;
