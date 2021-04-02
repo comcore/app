@@ -80,89 +80,61 @@
             android:id="@+id/divider3"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="396dp"
+            android:layout_marginTop="364dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="0dp" />
 
         <Switch
-            android:id="@+id/high_all_switch"
+            android:id="@+id/mute_all_switch"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="5dp"
-            android:text="@string/high_all_switch"
+            android:text="@string/mute_all_switch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/all_switch_label" />
 
         <Switch
-            android:id="@+id/medium_all_switch"
+            android:id="@+id/mention_all_switch"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="28dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="@string/medium_all_switch"
-            app:layout_constraintBottom_toTopOf="@+id/low_all_switch"
+            android:text="@string/mention_all_switch"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/high_all_switch" />
+            app:layout_constraintTop_toBottomOf="@+id/mute_all_switch" />
 
         <Switch
-            android:id="@+id/low_all_switch"
-            android:layout_width="300dp"
-            android:layout_height="13dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="20dp"
-            android:text="@string/low_all_switch"
-            app:layout_constraintBottom_toTopOf="@+id/divider3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Switch
-            android:id="@+id/high_current_switch"
+            android:id="@+id/mute_current_switch"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="5dp"
-            android:text="@string/high_current_switch"
+            android:text="@string/mute_current_switch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.504"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/current_switch_label" />
 
         <Switch
-            android:id="@+id/medium_current_switch"
+            android:id="@+id/mention_current_switch"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="28dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="@string/medium_current_switch"
-            app:layout_constraintBottom_toTopOf="@+id/low_current_switch"
+            android:text="@string/mention_current_switch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/high_current_switch" />
-
-        <Switch
-            android:id="@+id/low_current_switch"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="148dp"
-            android:layout_marginEnd="5dp"
-            android:text="@string/low_current_switch"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.495"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider3" />
+            app:layout_constraintTop_toBottomOf="@+id/mute_current_switch" />
 
         <TextView
             android:id="@+id/all_switch_label"
