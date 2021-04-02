@@ -1,13 +1,14 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
 import android.graphics.Color;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.TextAppearanceSpan;
 
 import androidx.annotation.NonNull;
+
+import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +68,26 @@ public class ChatMention {
     public boolean mentionsUser(String name) {
         return mentionName.equalsIgnoreCase(MENTION_ALL)
                 || mentionName.equalsIgnoreCase(name);
+    }
+
+    /**
+     * Check if the mentioned user is contained in a group.
+     *
+     * @param group the group to check for the user in
+     * @return true if they are in the group, false otherwise
+     */
+    public boolean containsMentioned(Group group) {
+        if (mentionName.equalsIgnoreCase(MENTION_ALL)) {
+            return true;
+        }
+
+        for (User user : group.getUsers()) {
+            if (user.getName().equalsIgnoreCase(mentionName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -145,12 +166,13 @@ public class ChatMention {
     }
 
     /**
-     * Format a message to include a special color for mentions.
+     * Format a message to include a special color for mentions of users in the group.
      *
      * @param message the message to parse
+     * @param group   the current group
      * @return the formatted string
      */
-    public static CharSequence formatMentions(String message) {
+    public static CharSequence formatMentions(String message, Group group) {
         if (message == null || message.isEmpty()) {
             return "[deleted]";
         }
@@ -159,11 +181,13 @@ public class ChatMention {
         List<ChatMention> mentions = parseMentions(message);
         Collections.reverse(mentions);
         for (ChatMention mention : mentions) {
-            int start = mention.index;
-            int end = start + mention.length();
-            ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
-            builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            builder.replace(start, end, mention.toString());
+            if (mention.containsMentioned(group)) {
+                int start = mention.index;
+                int end = start + mention.length();
+                ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
+                builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                builder.replace(start, end, mention.toString());
+            }
         }
 
         return builder;
