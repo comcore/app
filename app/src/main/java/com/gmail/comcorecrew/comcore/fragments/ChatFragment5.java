@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -111,8 +112,8 @@ public class ChatFragment5 extends Fragment {
     }
 
     public void refresh() {
-        mMessageAdapter.notifyDataSetChanged();
-        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+        messageAdapter.notifyDataSetChanged();
+        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
     }
 
     @Override
