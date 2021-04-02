@@ -18,50 +18,33 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
-import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
-import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
-import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
 import java.util.ArrayList;
 
 public class TaskListFragment extends Fragment {
-
-    private TaskList currentTaskList;
+    public static TaskList taskList;
     private CustomAdapter tasklistAdapter;
-    public static ArrayList<TaskItem> tasks =  new ArrayList<>();
 
     public TaskListFragment() {
         // Required empty public constructor
     }
 
     public static TaskListFragment newInstance() {
-        TaskListFragment fragment = new TaskListFragment();
-        return fragment;
+        return new TaskListFragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        /** Retrieve the TaskList passed from GroupFragment
-         */
-
-        currentTaskList = TaskListFragmentArgs.fromBundle(getArguments()).getTaskList();
     }
 
     @Override
@@ -78,12 +61,14 @@ public class TaskListFragment extends Fragment {
         rvGroups.setAdapter(tasklistAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
+        taskList.setCallback(this::refresh);
+        taskList.refresh();
+
         return rootView;
     }
 
     public void refresh() {
-        currentTaskList.refresh();
-        tasklistAdapter.refresh();
+        tasklistAdapter.notifyDataSetChanged();
     }
 
 
@@ -92,7 +77,7 @@ public class TaskListFragment extends Fragment {
 
         /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_tasklist_fragment);
-        welcomeText.setText(currentTaskList.getName());
+        welcomeText.setText(taskList.getName());
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -124,21 +109,21 @@ public class TaskListFragment extends Fragment {
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page. The GroupID is passed to settings. */
-                TaskListFragmentDirections.ActionTaskListFragmentToSettingsFragment action = TaskListFragmentDirections.actionTaskListFragmentToSettingsFragment(currentTaskList.getGroup().getGroupId());
-                action.setGroupId(currentTaskList.getGroup().getGroupId());
+                TaskListFragmentDirections.ActionTaskListFragmentToSettingsFragment action = TaskListFragmentDirections.actionTaskListFragmentToSettingsFragment(taskList.getGroup().getGroupId());
+                action.setGroupId(taskList.getGroup().getGroupId());
                 NavHostFragment.findNavController(TaskListFragment.this).navigate(action);
                 return true;
             case R.id.create_task:
                 /** Handle creating a new task **/
-                CreateTaskDialog addTaskDialog = new CreateTaskDialog(currentTaskList);
+                CreateTaskDialog addTaskDialog = new CreateTaskDialog(taskList);
                 addTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.delete_task:
-                ViewTasksDialog deleteTaskDialog = new ViewTasksDialog(currentTaskList, 0);
+                ViewTasksDialog deleteTaskDialog = new ViewTasksDialog(taskList, 0);
                 deleteTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.update_task:
-                ViewTasksDialog updateTaskDialog = new ViewTasksDialog(currentTaskList, 1);
+                ViewTasksDialog updateTaskDialog = new ViewTasksDialog(taskList, 1);
                 updateTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             default:
@@ -157,42 +142,9 @@ public class TaskListFragment extends Fragment {
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            private TaskItem currentTaskItem;
-
             public ViewHolder(View view) {
                 super(view);
-
             }
-
-            public void setTaskItem(TaskItem currentTaskItem) {
-                this.currentTaskItem = currentTaskItem;
-            }
-
-        }
-
-        public CustomAdapter() {
-            refresh();
-        }
-
-        private void refresh() {
-            ServerConnector.getTasks((TaskListID) currentTaskList.getId(), result -> {
-             if (result.isFailure()) {
-                new ErrorDialog(R.string.error_cannot_connect)
-                    .show(getParentFragmentManager(), null);
-                return;
-             }
-
-             TaskEntry[] info = result.data;
-             ArrayList<TaskItem> serverTasks = new ArrayList<>();
-             for (int i = 0; i < result.data.length; i++) {
-                TaskItem nextTaskItem = new TaskItem(info[i]);
-                serverTasks.add(nextTaskItem);
-             }
-             tasks = serverTasks;
-             currentTaskList.setTasks(tasks);
-
-             notifyDataSetChanged();
-             });
         }
 
         @Override
@@ -206,23 +158,20 @@ public class TaskListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
-
             TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
-            dataText.setText(tasks.get(position).getData());
-            if (tasks.get(position).isCompleted()) {
+            TaskEntry task = taskList.getEntry(position);
+            dataText.setText(task.description);
+            if (task.completed) {
                 completedText.setText(R.string.completed);
-            }
-            else {
+            } else {
                 completedText.setText(R.string.not_completed);
             }
-            viewHolder.setTaskItem(tasks.get(position));
-
         }
 
         @Override
         public int getItemCount() {
-            return tasks.size();
+            return taskList.numEntries();
         }
     }
 }

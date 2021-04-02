@@ -241,9 +241,9 @@ public class GroupFragment extends Fragment {
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_chatFragment5);
                 } else if (currentModule instanceof TaskList) {
-                    GroupFragmentDirections.ActionGroupFragmentToTaskListFragment action = GroupFragmentDirections.actionGroupFragmentToTaskListFragment((TaskList) currentModule);
-                    action.setTaskList((TaskList) currentModule);
-                    NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                    TaskListFragment.taskList = (TaskList) currentModule;
+                    NavHostFragment.findNavController(GroupFragment.this)
+                            .navigate(R.id.action_groupFragment_to_taskListFragment);
                 }
             }
         }

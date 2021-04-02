@@ -146,6 +146,14 @@ public class TaskList extends Module {
         toCache();
     }
 
+    public int numEntries() {
+        return tasks.size();
+    }
+
+    public TaskEntry getEntry(int i) {
+        return tasks.get(i).toEntry((TaskListID) getId());
+    }
+
     /**
      * Returns the data in the object as an array list of task entries.
      *
