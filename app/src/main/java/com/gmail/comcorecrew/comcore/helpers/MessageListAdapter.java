@@ -103,7 +103,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents, messaging));
+            messageText.setText(ChatMention.formatMentions(message.contents, messaging.getGroup()));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
@@ -152,7 +152,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents, messaging));
+            messageText.setText(ChatMention.formatMentions(message.contents, messaging.getGroup()));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
             UserStorage.lookup(message.sender, user -> {
