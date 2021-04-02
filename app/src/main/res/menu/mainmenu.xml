@@ -2,17 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- View Invitations -->
+    <item
+        android:id="@+id/refresh_button"
+        android:title="@string/refresh" />
+
     <item
         android:id="@+id/invitesFragment"
         android:title="@string/view_invites"
         app:showAsAction="never" />
 
-    <!-- Settings -->
-
     <item
-        android:id="@+id/refresh_button"
-        android:title="@string/refresh" />
+        android:id="@+id/pin_group"
+        android:title="@string/pin_group"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/settingsFragment"
         android:title="@string/action_settings"

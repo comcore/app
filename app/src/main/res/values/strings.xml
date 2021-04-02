@@ -144,6 +144,10 @@
     <string name="medium_current_switch">Enable medium priority notifications</string>
     <string name="low_current_switch">Enable low priority notifications</string>
 
+    <!-- Pin Groups -->
+    <string name="pin_group">Pin A Group</string>
+    <string name="pin_group_desc">Choose a group to pin (or unpin)</string>
+
 
 
 </resources>
