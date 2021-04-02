@@ -88,8 +88,6 @@ public class ChatFragment5 extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        messaging.refresh();
-
         initialize(view);
 
         //       System.out.println("JUST FINISHED INITIALIZING");
@@ -102,6 +100,9 @@ public class ChatFragment5 extends Fragment {
         mMessageAdapter = new MessageListAdapter(getContext(), messaging);
         mMessageRecycler.setAdapter(mMessageAdapter);
         mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+
+        messaging.setCallback(this::refresh);
+        messaging.refresh();
 
 
 //        messaging.refresh();
@@ -129,6 +130,11 @@ public class ChatFragment5 extends Fragment {
                 }
             }
         });
+    }
+
+    public void refresh() {
+        mMessageAdapter.notifyDataSetChanged();
+        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
     }
 
     @Override
