@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.abstracts;
 
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.LockObject;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -23,7 +24,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private boolean muted; //Contains muted status of module notifications
     private boolean mentionMuted; //Contains mention muted status of module notifications
     private long lastUpdated; //Last time contents were updated
-    private final Object cacheLock = new Object(); //Allows caching synchronization
+    private final LockObject cacheLock = new LockObject(); //Allows caching synchronization
     private transient int index; //index of the module
     private transient Runnable onUpdate;
 
