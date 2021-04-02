@@ -38,7 +38,8 @@ public class ChatMention {
      * @return true if they are mentioned, false otherwise
      */
     public boolean mentionsUser(String name) {
-        return mentionName.equals(MENTION_ALL) || mentionName.equals(getName(name, 0));
+        return mentionName.equalsIgnoreCase(MENTION_ALL)
+                || mentionName.equalsIgnoreCase(getName(name, 0));
     }
 
     /**
