@@ -15,13 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 
 public class ViewGroupsDialog extends DialogFragment {
 
 
-
     public void ViewTasksDialog () {
-
     }
 
     @Override
