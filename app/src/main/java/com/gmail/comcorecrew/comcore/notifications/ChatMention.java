@@ -38,7 +38,8 @@ public class ChatMention {
      * @return true if they are mentioned, false otherwise
      */
     public boolean mentionsUser(String name) {
-        return mentionName.equals(MENTION_ALL) || mentionName.equals(getName(name, 0));
+        return mentionName.equalsIgnoreCase(MENTION_ALL)
+                || mentionName.equalsIgnoreCase(getName(name, 0));
     }
 
     /**
@@ -58,17 +59,19 @@ public class ChatMention {
      * @return the parsed name substring
      */
     private static String getName(String message, int startIndex) {
-        int endIndex;
-        for (endIndex = startIndex; endIndex < message.length(); endIndex++) {
-            if (Character.isWhitespace(message.charAt(endIndex))) {
+        int ch, offset;
+        for (offset = 0; offset < message.length(); offset += Character.charCount(ch)) {
+            ch = message.codePointAt(offset);
+
+            if (!Character.isLetterOrDigit(ch)) {
                 break;
             }
         }
 
-        if (endIndex == startIndex) {
+        if (offset == startIndex) {
             return null;
         } else {
-            return message.substring(startIndex, endIndex);
+            return message.substring(startIndex, offset);
         }
     }
 
@@ -89,6 +92,7 @@ public class ChatMention {
                 mentions.add(new ChatMention(mentionName, mentionIndex));
             }
         }
+        System.out.println(mentions);
         return mentions;
     }
 

@@ -34,7 +34,6 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
     private CustomAdapter groupAdapter;
     private LinearLayoutManager groupLayout;
-    private ArrayList<Group> pinGroupList;
     private RecyclerView rvGroups;
 
     public MainFragment() {
@@ -49,7 +48,6 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        pinGroupList = sortPinnedList();
 
     }
 
@@ -63,7 +61,7 @@ public class MainFragment extends Fragment {
         rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
         groupLayout = new LinearLayoutManager(getActivity());
         rvGroups.setLayoutManager(groupLayout);
-        groupAdapter = new CustomAdapter(pinGroupList);
+        groupAdapter = new CustomAdapter();
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
         refresh();
@@ -72,22 +70,8 @@ public class MainFragment extends Fragment {
     }
 
     public void refresh() {
-        pinGroupList = sortPinnedList();
         InviteLinkDialog.showIfPossible(this);
-        GroupStorage.refresh(null);
-        groupAdapter.notifyDataSetChanged();
-    }
-
-    public ArrayList<Group> sortPinnedList() {
-        ArrayList<Group> newList = AppData.groups;
-        for (int i = 0; i < newList.size(); i++) {
-            if (newList.get(i).isPinned()) {
-                Group tempGroup = newList.get(i);
-                newList.remove(i);
-                newList.add(0, tempGroup);
-            }
-        }
-        return newList;
+        GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -118,14 +102,14 @@ public class MainFragment extends Fragment {
                         .show(getParentFragmentManager(), null);
                 return true;
             case R.id.pin_group:
-                new ViewGroupsDialog()
+                new ViewGroupsDialog(this)
                         .show(getParentFragmentManager(), null);
                 return true;
             case R.id.refresh_button:
                 refresh();
                 return true;
             case R.id.createGroupFragment:
-                NavHostFragment.findNavController(MainFragment.this)
+                NavHostFragment.findNavController(this)
                         .navigate(R.id.action_mainFragment_to_createGroupFragment);
                 return true;
             case R.id.settingsFragment:
@@ -134,7 +118,7 @@ public class MainFragment extends Fragment {
                 MainFragmentDirections.ActionMainFragmentToSettingsFragment action = MainFragmentDirections.actionMainFragmentToSettingsFragment(new GroupID("NO_GROUP"));
                 GroupID noGroup = new GroupID("NO_GROUP");
                 action.setGroupId(noGroup);
-                NavHostFragment.findNavController(MainFragment.this).navigate(action);
+                NavHostFragment.findNavController(this).navigate(action);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -145,13 +129,6 @@ public class MainFragment extends Fragment {
      * the list of groups in the GUI
      */
     class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-
-        private ArrayList<Group> sortedList;
-
-        CustomAdapter(ArrayList<Group> sortedList) {
-            this.sortedList = sortedList;
-        }
-
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private ImageView viewTag;
@@ -203,8 +180,8 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(sortedList.get(position).getName());
-            viewHolder.setGroup(sortedList.get(position));
+            viewHolder.getTextView().setText(AppData.groups.get(position).getName());
+            viewHolder.setGroup(AppData.groups.get(position));
 
             /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
@@ -213,7 +190,7 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            switch (sortedList.get(position).getGroupRole()) {
+            switch (AppData.groups.get(position).getGroupRole()) {
                 case OWNER:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
                     viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
@@ -227,7 +204,7 @@ public class MainFragment extends Fragment {
                     break;
             }
 
-            if (sortedList.get(position).isPinned()) {
+            if (AppData.groups.get(position).isPinned()) {
                 viewHolder.textView.setTextColor(getResources().getColor(R.color.primary));
             }
             else {
@@ -238,7 +215,7 @@ public class MainFragment extends Fragment {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return sortedList.size();
+            return AppData.groups.size();
         }
     }
 }

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Group implements NotificationListener {
+public class Group implements NotificationListener, Comparable<Group> {
 
     private GroupID groupID;
     private String groupName;
@@ -413,5 +413,34 @@ public class Group implements NotificationListener {
     @Override
     public Collection<? extends NotificationListener> getChildren() {
         return modules;
+    }
+
+    @Override
+    public int compareTo(Group o) {
+        int compare;
+
+        // Put pinned groups first
+        if ((compare = Boolean.compare(o.isPinned, isPinned)) != 0) {
+            return compare;
+        }
+
+        // Put moderated groups first
+        GroupRole roleA = groupRole == null ? GroupRole.USER : groupRole;
+        GroupRole roleB = o.groupRole == null ? GroupRole.USER : o.groupRole;
+        if ((compare = roleB.compareTo(roleA)) != 0) {
+            return compare;
+        }
+
+        // Sort by alphabetically next
+        String a = groupName == null ? "" : groupName;
+        String b = o.groupName == null ? "" : o.groupName;
+        if ((compare = a.compareToIgnoreCase(b)) != 0) {
+            return compare;
+        }
+
+        // Sort by group ID last
+        a = groupID == null ? "" : groupID.id;
+        a = o.groupID == null ? "" : o.groupID.id;
+        return groupID.id.compareTo(o.groupID.id);
     }
 }

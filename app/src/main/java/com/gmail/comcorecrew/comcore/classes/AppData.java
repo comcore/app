@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Singleton class to store data and contains helper functions.
@@ -119,8 +121,11 @@ public class AppData {
         groups.remove(groups.size() - 1);
     }
 
-    public static void refresh() {
-
+    public static void normalizeGroupList() {
+        Collections.sort(groups);
+        for (int i = 0; i < groups.size(); i++) {
+            groups.get(i).setIndex(i);
+        }
     }
 
     public static void writeBool(boolean b, Writer writer) throws IOException {

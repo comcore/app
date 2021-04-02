@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -105,19 +106,19 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             String mentionFormatted = "";
             String mention = "";
             int z = -1;
-            if (message.contents.contains("@")) {
-                String mention_with_at = "@";
-                z = message.contents.indexOf("@") + 1;
+            if (message.contents.contains("@<")) {
+                String mention_with_at = "@<";
+                z = message.contents.indexOf("@") + 2;
                 for (int i = z; i < message.contents.length(); i++) {
-                    if (message.contents.charAt(i) != ' ') {
+                    if (message.contents.charAt(i) != '>') {
                         mention += message.contents.charAt(i);
                     } else {
                         break;
                     }
                 }
-                mention_with_at += mention;
-                if (!mention_with_at.equals("@")) {
-                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+mention_with_at+"</font>");
+                mention_with_at += mention + '>';
+                if (!mention_with_at.equals("@<")) {
+                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+ "@" + mention +"</font>");
                     System.out.println("MentionFormatted: " + mentionFormatted);
                 }
             }
@@ -154,7 +155,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(this.getAdapterPosition(), 121, 0, "Delete");
             menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            if (messaging.getGroup().getGroupRole() == GroupRole.MODERATOR || messaging.getGroup().getGroupRole() == GroupRole.OWNER) {
+                menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            }
         }
     }
 
@@ -192,19 +195,19 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             String mentionFormatted = "";
             String mention = "";
             int z = -1;
-            if (message.contents.contains("@")) {
-                String mention_with_at = "@";
-                z = message.contents.indexOf("@") + 1;
+            if (message.contents.contains("@<")) {
+                String mention_with_at = "@<";
+                z = message.contents.indexOf("@") + 2;
                 for (int i = z; i < message.contents.length(); i++) {
-                    if (message.contents.charAt(i) != ' ') {
+                    if (message.contents.charAt(i) != '>') {
                         mention += message.contents.charAt(i);
                     } else {
                         break;
                     }
                 }
-                mention_with_at += mention;
-                if (!mention_with_at.equals("@")) {
-                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+mention_with_at+"</font>");
+                mention_with_at += mention + '>';
+                if (!mention_with_at.equals("@<")) {
+                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+ "@" + mention +"</font>");
                     System.out.println("MentionFormatted: " + mentionFormatted);
                 }
             }
@@ -240,9 +243,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         // Creates menu for each message with 3 options
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-            menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            if (messaging.getGroup().getGroupRole() == GroupRole.MODERATOR || messaging.getGroup().getGroupRole() == GroupRole.OWNER) {
+                menu.add(this.getAdapterPosition(), 121, 0, "Delete");
+                menu.add(this.getAdapterPosition(), 122, 1, "Edit");
+                menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            }
         }
     }
 }

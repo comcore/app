@@ -5,6 +5,9 @@
     <item
         android:id="@+id/go_back"
         android:title="@string/back" />
+    <item
+        android:id="@+id/pinned_messages"
+        android:title="@string/pinned_messages"/>
 
     <item
         android:id="@+id/pin_message"

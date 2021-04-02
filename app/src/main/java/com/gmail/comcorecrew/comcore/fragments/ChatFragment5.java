@@ -23,6 +23,7 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
@@ -45,7 +46,6 @@ import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 public class ChatFragment5 extends Fragment {
     public static Messaging messaging;
-    private MessageID messageID;
     private MessageEntry messageEntry;
 
     private Button sendButton;
@@ -56,7 +56,6 @@ public class ChatFragment5 extends Fragment {
 
     boolean isEditMode = false;
     boolean isDeleteMode = false;
-    private MessageEntry editMessage;
 
     public ChatFragment5() {
         // Required empty public constructor
@@ -139,10 +138,11 @@ public class ChatFragment5 extends Fragment {
                 /** Handle back button **/
                 NavHostFragment.findNavController(this).popBackStack();
                 return true;
-            case R.id.pin_message:
-                /** Handle pin message **/
 
+            case R.id.pinned_messages:
+                /**Handle pinned messages button **/
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -150,11 +150,6 @@ public class ChatFragment5 extends Fragment {
 
     @Override
     public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-//        MenuInflater menuInflater = getContext().getMenuInflater();
-//        menuInflater.inflate(R.menu.chat_message_menu, menu);
-//        menu.setHeaderTitle("Menu");
-//        menu.add(0, v.getId(), 0, "Update");
-//        menu.add(0, v.getId(), 0, "Edit");
         messageAdapter.notifyDataSetChanged();
         messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
 
@@ -253,13 +248,9 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void pinMessage(MenuItem item) {
-//        item.getGroupId();
-//        MessageID messageID = messageList.get(item.getGroupId()).id;
-//        messaging.createPinnedMessages();
-//
-//        mMessageAdapter.notifyDataSetChanged();
-//        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-//
-//        messageToBeSent.getText().clear();
+        item.getGroupId();
+        messageEntry = messaging.getEntry(item.getGroupId());
+        boolean x = PinnedMessages.pinUnpinMessage(messageEntry);
+        System.out.println(x);
     }
 }
