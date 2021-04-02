@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
@@ -53,7 +54,6 @@ public class PinnedMessages extends CustomChat {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
-                        ((PinnedMessages) module).pinMessage(message);
                         if (((PinnedMessages) module).pinMessage(message)) {
                             return 1;
                         }
@@ -150,7 +150,7 @@ public class PinnedMessages extends CustomChat {
     }
 
     @Override
-    public void viewInit(@NonNull View view) {
+    public void viewInit(@NonNull View view, Fragment current) {
         //TODO Implement
     }
 

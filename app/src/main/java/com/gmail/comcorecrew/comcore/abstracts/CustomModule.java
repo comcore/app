@@ -20,6 +20,7 @@ import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
@@ -252,12 +253,12 @@ public abstract class CustomModule extends Module {
         });
     }
 
-    public void onViewCreated(@NonNull View view) {
+    public void onViewCreated(@NonNull View view, Fragment fragment) {
         this.view = view;
-        viewInit(view);
+        viewInit(view, fragment);
     }
 
-    abstract public void viewInit(View view);
+    abstract public void viewInit(View view, Fragment fragment);
 
     abstract public int getLayout();
 
