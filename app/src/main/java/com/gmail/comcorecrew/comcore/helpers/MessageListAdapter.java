@@ -110,7 +110,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 //            System.out.println("Inside BIND SENT MESSAGE");
 //            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
 //            LocalDateTime now = LocalDateTime.now();
-            messageText.setText(message.contents);
+            messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
             //timeText.setText(dtf.format(now));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
@@ -165,7 +165,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         void bind(MessageEntry message) {
  //           System.out.println("Inside BIND RECEIVED MESSAGE");
 //            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-            messageText.setText(message.contents);
+            messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
 //            timeText.setText(dtf.format(message.getTime()));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
