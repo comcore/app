@@ -19,4 +19,6 @@
     <color name="secondary_d1">#AAAAAA</color>
     <color name="owner_color">#313C7A</color>
     <color name="moderator_color">#60647E</color>
+    <color name="red">#ff0000</color>
+    <color name="blue">#0000ff</color>
 </resources>

@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
@@ -150,7 +151,7 @@ public class PinnedMessages extends CustomChat {
     }
 
     @Override
-    public void viewInit(@NonNull View view) {
+    public void viewInit(@NonNull View view, Fragment current) {
         //TODO Implement
     }
 

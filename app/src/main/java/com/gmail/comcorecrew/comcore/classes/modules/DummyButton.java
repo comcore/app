@@ -1,8 +1,11 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
@@ -29,7 +32,13 @@ public class DummyButton extends CustomChat {
     }
 
     @Override
-    public void viewInit(@NonNull View view) {
+    public void viewInit(@NonNull View view, Fragment current) {
+        view.findViewById(R.id.dummy_back_button).setOnClickListener(clickedView -> {
+            NavHostFragment.findNavController(current)
+                    .popBackStack();
+        });
+
+        refreshView(view);
     }
 
     @Override
@@ -37,9 +46,15 @@ public class DummyButton extends CustomChat {
         return R.layout.fragment_custom_button;
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public void refreshView(View view) {
 
+        if (getState() == 1) {
+            view.findViewById(R.id.dummy_button).setBackgroundColor(R.color.blue);
+        } else {
+            view.findViewById(R.id.dummy_button).setBackgroundColor(R.color.red);
+        }
     }
 
     public int getState() {
