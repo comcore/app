@@ -146,7 +146,7 @@
     <!-- Pin Groups -->
     <string name="pin_group">Pin A Group</string>
     <string name="pin_group_desc">Choose a group to pin (or unpin)</string>
-
+    <string name="pinned_messages">Pinned Messages</string>
 
 
 </resources>
