@@ -18,9 +18,10 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 
 public class ViewGroupsDialog extends DialogFragment {
+    private final MainFragment fragment;
 
-
-    public void ViewTasksDialog () {
+    public ViewGroupsDialog(MainFragment fragment) {
+        this.fragment = fragment;
     }
 
     @Override
@@ -84,6 +85,7 @@ public class ViewGroupsDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 AppData.getGroup(currentGroup.getIndex()).setPinned(!currentGroup.isPinned());
+                fragment.refresh();
                 dismiss();
             }
         }
