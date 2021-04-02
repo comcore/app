@@ -47,7 +47,7 @@ public class GroupStorage {
 
             // Remove any duplicated groups
             if (existingIds.containsKey(id)) {
-                AppData.groups.remove(i--);
+                AppData.deleteGroup(i--);
                 continue;
             }
 
@@ -57,55 +57,58 @@ public class GroupStorage {
         // Get all of the groups that the user is part of
         ServerConnector.getGroups(result -> {
             HashMap<GroupID, Group> ids;
+            ArrayList<Group> newGroups;
             if (result.isSuccess()) {
                 // Update the list of groups if the request was successful
                 ids = new HashMap<>(existingIds.size());
-                AppData.groups.clear();
+                newGroups = new ArrayList<>(AppData.groups.size());
                 for (GroupID id : result.data) {
                     // Check for an existing group object to reuse
                     Group group = existingIds.get(id);
                     if (group != null) {
                         ids.put(id, group);
-                        AppData.groups.add(group);
+                        newGroups.add(group);
                         continue;
                     }
 
                     // Create a new group object for this new group since it wasn't present before
                     group = new Group(id);
-                    AppData.groups.add(group);
+                    newGroups.add(group);
                     ids.put(id, group);
                 }
             } else {
                 ids = existingIds;
+                newGroups = null;
             }
 
             // Update the group info of any existing groups
             ServerConnector.getGroupInfo(ids.keySet(), 0, resultGroups -> {
-                if (resultGroups.isFailure()) {
-                    if (callback != null) {
-                        callback.run();
+                if (resultGroups.isSuccess()) {
+                    // Iterate over every group and refresh their user information as well
+                    HashSet<UserID> alreadyRefreshed = new HashSet<>();
+                    for (GroupInfo info : resultGroups.data) {
+                        Group group = ids.get(info.id);
+                        if (group == null) {
+                            continue;
+                        }
+
+                        // Update the group's info
+                        group.setName(info.name);
+                        group.setGroupRole(info.role);
+                        group.setMuted(info.muted);
+
+                        // Refresh the group's users (and store the group data)
+                        group.refreshUsers(alreadyRefreshed, null);
+
+                        // Refresh the group's modules (and store the module data)
+                        group.refreshModules(null);
                     }
-                    return;
                 }
 
-                // Iterate over every group and refresh their user information as well
-                HashSet<UserID> alreadyRefreshed = new HashSet<>();
-                for (GroupInfo info : resultGroups.data) {
-                    Group group = ids.get(info.id);
-                    if (group == null) {
-                        continue;
-                    }
-
-                    // Update the group's info
-                    group.setName(info.name);
-                    group.setGroupRole(info.role);
-                    group.setMuted(info.muted);
-
-                    // Refresh the group's users (and store the group data)
-                    group.refreshUsers(alreadyRefreshed, null);
-
-                    // Refresh the group's modules (and store the module data)
-                    group.refreshModules(null);
+                // Update the list of groups using the new info
+                if (newGroups != null) {
+                    AppData.groups = newGroups;
+                    AppData.normalizeGroupList();
                 }
 
                 // Run the callback after setting all of the info
@@ -216,10 +219,11 @@ public class GroupStorage {
             throw new InvalidFileFormatException("Cannot read groups directory!");
         }
         for (File file : files) {
-            AppData.groups.add(new Group(new GroupID(file.getName())));
-            readGroup(AppData.groups.get(AppData.groups.size() - 1));
-            AppData.groups.get(AppData.groups.size() - 1).setIndex(AppData.groups.size() - 1);
+            Group group = new Group(new GroupID(file.getName()));
+            AppData.groups.add(group);
+            readGroup(group);
         }
+        AppData.normalizeGroupList();
     }
 
     /**
@@ -313,6 +317,7 @@ public class GroupStorage {
             }
         }
         AppData.groups.add(group);
+        AppData.normalizeGroupList();
         storeGroup(group);
         return true;
     }
