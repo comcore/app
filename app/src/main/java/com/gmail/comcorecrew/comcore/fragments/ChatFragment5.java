@@ -7,10 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
@@ -62,6 +71,9 @@ public class ChatFragment5 extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = this.getArguments();
+        setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -102,6 +114,39 @@ public class ChatFragment5 extends Fragment {
     public void refresh() {
         messageAdapter.notifyDataSetChanged();
         messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.chatmenu, menu);
+    }
+
+    /**
+     * Handles click events for the option menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.go_back:
+                /** Handle back button **/
+                NavHostFragment.findNavController(this).popBackStack();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+//        MenuInflater menuInflater = getContext().getMenuInflater();
+//        menuInflater.inflate(R.menu.chat_message_menu, menu);
+//        menu.setHeaderTitle("Menu");
+//        menu.add(0, v.getId(), 0, "Update");
+//        menu.add(0, v.getId(), 0, "Edit");
+        messageAdapter.notifyDataSetChanged();
+        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
+
     }
 
     // Listens for selection of an item in the ContextMenu in messageAdapter
