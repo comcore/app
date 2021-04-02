@@ -17,6 +17,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/createGroupFragment"
+        android:title="@string/title_create_group"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/settingsFragment"
         android:title="@string/action_settings"
         app:showAsAction="never" />

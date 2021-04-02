@@ -94,14 +94,6 @@ public class MainFragment extends Fragment {
 
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
         welcomeText.setText("Welcome " + ServerConnector.getUser().name);
-
-        view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(MainFragment.this)
-                        .navigate(R.id.action_mainFragment_to_createGroupFragment);
-            }
-        });
     }
 
     @Override
@@ -130,6 +122,10 @@ public class MainFragment extends Fragment {
                 return true;
             case R.id.refresh_button:
                 refresh();
+                return true;
+            case R.id.createGroupFragment:
+                NavHostFragment.findNavController(MainFragment.this)
+                        .navigate(R.id.action_mainFragment_to_createGroupFragment);
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page. The GroupID is passed as NO_GROUP, which
