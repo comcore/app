@@ -105,7 +105,7 @@ public class TaskListFragment extends Fragment {
 
             case R.id.refresh_button:
                 /** Handle refresh **/
-                refresh();
+                taskList.refresh();
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page. The GroupID is passed to settings. */
