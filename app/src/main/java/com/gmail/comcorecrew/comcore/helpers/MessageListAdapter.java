@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.helpers;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.Html;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
@@ -100,13 +102,52 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-            timeText.setText(format(message.timestamp));
-            dateText.setText(format2(message.timestamp));
-            UserStorage.lookup(message.sender, user -> {
-                nameText.setText(user.getName());
-            });
-            messageText.setOnCreateContextMenuListener(this);
+            String mentionFormatted = "";
+            String mention = "";
+            int z = -1;
+            if (message.contents.contains("@")) {
+                String mention_with_at = "@";
+                z = message.contents.indexOf("@") + 1;
+                for (int i = z; i < message.contents.length(); i++) {
+                    if (message.contents.charAt(i) != ' ') {
+                        mention += message.contents.charAt(i);
+                    } else {
+                        break;
+                    }
+                }
+                mention_with_at += mention;
+                if (!mention_with_at.equals("@")) {
+                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+mention_with_at+"</font>");
+                    System.out.println("MentionFormatted: " + mentionFormatted);
+                }
+            }
+
+            boolean isUser = false;
+
+            for (int i = 0; i < messaging.getGroup().getUsers().size(); i++) {
+                if (mention.equals(messaging.getGroup().getUsers().get(i).getName())) {
+                    isUser = true;
+                    break;
+                }
+            }
+
+            if (!mentionFormatted.equals("") & isUser){
+                messageText.setText(message.contents.isEmpty() ? "[deleted]" : Html.fromHtml(mentionFormatted));
+                timeText.setText(format(message.timestamp));
+                dateText.setText(format2(message.timestamp));
+                UserStorage.lookup(message.sender, user -> {
+                    nameText.setText(user.getName());
+                });
+                messageText.setOnCreateContextMenuListener(this);
+            } else {
+                messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
+                timeText.setText(format(message.timestamp));
+                dateText.setText(format2(message.timestamp));
+                UserStorage.lookup(message.sender, user -> {
+                    nameText.setText(user.getName());
+                });
+                messageText.setOnCreateContextMenuListener(this);
+            }
         }
 
         @Override
@@ -148,13 +189,52 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-            timeText.setText(format(message.timestamp));
-            dateText.setText(format2(message.timestamp));
-            UserStorage.lookup(message.sender, user -> {
-                nameText.setText(user.getName());
-            });
-            messageText.setOnCreateContextMenuListener(this);
+            String mentionFormatted = "";
+            String mention = "";
+            int z = -1;
+            if (message.contents.contains("@")) {
+                String mention_with_at = "@";
+                z = message.contents.indexOf("@") + 1;
+                for (int i = z; i < message.contents.length(); i++) {
+                    if (message.contents.charAt(i) != ' ') {
+                        mention += message.contents.charAt(i);
+                    } else {
+                        break;
+                    }
+                }
+                mention_with_at += mention;
+                if (!mention_with_at.equals("@")) {
+                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+mention_with_at+"</font>");
+                    System.out.println("MentionFormatted: " + mentionFormatted);
+                }
+            }
+
+            boolean isUser = false;
+
+            for (int i = 0; i < messaging.getGroup().getUsers().size(); i++) {
+                if (mention.equals(messaging.getGroup().getUsers().get(i).getName())) {
+                    isUser = true;
+                    break;
+                }
+            }
+
+            if (!mentionFormatted.equals("") & isUser){
+                messageText.setText(message.contents.isEmpty() ? "[deleted]" : Html.fromHtml(mentionFormatted));
+                timeText.setText(format(message.timestamp));
+                dateText.setText(format2(message.timestamp));
+                UserStorage.lookup(message.sender, user -> {
+                    nameText.setText(user.getName());
+                });
+                messageText.setOnCreateContextMenuListener(this);
+            } else {
+                messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
+                timeText.setText(format(message.timestamp));
+                dateText.setText(format2(message.timestamp));
+                UserStorage.lookup(message.sender, user -> {
+                    nameText.setText(user.getName());
+                });
+                messageText.setOnCreateContextMenuListener(this);
+            }
         }
 
         // Creates menu for each message with 3 options

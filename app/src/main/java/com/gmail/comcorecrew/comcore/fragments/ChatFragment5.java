@@ -136,27 +136,12 @@ public class ChatFragment5 extends Fragment {
             return;
         }
 
-        String x = messageToBeSent.getText().toString();
-
         ChatID chatID = (ChatID) messaging.getId();
-        ServerConnector.sendMessage(chatID, x, result -> {
+        ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
                 new StringErrorDialog(result.errorMessage)
                         .show(getParentFragmentManager(), null);
             }
-//            if (x.contains("@")) {
-//               String[] z = x.split(" ");
-//                for (int i = 0; i < z.length; i++) {
-//                    if (z[i].startsWith("@")) {
-//                        for (int j = 0; j < messaging.getGroup().getUsers().size(); j++) {
-//                            if (z[i].substring(1).equals(messaging.getGroup().getUsers().get(j).getName())) {
-//                                ChatMention chatMention;
-//                                parseCha
-//                            }
-//                        }
-//                    }
-//                }
-//            }
             messaging.onReceiveMessage(result.data);
             refresh();
             messageToBeSent.getText().clear();
