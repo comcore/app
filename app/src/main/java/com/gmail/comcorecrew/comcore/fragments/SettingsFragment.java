@@ -12,30 +12,24 @@ import android.view.ViewGroup;
 import android.widget.Switch;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
+
+import java.util.ArrayList;
 
 public class SettingsFragment extends Fragment {
-
-    GroupID currentGroupID = null;
+    public static Group currentGroup = null;
 
     public SettingsFragment() {
         // Required empty public constructor
     }
 
     public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        currentGroupID = SettingsFragmentArgs.fromBundle(getArguments()).getGroupId();
+        return new SettingsFragment();
     }
 
     @Override
@@ -48,25 +42,27 @@ public class SettingsFragment extends Fragment {
          * enabled two factor authentication.
          */
         Switch twoFactorSwitch = rootView.findViewById(R.id.settings_two_factor_switch);
+        Switch muteCurrentSwitch = rootView.findViewById(R.id.mute_current_switch);
         Switch mentionCurrentSwitch = rootView.findViewById(R.id.mention_current_switch);
 
         ServerConnector.getTwoFactor(result -> {
+            System.out.println(result);
             if (result.isSuccess()) {
                 twoFactorSwitch.setChecked(result.data);
             }
         });
 
-        /** If NO_GROUP was passed to the SettingsFragment, the settings relating to the current
-         * group should not be displayed.
-         */
-        if (currentGroupID.toString().equals("NO_GROUP")) {
+        if (currentGroup == null) {
             rootView.findViewById(R.id.current_switch_label).setVisibility(View.INVISIBLE);
-            rootView.findViewById(R.id.mention_current_switch).setVisibility(View.INVISIBLE);
-            rootView.findViewById(R.id.mute_current_switch).setVisibility(View.INVISIBLE);
-        }
-        else if (!GroupStorage.getGroup(currentGroupID).getModule(0).isMentionMuted()) {
-            mentionCurrentSwitch.setChecked(true);
-
+            muteCurrentSwitch.setVisibility(View.INVISIBLE);
+            mentionCurrentSwitch.setVisibility(View.INVISIBLE);
+        } else {
+            ArrayList<Module> modules = currentGroup.getModules();
+            if (!modules.isEmpty()) {
+                Module module = modules.get(0);
+                muteCurrentSwitch.setChecked(!module.isMuted());
+                mentionCurrentSwitch.setChecked(!module.isMentionMuted());
+            }
         }
 
         return rootView;
@@ -85,8 +81,6 @@ public class SettingsFragment extends Fragment {
         view.findViewById(R.id.settings_submit_button).setOnClickListener(clickedView -> {
 
             Switch twoFactorSwitch = view.findViewById(R.id.settings_two_factor_switch);
-            Switch muteAllSwitch = view.findViewById(R.id.mute_all_switch);
-            Switch mentionAllSwitch = view.findViewById(R.id.mention_all_switch);
             Switch muteCurrentSwitch = view.findViewById(R.id.mute_current_switch);
             Switch mentionCurrentSwitch = view.findViewById(R.id.mention_current_switch);
 
@@ -98,63 +92,12 @@ public class SettingsFragment extends Fragment {
                 }
             });
 
-            /** Check if notifications for the current group should be muted **/
-            if (!muteCurrentSwitch.isChecked()) {
-                for (int i = 0; i < GroupStorage.getGroup(currentGroupID).getModules().size(); i++) {
-                    GroupStorage.getGroup(currentGroupID).getModule(i).setMuted(true);
+            if (currentGroup != null) {
+                for (Module module : currentGroup.getModules()) {
+                    module.setMuted(!muteCurrentSwitch.isChecked());
+                    module.setMentionMuted(!mentionCurrentSwitch.isChecked());
                 }
             }
-            else {
-                for (int i = 0; i < GroupStorage.getGroup(currentGroupID).getModules().size(); i++) {
-                    GroupStorage.getGroup(currentGroupID).getModule(i).setMuted(false);
-                }
-            }
-
-            /** Check if mention notifications for the current group should be muted **/
-            if (!mentionCurrentSwitch.isChecked()) {
-                for (int i = 0; i < GroupStorage.getGroup(currentGroupID).getModules().size(); i++) {
-                    GroupStorage.getGroup(currentGroupID).getModule(i).setMentionMuted(true);
-                }
-            }
-            else {
-                for (int i = 0; i < GroupStorage.getGroup(currentGroupID).getModules().size(); i++) {
-                    GroupStorage.getGroup(currentGroupID).getModule(i).setMentionMuted(false);
-                }
-            }
-
-            /** Check if mention notifications for all groups should be muted **/
-            if (!mentionAllSwitch.isChecked()) {
-                for (int i = 0; i < AppData.groups.size(); i++) {
-                    for (int j = 0; j < AppData.getGroup(i).getModules().size(); j++) {
-                        AppData.getGroup(i).getModule(j).setMentionMuted(true);
-                    }
-                }
-            }
-            else {
-                for (int i = 0; i < AppData.groups.size(); i++) {
-                    for (int j = 0; j < AppData.getGroup(i).getModules().size(); j++) {
-                        AppData.getGroup(i).getModule(j).setMentionMuted(false);
-                    }
-                }
-            }
-
-            /** Check if mention notifications for all groups should be muted **/
-            if (!muteAllSwitch.isChecked()) {
-                for (int i = 0; i < AppData.groups.size(); i++) {
-                    for (int j = 0; j < AppData.getGroup(i).getModules().size(); j++) {
-                        AppData.getGroup(i).getModule(j).setMuted(true);
-                    }
-                }
-            }
-            else {
-                for (int i = 0; i < AppData.groups.size(); i++) {
-                    for (int j = 0; j < AppData.getGroup(i).getModules().size(); j++) {
-                        AppData.getGroup(i).getModule(j).setMuted(false);
-                    }
-                }
-            }
-
-
 
             /** Close the settings fragment **/
             NavHostFragment.findNavController(this)

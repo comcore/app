@@ -113,12 +113,10 @@ public class MainFragment extends Fragment {
                         .navigate(R.id.action_mainFragment_to_createGroupFragment);
                 return true;
             case R.id.settingsFragment:
-                /** Handle moving to the settings page. The GroupID is passed as NO_GROUP, which
-                 * will not be treated like a real GroupID by SettingsFragment */
-                MainFragmentDirections.ActionMainFragmentToSettingsFragment action = MainFragmentDirections.actionMainFragmentToSettingsFragment(new GroupID("NO_GROUP"));
-                GroupID noGroup = new GroupID("NO_GROUP");
-                action.setGroupId(noGroup);
-                NavHostFragment.findNavController(this).navigate(action);
+                /** Handle moving to the settings page */
+                SettingsFragment.currentGroup = null;
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_mainFragment_to_settingsFragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

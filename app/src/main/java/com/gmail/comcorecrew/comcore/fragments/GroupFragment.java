@@ -194,10 +194,9 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.settingsFragment:
                 /** Handle passing the current GroupID to the settings page */
-                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action =
-                        GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroup.getGroupId());
-                action.setGroupId(currentGroup.getGroupId());
-                NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                SettingsFragment.currentGroup = currentGroup;
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_groupFragment_to_settingsFragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

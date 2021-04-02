@@ -168,6 +168,49 @@ public class TaskList extends Module {
     }
 
     @Override
+    public void onTaskAdded(TaskEntry task) {
+        if (!task.id.module.equals(getId())) {
+            return;
+        }
+
+        addTask(task);
+    }
+
+    @Override
+    public void onTaskUpdated(TaskEntry task) {
+        if (!task.id.module.equals(getId())) {
+            return;
+        }
+
+        long id = task.id.id;
+        for (TaskItem item : tasks) {
+            if (item.getTaskid() == id) {
+                item.setTimestamp(task.timestamp);
+                item.setData(task.description);
+                item.setCompleted(task.completed);
+                this.toCache();
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onTaskDeleted(TaskID task) {
+        if (!task.module.equals(getId())) {
+            return;
+        }
+
+        long id = task.id;
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getTaskid() == id) {
+                tasks.remove(i);
+                toCache();
+                return;
+            }
+        }
+    }
+
+    @Override
     protected void readToCache() {
         if (tasks.size() == 0) {
             return;
