@@ -3,14 +3,20 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.helpers.PinnedMessageAdapter;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -152,6 +158,19 @@ public class PinnedMessages extends CustomChat {
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
         //TODO Implement
+
+        PinnedMessageAdapter pinnedAdapter;
+        RecyclerView pinnedRecycler;
+
+
+        pinnedRecycler = (RecyclerView) view.findViewById(R.id.recycler_pinned_messages);
+        LinearLayoutManager manager = new LinearLayoutManager(current.getContext());
+        manager.setStackFromEnd(true);
+        pinnedRecycler.setLayoutManager(manager);
+        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), readPinned());
+        pinnedRecycler.setAdapter(pinnedAdapter);
+        pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
+        refresh();
     }
 
     @Override
@@ -161,7 +180,7 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public int getLayout() {
-        return -1; //TODO Implement
+        return R.layout.fragment_pinned_messages;
     }
 
     @Override
