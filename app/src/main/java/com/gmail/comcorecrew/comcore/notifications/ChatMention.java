@@ -1,8 +1,16 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,11 +18,27 @@ import java.util.List;
  */
 public class ChatMention {
     public static final String MENTION_ALL = "all";
+    public static final char START_BLOCK = '<';
+    public static final char END_BLOCK = '>';
+    public static final int MENTION_COLOR = Color.GREEN;
+
+    /**
+     * Represents the two kinds of styles a mention can be.
+     */
+    public enum Style {
+        WORD,
+        BLOCK,
+    }
 
     /**
      * The name that was mentioned.
      */
     public final String mentionName;
+
+    /**
+     * The style of the mention.
+     */
+    public final Style style;
 
     /**
      * The index of the mention in the string.
@@ -24,10 +48,13 @@ public class ChatMention {
     /**
      * Create a ChatMention from a mentioned name.
      *
-     * @param mentionName the name that was mentioned or "all"
+     * @param mentionName the name that was mentioned
+     * @param style       the style of the mention
+     * @param index       where the mention occurred in the string
      */
-    public ChatMention(String mentionName, int index) {
+    public ChatMention(String mentionName, Style style, int index) {
         this.mentionName = mentionName;
+        this.style = style;
         this.index = index;
     }
 
@@ -39,7 +66,7 @@ public class ChatMention {
      */
     public boolean mentionsUser(String name) {
         return mentionName.equalsIgnoreCase(MENTION_ALL)
-                || mentionName.equalsIgnoreCase(getName(name, 0));
+                || mentionName.equalsIgnoreCase(name);
     }
 
     /**
@@ -48,21 +75,38 @@ public class ChatMention {
      * @return the number of characters in the mention
      */
     public int length() {
-        return mentionName.length() + 1;
+        switch (style) {
+            case WORD:
+                return mentionName.length() + 1;
+            case BLOCK:
+                return mentionName.length() + 3;
+            default:
+                throw new IllegalStateException("invalid style");
+        }
     }
 
     /**
-     * Extracts a first name from a string. Used for parsing mentions.
+     * Parse the contents of a mention from a string.
      *
-     * @param message    the message
-     * @param startIndex the start index to parse from
-     * @return the parsed name substring
+     * @param message the message
+     * @param atIndex the index of the at symbol
+     * @return the parsed ChatMention
      */
-    private static String getName(String message, int startIndex) {
-        int ch, offset;
-        for (offset = 0; offset < message.length(); offset += Character.charCount(ch)) {
-            ch = message.codePointAt(offset);
+    private static ChatMention parseMention(String message, int atIndex) {
+        int startIndex = atIndex + 1;
+        if (message.charAt(startIndex) == START_BLOCK) {
+            int endIndex = message.indexOf(END_BLOCK, startIndex + 1);
+            if (endIndex == -1) {
+                return null;
+            }
 
+            String name = message.substring(startIndex + 1, endIndex);
+            return new ChatMention(name, Style.BLOCK, atIndex);
+        }
+
+        int ch, offset;
+        for (offset = startIndex; offset < message.length(); offset += Character.charCount(ch)) {
+            ch = message.codePointAt(offset);
             if (!Character.isLetterOrDigit(ch)) {
                 break;
             }
@@ -70,30 +114,59 @@ public class ChatMention {
 
         if (offset == startIndex) {
             return null;
-        } else {
-            return message.substring(startIndex, offset);
         }
+
+        String name = message.substring(startIndex, offset);
+        return new ChatMention(name, Style.WORD, atIndex);
     }
 
     /**
-     * Find all of the mentions in a message of the format @ followed by a word.
+     * Find all of the mentions in a message.
      *
      * @param message the message to parse
      * @return a list of all chat mentions
      */
-    public static List<ChatMention> parseChatMentions(String message) {
+    public static List<ChatMention> parseMentions(String message) {
         ArrayList<ChatMention> mentions = new ArrayList<>(0);
+
         int index = 0;
         while ((index = message.indexOf('@', index)) != -1) {
-            int mentionIndex = index++;
-            String mentionName = getName(message, index);
-            if (mentionName != null) {
-                index += mentionName.length();
-                mentions.add(new ChatMention(mentionName, mentionIndex));
+            ChatMention mention = parseMention(message, index);
+            if (mention == null) {
+                index++;
+                continue;
             }
+
+            mentions.add(mention);
+            index += mention.length();
         }
-        System.out.println(mentions);
+
         return mentions;
+    }
+
+    /**
+     * Format a message to include a special color for mentions.
+     *
+     * @param message the message to parse
+     * @return the formatted string
+     */
+    public static CharSequence formatMentions(String message) {
+        if (message == null || message.isEmpty()) {
+            return "[deleted]";
+        }
+
+        SpannableStringBuilder builder = new SpannableStringBuilder(message);
+        List<ChatMention> mentions = parseMentions(message);
+        Collections.reverse(mentions);
+        for (ChatMention mention : mentions) {
+            int start = mention.index;
+            int end = start + mention.length();
+            ForegroundColorSpan color = new ForegroundColorSpan(MENTION_COLOR);
+            builder.setSpan(color, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            builder.replace(start, end, mention.toString());
+        }
+
+        return builder;
     }
 
     @Override
