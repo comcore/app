@@ -33,6 +33,7 @@ public class Group implements NotificationListener, Comparable<Group> {
     private boolean isMuted;
     private boolean isPinned;
     private ArrayList<Module> modules;
+    private transient ArrayList<ModuleInfo> disabledModules;
     private ArrayList<User> users;
     private ArrayList<UserID> moderators;
     private UserID owner;
@@ -166,9 +167,17 @@ public class Group implements NotificationListener, Comparable<Group> {
                 return;
             }
 
+            // Reset the disabled modules list
+            disabledModules = new ArrayList<>();
+
             // Add any newly created modules to the group
             HashSet<ModuleID> keptIds = new HashSet<>();
             for (ModuleInfo info : result.data) {
+                if (!info.enabled) {
+                    disabledModules.add(info);
+                    continue;
+                }
+
                 Module module = ids.get(info.id);
                 if (module == null) {
                     module = createModule(info);
@@ -273,6 +282,13 @@ public class Group implements NotificationListener, Comparable<Group> {
 
     public void setModules(ArrayList<Module> modules) {
         this.modules = modules;
+    }
+
+    public ArrayList<ModuleInfo> getDisabledModules() {
+        if (disabledModules == null) {
+            disabledModules = new ArrayList<>(0);
+        }
+        return disabledModules;
     }
 
     public int getIndex() {
@@ -397,7 +413,7 @@ public class Group implements NotificationListener, Comparable<Group> {
             modules.set(i, modules.get(i + 1));
             modules.get(i).setIndex(i);
         }
-        modules.remove(modules.size());
+        modules.remove(modules.size() - 1);
     }
 
     @Override

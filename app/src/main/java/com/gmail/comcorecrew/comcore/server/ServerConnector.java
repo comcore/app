@@ -350,6 +350,27 @@ public final class ServerConnector {
     }
 
     /**
+     * Set whether a module is enabled or disabled.
+     *
+     * @param module  the module to enable/disable
+     * @param enabled whether the module should be enabled
+     * @param handler the handler for the response of the server
+     */
+    public static void setModuleEnabled(ModuleID module, boolean enabled,
+                                        ResultHandler<Void> handler) {
+        if (module == null) {
+            throw new IllegalArgumentException("ModuleID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", module.group.id);
+        data.addProperty("id", module.id);
+        data.addProperty("enabled", enabled);
+        getConnection().send(new ServerMsg("setModuleEnabled", data), handler,
+                response -> null);
+    }
+
+    /**
      * Get a list of all users in a group, including the current user.
      *
      * @param group   the group to list the users of

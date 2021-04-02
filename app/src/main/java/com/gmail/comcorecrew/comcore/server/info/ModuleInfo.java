@@ -34,13 +34,19 @@ public final class ModuleInfo {
     public final long cacheClearTimestamp;
 
     /**
+     * Whether the module is enabled and should be shown to the user.
+     */
+    public final boolean enabled;
+
+    /**
      * Create a ModuleInfo from a ModuleID and a name.
      *
-     * @param id   the ModuleID of the module
-     * @param name the name of the module
+     * @param id      the ModuleID of the module
+     * @param name    the name of the module
      * @param cacheClearTimestamp when the last cache-clearing action occurred
+     * @param enabled whether the module is enabled
      */
-    public ModuleInfo(ModuleID id, String name, long cacheClearTimestamp) {
+    public ModuleInfo(ModuleID id, String name, long cacheClearTimestamp, boolean enabled) {
         if (id == null) {
             throw new IllegalArgumentException("ModuleID cannot be null");
         } else if (name == null || name.isEmpty()) {
@@ -52,6 +58,7 @@ public final class ModuleInfo {
         this.id = id;
         this.name = name;
         this.cacheClearTimestamp = cacheClearTimestamp;
+        this.enabled = enabled;
     }
 
     /**
@@ -66,7 +73,8 @@ public final class ModuleInfo {
         String name = json.get("name").getAsString();
         JsonElement lastUpdateJson = json.get("lastUpdate");
         long cacheClearTimestamp = lastUpdateJson == null ? 0 : lastUpdateJson.getAsLong();
-        return new ModuleInfo(id, name, cacheClearTimestamp);
+        boolean enabled = json.get("enabled").getAsBoolean();
+        return new ModuleInfo(id, name, cacheClearTimestamp, enabled);
     }
 
     @Override
