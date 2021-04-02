@@ -90,6 +90,6 @@ public abstract class ModuleID extends ItemID {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), group);
+        return Objects.hash(id, group);
     }
 }
