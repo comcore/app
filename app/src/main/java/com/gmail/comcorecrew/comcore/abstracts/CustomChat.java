@@ -110,6 +110,10 @@ public abstract class CustomChat extends CustomModule {
 
     @Override
     public void onReceiveMessage(MessageEntry message) {
+        if (!message.id.module.equals(getId())) {
+            return;
+        }
+
         addMessage(message);
         if (getView() != null) {
             refreshView(getView());
@@ -118,6 +122,10 @@ public abstract class CustomChat extends CustomModule {
 
     @Override
     public void onMessageUpdated(MessageEntry message) {
+        if (!message.id.module.equals(getId())) {
+            return;
+        }
+
         updateItem(message);
         if (getView() != null) {
             refreshView(getView());

@@ -154,10 +154,17 @@ public class Messaging extends Module {
 
     @Override
     public void onReceiveMessage(MessageEntry message) {
-        MessageID lastMessageId = latestMessageId();
-        if (!message.id.immediatelyAfter(lastMessageId)) {
-            messages.clear();
+        if (!message.id.module.equals(getId())) {
+            return;
         }
+
+        // Don't add it directly if the cache is empty, but refresh the whole chat instead
+        MessageID lastMessageId = latestMessageId();
+        if (lastMessageId == null || !message.id.immediatelyAfter(lastMessageId)) {
+            refresh();
+            return;
+        }
+
         addMessage(message);
         this.toCache();
     }
@@ -165,6 +172,10 @@ public class Messaging extends Module {
     @Override
     public void onMessageUpdated(MessageEntry message) {
         if (messages.isEmpty()) {
+            return;
+        }
+
+        if (!message.id.module.equals(getId())) {
             return;
         }
 
