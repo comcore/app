@@ -120,7 +120,7 @@ public class NotificationHandler implements NotificationListener {
         // Check for mentions for the current user in the notification
         String name = ServerConnector.getUser().name;
         boolean mentioned = false;
-        for (ChatMention mention : ChatMention.parseChatMentions(message.contents)) {
+        for (ChatMention mention : ChatMention.parseMentions(message.contents)) {
             if (mention.mentionsUser(name)) {
                 if (module.isMentionMuted()) {
                     return;

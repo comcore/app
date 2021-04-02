@@ -103,52 +103,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            String mentionFormatted = "";
-            String mention = "";
-            int z = -1;
-            if (message.contents.contains("@<")) {
-                String mention_with_at = "@<";
-                z = message.contents.indexOf("@") + 2;
-                for (int i = z; i < message.contents.length(); i++) {
-                    if (message.contents.charAt(i) != '>') {
-                        mention += message.contents.charAt(i);
-                    } else {
-                        break;
-                    }
-                }
-                mention_with_at += mention + '>';
-                if (!mention_with_at.equals("@<")) {
-                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+ "@" + mention +"</font>");
-                    System.out.println("MentionFormatted: " + mentionFormatted);
-                }
-            }
-
-            boolean isUser = false;
-
-            for (int i = 0; i < messaging.getGroup().getUsers().size(); i++) {
-                if (mention.equals(messaging.getGroup().getUsers().get(i).getName())) {
-                    isUser = true;
-                    break;
-                }
-            }
-
-            if (!mentionFormatted.equals("") & isUser){
-                messageText.setText(message.contents.isEmpty() ? "[deleted]" : Html.fromHtml(mentionFormatted));
-                timeText.setText(format(message.timestamp));
-                dateText.setText(format2(message.timestamp));
-                UserStorage.lookup(message.sender, user -> {
-                    nameText.setText(user.getName());
-                });
-                messageText.setOnCreateContextMenuListener(this);
-            } else {
-                messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-                timeText.setText(format(message.timestamp));
-                dateText.setText(format2(message.timestamp));
-                UserStorage.lookup(message.sender, user -> {
-                    nameText.setText(user.getName());
-                });
-                messageText.setOnCreateContextMenuListener(this);
-            }
+            messageText.setText(ChatMention.formatMentions(message.contents));
+            timeText.setText(format(message.timestamp));
+            dateText.setText(format2(message.timestamp));
+            UserStorage.lookup(message.sender, user -> {
+                nameText.setText(user.getName());
+            });
+            messageText.setOnCreateContextMenuListener(this);
         }
 
         @Override
@@ -192,52 +153,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
 
         void bind(MessageEntry message) {
-            String mentionFormatted = "";
-            String mention = "";
-            int z = -1;
-            if (message.contents.contains("@<")) {
-                String mention_with_at = "@<";
-                z = message.contents.indexOf("@") + 2;
-                for (int i = z; i < message.contents.length(); i++) {
-                    if (message.contents.charAt(i) != '>') {
-                        mention += message.contents.charAt(i);
-                    } else {
-                        break;
-                    }
-                }
-                mention_with_at += mention + '>';
-                if (!mention_with_at.equals("@<")) {
-                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+ "@" + mention +"</font>");
-                    System.out.println("MentionFormatted: " + mentionFormatted);
-                }
-            }
-
-            boolean isUser = false;
-
-            for (int i = 0; i < messaging.getGroup().getUsers().size(); i++) {
-                if (mention.equals(messaging.getGroup().getUsers().get(i).getName())) {
-                    isUser = true;
-                    break;
-                }
-            }
-
-            if (!mentionFormatted.equals("") & isUser){
-                messageText.setText(message.contents.isEmpty() ? "[deleted]" : Html.fromHtml(mentionFormatted));
-                timeText.setText(format(message.timestamp));
-                dateText.setText(format2(message.timestamp));
-                UserStorage.lookup(message.sender, user -> {
-                    nameText.setText(user.getName());
-                });
-                messageText.setOnCreateContextMenuListener(this);
-            } else {
-                messageText.setText(message.contents.isEmpty() ? "[deleted]" : message.contents);
-                timeText.setText(format(message.timestamp));
-                dateText.setText(format2(message.timestamp));
-                UserStorage.lookup(message.sender, user -> {
-                    nameText.setText(user.getName());
-                });
-                messageText.setOnCreateContextMenuListener(this);
-            }
+            messageText.setText(ChatMention.formatMentions(message.contents));
+            timeText.setText(format(message.timestamp));
+            dateText.setText(format2(message.timestamp));
+            UserStorage.lookup(message.sender, user -> {
+                nameText.setText(user.getName());
+            });
+            messageText.setOnCreateContextMenuListener(this);
         }
 
         // Creates menu for each message with 3 options
