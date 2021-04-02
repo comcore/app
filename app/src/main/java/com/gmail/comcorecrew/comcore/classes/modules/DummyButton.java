@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 
 import android.annotation.SuppressLint;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +34,10 @@ public class DummyButton extends CustomChat {
 
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
+
+        TextView welcomeText = (TextView) view.findViewById(R.id.label_dummy_fragment);
+        welcomeText.setText("Dummy");
+
         view.findViewById(R.id.dummy_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(current)
                     .popBackStack();
