@@ -193,8 +193,7 @@ public class GroupStorage {
      * @throws IOException if an IO error occurs
      */
     public static void storeModule(Module module) throws IOException {
-        File moduleData = new File(AppData.groupsDir, module.getGroupIdString() + "/"
-                + module.getLocatorString());
+        File moduleData = new File(AppData.groupsDir, module.getLocatorString());
         if ((!moduleData.exists()) && (!moduleData.createNewFile())) {
             throw new IOException("Cannot store module: " + module.getLocatorString());
         }
