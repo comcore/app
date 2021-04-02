@@ -48,19 +48,13 @@ public class SettingsFragment extends Fragment {
         Switch twoFactorSwitch = rootView.findViewById(R.id.settings_two_factor_switch);
 
         ServerConnector.getTwoFactor(result -> {
-            if (result.isSuccess()) {
-                if (result.data.booleanValue() == true) {
-                    twoFactorSwitch.setChecked(true);
-                }
-                else {
-                    twoFactorSwitch.setChecked(false);
-                }
-            }
-            else {
+            if (result.isFailure()) {
                 new ErrorDialog(R.string.error_cannot_connect)
                         .show(getParentFragmentManager(), null);
                 return;
             }
+
+            twoFactorSwitch.setChecked(result.data);
         });
 
 
@@ -93,24 +87,12 @@ public class SettingsFragment extends Fragment {
             Switch twoFactorSwitch = view.findViewById(R.id.settings_two_factor_switch);
 
             /** Set Two Factor Authentication */
-            if (twoFactorSwitch.isChecked()) {
-                ServerConnector.setTwoFactor(true, result -> {
-                    if (result.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
-                        return;
-                    }
-                });
-            }
-            else {
-                ServerConnector.setTwoFactor(false, result -> {
-                    if (result.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
-                        return;
-                    }
-                });
-            }
+            ServerConnector.setTwoFactor(twoFactorSwitch.isChecked(), result -> {
+                if (result.isFailure()) {
+                    new ErrorDialog(R.string.error_cannot_connect)
+                            .show(getParentFragmentManager(), null);
+                }
+            });
 
             /** Close the settings fragment **/
             NavHostFragment.findNavController(this)
