@@ -82,10 +82,10 @@ public abstract class ModuleID extends ItemID {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!(o instanceof ModuleID)) return false;
         ModuleID moduleID = (ModuleID) o;
-        return group.equals(moduleID.group);
+        return id.equals(moduleID.id)
+                && group.equals(moduleID.group);
     }
 
     @Override
