@@ -23,7 +23,7 @@ public abstract class Module implements Serializable, NotificationListener {
     private boolean muted; //Contains muted status of module notifications
     private boolean mentionMuted; //Contains mention muted status of module notifications
     private long lastUpdated; //Last time contents were updated
-    private transient final Object cacheLock = new Object(); //Allows caching synchronization
+    private final Object cacheLock = new Object(); //Allows caching synchronization
     private transient int index; //index of the module
     private transient Runnable onUpdate;
 
