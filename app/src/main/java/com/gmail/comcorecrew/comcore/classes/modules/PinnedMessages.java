@@ -54,7 +54,6 @@ public class PinnedMessages extends CustomChat {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
-                        ((PinnedMessages) module).pinMessage(message);
                         if (((PinnedMessages) module).pinMessage(message)) {
                             return 1;
                         }
