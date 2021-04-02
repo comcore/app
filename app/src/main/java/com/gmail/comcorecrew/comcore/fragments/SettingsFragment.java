@@ -46,7 +46,6 @@ public class SettingsFragment extends Fragment {
         Switch mentionCurrentSwitch = rootView.findViewById(R.id.mention_current_switch);
 
         ServerConnector.getTwoFactor(result -> {
-            System.out.println(result);
             if (result.isSuccess()) {
                 twoFactorSwitch.setChecked(result.data);
             }
