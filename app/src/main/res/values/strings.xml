@@ -72,7 +72,7 @@
     <string name="error_cannot_kick">The user could not be kicked.</string>
     <string name="error_cannot_mute">The user could not be muted.</string>
     <string name="error_cannot_unmute">The user could not be unmuted.</string>
-    <string name="error_cannot_create_module">The module could not be created.</string>
+    <string name="error_module_not_selected">No module type selected.</string>
     <string name="error_unknown_module_type">An unknown type of module was received.</string>
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>

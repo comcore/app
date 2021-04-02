@@ -57,6 +57,7 @@ public class MainFragment extends Fragment {
         groupAdapter = new CustomAdapter();
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
+        refresh();
 
         return rootView;
     }
