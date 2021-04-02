@@ -18,6 +18,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
 import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -114,10 +115,10 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-            menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-            if (messaging.getGroup().getGroupRole() == GroupRole.MODERATOR || messaging.getGroup().getGroupRole() == GroupRole.OWNER) {
-                menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
+            menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
+            if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
             }
         }
     }
@@ -164,10 +165,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         // Creates menu for each message with 3 options
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (messaging.getGroup().getGroupRole() == GroupRole.MODERATOR || messaging.getGroup().getGroupRole() == GroupRole.OWNER) {
-                menu.add(this.getAdapterPosition(), 121, 0, "Delete");
-                menu.add(this.getAdapterPosition(), 122, 1, "Edit");
-                menu.add(this.getAdapterPosition(), 123, 2, "Pin");
+            if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 0, "Delete");
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 1, "Pin");
             }
         }
     }

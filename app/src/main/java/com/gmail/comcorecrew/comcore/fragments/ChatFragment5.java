@@ -22,21 +22,14 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
-import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
-import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
-import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
-import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
-import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,7 +38,12 @@ import com.gmail.comcorecrew.comcore.server.id.MessageID;
  */
 
 public class ChatFragment5 extends Fragment {
+    public static final int ID_EDIT_BUTTON = 121;
+    public static final int ID_DELETE_BUTTON = 122;
+    public static final int ID_PIN_BUTTON = 123;
+
     public static Messaging messaging;
+
     private MessageEntry messageEntry;
 
     private Button sendButton;
@@ -161,13 +159,13 @@ public class ChatFragment5 extends Fragment {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case 121:
-                deleteMessage(item);
-                return true;
-            case 122:
+            case ID_EDIT_BUTTON:
                 editMessage(item);
                 return true;
-            case 123:
+            case ID_DELETE_BUTTON:
+                deleteMessage(item);
+                return true;
+            case ID_PIN_BUTTON:
                 pinMessage(item);
                 return true;
             default:
