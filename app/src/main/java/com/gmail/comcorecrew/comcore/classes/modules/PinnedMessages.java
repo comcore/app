@@ -22,7 +22,6 @@ import java.util.ArrayList;
 public class PinnedMessages extends CustomChat {
 
     private String chatId;
-    private transient ArrayList<MessageEntry> pinned;
 
     public PinnedMessages(String name, CustomModuleID id, Group group, ChatID chat) {
         super(name, id, group);
@@ -33,35 +32,35 @@ public class PinnedMessages extends CustomChat {
         else {
             chatId = chat.id;
         }
-        pinned = new ArrayList<>();
     }
 
     public PinnedMessages(String name, Group group, ChatID chat) {
         super(name, group, "pinnedMessages");
         chatId = chat.id;
-        pinned = new ArrayList<>();
     }
 
-    public static void pinUnpinMessage(MessageEntry message) {
+    /**
+     * Attempts to pin/unpin the given message
+     *
+     * @param message the message to pin
+     * @return true if the message status was changed; false if no pinned module exists.
+     */
+    public static boolean pinUnpinMessage(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
-        String name = "ERROR";
         for (Group group : AppData.groups) {
             if (group.getGroupId().equals(groupID)) {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
                         ((PinnedMessages) module).pinMessage(message);
-                        return;
-                    }
-                    else if (module.getId().id.equals(chatID.id)) {
-                        name = "Pinned" + module.getName();
+                        return true;
                     }
                 }
-                PinnedMessages newPinned = new PinnedMessages(name, group, chatID);
-                newPinned.pinMessage(message);
+                return false;
             }
         }
+        return false;
     }
 
     public String getChatId() {
@@ -102,15 +101,15 @@ public class PinnedMessages extends CustomChat {
         });
     }
 
-    public void readPinned() {
+    public ArrayList<MessageEntry> readPinned() {
         ChatID chId = new ChatID(getGroup().getGroupId(), chatId);
-        pinned = new ArrayList<>();
+        ArrayList<MessageEntry> pinned = new ArrayList<>();
         for (CustomItem item : getItems()) {
-            pinned.add(new MsgCacheable(item.getData()).toEntry(chId));
+            MsgCacheable message = new MsgCacheable(item.getData());
+            if (!message.getData().equals("")) {
+                pinned.add(new MsgCacheable(item.getData()).toEntry(chId));
+            }
         }
-    }
-
-    public ArrayList<MessageEntry> getPinned() {
         return pinned;
     }
 

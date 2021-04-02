@@ -232,14 +232,7 @@ public abstract class CustomModule extends Module {
                 return;
             }
 
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).getItemId() == messageID.id) {
-                    items.set(i, new CustomItem(result.data));
-                    items.remove(i);
-                    toCache();
-                    return;
-                }
-            }
+            updateItem(result.data);
         });
     }
 
