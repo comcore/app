@@ -74,7 +74,8 @@ public class MainFragment extends Fragment {
     public void refresh() {
         pinGroupList = sortPinnedList();
         InviteLinkDialog.showIfPossible(this);
-        GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
+        GroupStorage.refresh(null);
+        groupAdapter.notifyDataSetChanged();
     }
 
     public ArrayList<Group> sortPinnedList() {
@@ -224,6 +225,13 @@ public class MainFragment extends Fragment {
                 case USER:
                     viewHolder.viewTag.setVisibility(View.INVISIBLE);
                     break;
+            }
+
+            if (sortedList.get(position).isPinned()) {
+                viewHolder.textView.setTextColor(getResources().getColor(R.color.primary));
+            }
+            else {
+                viewHolder.textView.setTextColor(getResources().getColor(R.color.black));
             }
         }
 
