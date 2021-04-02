@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
@@ -118,7 +119,13 @@ public class ChatFragment5 extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.chatmenu, menu);
+        if (messaging.getGroup().getGroupRole() == GroupRole.OWNER || messaging.getGroup().getGroupRole() == GroupRole.MODERATOR) {
+            menu.setGroupVisible(R.id.pin_group, true);
+        }
+        else {
+            menu.setGroupVisible(R.id.pin_group, true);
+        }
+
     }
 
     /**
@@ -131,7 +138,11 @@ public class ChatFragment5 extends Fragment {
             case R.id.go_back:
                 /** Handle back button **/
                 NavHostFragment.findNavController(this).popBackStack();
+                return true;
+            case R.id.pin_message:
+                /** Handle pin message **/
 
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

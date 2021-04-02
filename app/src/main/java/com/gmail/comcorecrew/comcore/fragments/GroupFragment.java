@@ -97,17 +97,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groupmenu, menu);
-        /*
-         * Possibly re-enable this. Currently I disabled it since the main menu has different items
-         * than the group menu, and the 'Refresh' button won't work in the group.
-         */
-        // inflater.inflate(R.menu.mainmenu, menu);
-
-        /*
-         * If the current user is a moderator, display R.id.menu_group_moderator_actions
-         * If the current user is an owner, display R.id.menu_group_owner_actions
-         * and R.id.menu_group_moderator_actions
-         */
 
         /**  TODO
          * If currentGroup is null, then there has been an error finding the group associated
@@ -137,7 +126,6 @@ public class GroupFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.view_members:
                 /** Handle viewing list of members **/
