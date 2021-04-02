@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +21,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
+import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -41,8 +41,8 @@ public class ChatFragment5 extends Fragment {
     private Button sendButton;
     private EditText messageToBeSent;
 
-    private RecyclerView mMessageRecycler;
-    private MessageListAdapter mMessageAdapter;
+    private RecyclerView messageRecycler;
+    private MessageListAdapter messageAdapter;
 
     boolean isEditMode = false;
     boolean isDeleteMode = false;
@@ -56,25 +56,12 @@ public class ChatFragment5 extends Fragment {
         ChatFragment5 fragment = new ChatFragment5();
         Bundle args = new Bundle();
         fragment.setArguments(args);
-        //       System.out.println("CREATED CHAT FRAG 5");
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = this.getArguments();
-//        if (bundle != null) {
-//            bundle.getClassLoader();
-//            currentGroup = bundle.getParcelable("currentGroup");
-//  //          messaging = bundle.getParcelableArray("messaging");
-//
-//        }
-//        else {
-//            new ErrorDialog(R.string.error_unknown)
-//                    .show(getParentFragmentManager(), null);
-//        }
-
     }
 
     @Override
@@ -90,39 +77,19 @@ public class ChatFragment5 extends Fragment {
 
         initialize(view);
 
-        //       System.out.println("JUST FINISHED INITIALIZING");
-
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setStackFromEnd(true);
-        mMessageRecycler.setLayoutManager(manager);
-        //mMessageRecycler.setHasFixedSize(true);
-//        System.out.println("MAKING AN ARRAY ADAPTER I GUESS");
-        mMessageAdapter = new MessageListAdapter(getContext(), messaging);
-        mMessageRecycler.setAdapter(mMessageAdapter);
-        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
+        messageRecycler.setLayoutManager(manager);
+        messageAdapter = new MessageListAdapter(getContext(), messaging);
+        messageRecycler.setAdapter(messageAdapter);
+        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
         messaging.setCallback(this::refresh);
         messaging.refresh();
-
-
-//        messaging.refresh();
-//        messageList = messaging.getEntries();
-
-//        registerForContextMenu(mMessageRecycler);
-
-//        manager.setStackFromEnd(true);
-
-//        for (int i = 0; i < messageList.size(); i++) {
-//            System.out.println("3. Message # " + i + ": " + messageList.get(i).contents);
-//        }
-
-//        System.out.println("AFTER THE RECYCLER SHIT");
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                       System.out.println("SHOULD BE SENDING A MESSAGE RIGHT ABOUT NOW");
                 if (!isEditMode & !isDeleteMode) {
                     sendMessage();
                 } else {
@@ -133,23 +100,14 @@ public class ChatFragment5 extends Fragment {
     }
 
     public void refresh() {
-        mMessageAdapter.notifyDataSetChanged();
-        mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
+        messageAdapter.notifyDataSetChanged();
+        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
     }
 
-    @Override
-    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-//        MenuInflater menuInflater = getContext().getMenuInflater();
-//        menuInflater.inflate(R.menu.chat_message_menu, menu);
-//        menu.setHeaderTitle("Menu");
-//        menu.add(0, v.getId(), 0, "Update");
-//        menu.add(0, v.getId(), 0, "Edit");
-    }
-
+    // Listens for selection of an item in the ContextMenu in messageAdapter
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()) {
             case 121:
                 deleteMessage(item);
@@ -165,85 +123,74 @@ public class ChatFragment5 extends Fragment {
         }
     }
 
+    // Initializes objects in GUI
     public void initialize(View view) {
-//        System.out.println("INSIDE INITIALIZE");
         sendButton = (Button) view.findViewById(R.id.button_gchat_send);
         messageToBeSent = (EditText) view.findViewById(R.id.edit_gchat_message);
-//        System.out.println("Before Recylcer");
-        mMessageRecycler = (RecyclerView) view.findViewById(R.id.recycler_gchat);
-//        System.out.println("After Recycler");
+        messageRecycler = (RecyclerView) view.findViewById(R.id.recycler_gchat);
     }
 
+    // Sends message to the server and updates the view.
     public void sendMessage() {
-        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
+        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().trim().isEmpty()) {
             return;
         }
-             System.out.println("Going to send that message");
 
-            System.out.println(messageToBeSent.getText().toString());
+        String x = messageToBeSent.getText().toString();
 
         ChatID chatID = (ChatID) messaging.getId();
-        ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
+        ServerConnector.sendMessage(chatID, x, result -> {
             if (result.isFailure()) {
                 new StringErrorDialog(result.errorMessage)
                         .show(getParentFragmentManager(), null);
             }
-
-                System.out.println("Before addMessage(): " + messaging.getEntries().size());
-
+//            if (x.contains("@")) {
+//               String[] z = x.split(" ");
+//                for (int i = 0; i < z.length; i++) {
+//                    if (z[i].startsWith("@")) {
+//                        for (int j = 0; j < messaging.getGroup().getUsers().size(); j++) {
+//                            if (z[i].substring(1).equals(messaging.getGroup().getUsers().get(j).getName())) {
+//                                ChatMention chatMention;
+//                                parseCha
+//                            }
+//                        }
+//                    }
+//                }
+//            }
             messaging.onReceiveMessage(result.data);
-
-
-            System.out.println("After refreshMessages(): " + messaging.getEntries().size());
-
-            mMessageAdapter.notifyDataSetChanged();
-            mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
+            refresh();
             messageToBeSent.getText().clear();
         });
     }
 
+    // Used for deleteMessage() and editMessage()
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendMessage(MessageEntry messageEntry1) {
-        System.out.println("Starting her up");
+        // If you're editing a message
         if (isEditMode) {
-
-            if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().equals("")) {
+            if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().trim().isEmpty()) {
                 return;
             }
-
-            System.out.println("editing");
-
             ServerConnector.updateMessage(messageEntry1.id, messageToBeSent.getText().toString(), result -> {
                 if (result.isFailure()) {
                     new StringErrorDialog(result.errorMessage)
                             .show(getParentFragmentManager(), null);
                 } else {
                     messaging.onMessageUpdated(result.data);
-
-                    mMessageAdapter.notifyDataSetChanged();
-                    mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
+                    refresh();
                     messageToBeSent.getText().clear();
                 }
             });
-
             isEditMode = false;
+            // If you're deleting a message
         } else {
-            //  System.out.println("Inside sendMessage");
-            System.out.println("In it now");
-
             ServerConnector.updateMessage(messageEntry1.id, null, result -> {
                 if (result.isFailure()) {
                     new StringErrorDialog(result.errorMessage)
                             .show(getParentFragmentManager(), null);
                 } else {
-                    System.out.println("We in it boys");
                     messaging.onMessageUpdated(result.data);
-
-                    mMessageAdapter.notifyDataSetChanged();
-                    mMessageRecycler.smoothScrollToPosition(mMessageAdapter.getItemCount());
-
+                    refresh();
                     messageToBeSent.getText().clear();
                     isDeleteMode = false;
                 }
@@ -259,12 +206,9 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void editMessage(MenuItem item) {
-
         messageEntry = messaging.getEntry(item.getGroupId());
         messageToBeSent.setText(messaging.getEntries().get(item.getGroupId()).contents);
-        System.out.println("MessageID: " + messageID);
         isEditMode = true;
-
     }
 
     private void pinMessage(MenuItem item) {
