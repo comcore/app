@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public abstract class CustomModule extends Module {
 
     private transient View view;
-    private transient long cacheByteLimit;
+    private long cacheByteLimit;
     private transient ArrayList<CustomItem> items;
 
     public CustomModule(String name, CustomModuleID id, Group group) {

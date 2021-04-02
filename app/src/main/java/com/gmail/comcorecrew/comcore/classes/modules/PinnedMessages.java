@@ -43,9 +43,9 @@ public class PinnedMessages extends CustomChat {
      * Attempts to pin/unpin the given message
      *
      * @param message the message to pin
-     * @return true if the message status was changed; false if no pinned module exists.
+     * @return 0 if the message was unpinned; 1 if the message was pinned; -1 if there is no module
      */
-    public static boolean pinUnpinMessage(MessageEntry message) {
+    public static int pinUnpinMessage(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
         for (Group group : AppData.groups) {
@@ -54,7 +54,35 @@ public class PinnedMessages extends CustomChat {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
                         ((PinnedMessages) module).pinMessage(message);
-                        return true;
+                        if (((PinnedMessages) module).pinMessage(message)) {
+                            return 1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                }
+                return -1;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Statically gets the pinned status of a message
+     *
+     * @param message the message to check
+     * @return true if the message is pinned; false otherwise.
+     */
+    public static boolean isPined(MessageEntry message) {
+        ChatID chatID = message.id.module;
+        GroupID groupID = chatID.group;
+        for (Group group : AppData.groups) {
+            if (group.getGroupId().equals(groupID)) {
+                for (Module module : group.getModules()) {
+                    if ((module instanceof PinnedMessages) &&
+                            (((PinnedMessages) module).chatId.equals(chatID.id))) {
+                        return ((PinnedMessages) module).isPinned(message);
                     }
                 }
                 return false;
@@ -78,12 +106,20 @@ public class PinnedMessages extends CustomChat {
         return false;
     }
 
-    public void pinMessage(MessageEntry message) {
+    /**
+     * Pins or unpins the message in the pinnedMessages module
+     *
+     * @param message the message to modify
+     * @return true if the message was pinned; false if it was not
+     */
+    public boolean pinMessage(MessageEntry message) {
         if (!isPinned(message)) {
             sendMessage(String.copyValueOf(new MsgCacheable(message).toCache()));
+            return true;
         }
         else {
             deleteMessage(message);
+            return false;
         }
     }
 
