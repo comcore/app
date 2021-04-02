@@ -2,11 +2,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/RowItemBackground"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="@color/secondary_d1"
     android:focusable="auto"
     android:gravity="center_vertical">
 
@@ -19,6 +19,7 @@
             android:id="@+id/task_description"
             android:layout_width="0dp"
             android:layout_height="35dp"
+            style="@style/RowItemBackground"
             android:gravity="center"
             android:text="@string/tl_description_default"
             android:textSize="18sp"
@@ -30,6 +31,7 @@
 
         <TextView
             android:id="@+id/task_completed_status"
+            style="@style/RowItemBackground"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"

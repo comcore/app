@@ -137,12 +137,15 @@
     <string name="all_switch_label">Change Settings For All Groups</string>
     <string name="current_switch_label">Change Settings For The Current Group</string>
     <string name="two_factor_switch">Enable two-factor authentication</string>
-    <string name="high_all_switch">Enable high priority notifications</string>
-    <string name="medium_all_switch">Enable medium priority notifications</string>
-    <string name="low_all_switch">Enable low priority notifications</string>
-    <string name="high_current_switch">Enable high priority notifications</string>
-    <string name="medium_current_switch">Enable medium priority notifications</string>
-    <string name="low_current_switch">Enable low priority notifications</string>
+    <string name="mention_all_switch">Enable notifications for mentions in all groups</string>
+    <string name="mute_all_switch">Enable notifications for all groups</string>
+    <string name="mention_current_switch">Enable notifications for mentions in this group</string>
+    <string name="mute_current_switch">Enable notifications for this group</string>
+
+
+    <!-- Pin Groups -->
+    <string name="pin_group">Pin A Group</string>
+    <string name="pin_group_desc">Choose a group to pin (or unpin)</string>
 
 
 

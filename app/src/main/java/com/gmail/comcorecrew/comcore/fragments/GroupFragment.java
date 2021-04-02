@@ -78,6 +78,9 @@ public class GroupFragment extends Fragment {
 
         refresh();
 
+        TextView groupNameText = (TextView) view.findViewById(R.id.label_group_fragment);
+        groupNameText.setText(currentGroup.getName());
+
         /**
          * If the "back" button is clicked, return to the main page
          */
@@ -89,16 +92,6 @@ public class GroupFragment extends Fragment {
 
     public void refresh() {
         currentGroup.refreshModules(moduleAdapter::notifyDataSetChanged);
-
-        /** Refresh the welcome text if the currentGroup was originally null
-         *
-         * Once the currentGroup is retrieved from the cache instead
-         * of through the server at the creation of GroupFragment, this will not be necessary
-         */
-        TextView welcomeText = this.getView().findViewById(R.id.label_group_fragment);
-        if (currentGroup != null) {
-            welcomeText.setText(currentGroup.getName());
-        }
     }
 
     @Override

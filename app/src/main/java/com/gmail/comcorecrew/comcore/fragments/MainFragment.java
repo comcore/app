@@ -23,12 +23,19 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewGroupsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+
+import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
     private CustomAdapter groupAdapter;
+    private LinearLayoutManager groupLayout;
+    private ArrayList<Group> pinGroupList;
+    private RecyclerView rvGroups;
 
     public MainFragment() {
         // Required empty public constructor
@@ -42,6 +49,7 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        pinGroupList = sortPinnedList();
 
     }
 
@@ -52,9 +60,10 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
-        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-        groupAdapter = new CustomAdapter();
+        rvGroups = (RecyclerView) rootView.findViewById(R.id.main_recycler);
+        groupLayout = new LinearLayoutManager(getActivity());
+        rvGroups.setLayoutManager(groupLayout);
+        groupAdapter = new CustomAdapter(pinGroupList);
         rvGroups.setAdapter(groupAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
         refresh();
@@ -63,8 +72,21 @@ public class MainFragment extends Fragment {
     }
 
     public void refresh() {
+        pinGroupList = sortPinnedList();
         InviteLinkDialog.showIfPossible(this);
         GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
+    }
+
+    public ArrayList<Group> sortPinnedList() {
+        ArrayList<Group> newList = AppData.groups;
+        for (int i = 0; i < newList.size(); i++) {
+            if (newList.get(i).isPinned()) {
+                Group tempGroup = newList.get(i);
+                newList.remove(i);
+                newList.add(0, tempGroup);
+            }
+        }
+        return newList;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -72,14 +94,6 @@ public class MainFragment extends Fragment {
 
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
         welcomeText.setText("Welcome " + ServerConnector.getUser().name);
-
-        view.findViewById(R.id.createGroupButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(MainFragment.this)
-                        .navigate(R.id.action_mainFragment_to_createGroupFragment);
-            }
-        });
     }
 
     @Override
@@ -102,8 +116,16 @@ public class MainFragment extends Fragment {
                 new ViewInvitesDialog(this)
                         .show(getParentFragmentManager(), null);
                 return true;
+            case R.id.pin_group:
+                new ViewGroupsDialog()
+                        .show(getParentFragmentManager(), null);
+                return true;
             case R.id.refresh_button:
                 refresh();
+                return true;
+            case R.id.createGroupFragment:
+                NavHostFragment.findNavController(MainFragment.this)
+                        .navigate(R.id.action_mainFragment_to_createGroupFragment);
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page. The GroupID is passed as NO_GROUP, which
@@ -121,11 +143,14 @@ public class MainFragment extends Fragment {
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
      * the list of groups in the GUI
      */
-    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-        /**
-         * Provide a reference to the type of views that you are using
-         * (custom ViewHolder).
-         */
+    class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
+        private ArrayList<Group> sortedList;
+
+        CustomAdapter(ArrayList<Group> sortedList) {
+            this.sortedList = sortedList;
+        }
+
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private ImageView viewTag;
@@ -177,8 +202,8 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(AppData.groups.get(position).getName());
-            viewHolder.setGroup(AppData.groups.get(position));
+            viewHolder.getTextView().setText(sortedList.get(position).getName());
+            viewHolder.setGroup(sortedList.get(position));
 
             /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
@@ -187,7 +212,7 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            switch (AppData.groups.get(position).getGroupRole()) {
+            switch (sortedList.get(position).getGroupRole()) {
                 case OWNER:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
                     viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
@@ -205,8 +230,8 @@ public class MainFragment extends Fragment {
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return AppData.groups.size();
+            return sortedList.size();
         }
     }
-
 }
+
