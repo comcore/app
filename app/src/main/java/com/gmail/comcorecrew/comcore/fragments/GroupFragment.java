@@ -25,21 +25,13 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.id.ModuleID;
-import com.gmail.comcorecrew.comcore.server.id.TaskListID;
-import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GroupFragment extends Fragment {
 
@@ -179,6 +171,11 @@ public class GroupFragment extends Fragment {
                 /** Handle inviting a new member **/
                 AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
                 addMemberDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.create_invite_link:
+                // Handle creating an invite link
+                CreateLinkDialog createLinkDialog = new CreateLinkDialog(this, currentGroup.getGroupId());
+                createLinkDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
                 /** Handle adding moderator **/

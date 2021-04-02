@@ -421,6 +421,10 @@ public final class ServerConnector {
      * @see InviteLinkEntry
      */
     public static void checkInviteLink(String inviteLink, ResultHandler<InviteLinkEntry> handler) {
+        if (inviteLink == null) {
+            throw new IllegalArgumentException("invite link cannot be null");
+        }
+
         JsonObject data = new JsonObject();
         data.addProperty("link", inviteLink);
         getConnection().send(new ServerMsg("checkInviteLink", data), handler, response -> {
@@ -440,6 +444,10 @@ public final class ServerConnector {
      * @param handler    the handler for the response of the server
      */
     public static void useInviteLink(String inviteLink, ResultHandler<GroupID> handler) {
+        if (inviteLink == null) {
+            throw new IllegalArgumentException("invite link cannot be null");
+        }
+
         JsonObject data = new JsonObject();
         data.addProperty("link", inviteLink);
         getConnection().send(new ServerMsg("useInviteLink", data), handler, response -> {

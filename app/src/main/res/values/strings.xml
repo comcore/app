@@ -12,6 +12,9 @@
     <string name="back">Back</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="join">Join</string>
     <string name="refresh">Refresh</string>
     <string name="add">Add</string>
     <string name="remove">Remove</string>
@@ -48,6 +51,7 @@
     <!-- Group Menu -->
     <string name="view_members">View Members</string>
     <string name="invite_member">Invite Member</string>
+    <string name="create_invite_link">Create Invite Link</string>
     <string name="transfer_ownership">Transfer Ownership</string>
     <string name="kick_member">Kick Member</string>
     <string name="mute_member">Mute Member</string>
@@ -58,8 +62,15 @@
     <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
 
+    <!-- Create Link -->
+    <string name="create_link_does_expire">Do you want the invite link to expire?</string>
+    <string name="create_link_copied">The link was copied to your clipboard.</string>
+    <string name="error_expire_past">The expire time cannot be in the past.</string>
+
     <!-- Error Messages -->
     <string name="error_cannot_connect">Cannot connect to server.</string>
+    <string name="error_link_invalid">This link does not exist.</string>
+    <string name="error_link_expired">This link has expired.</string>
     <string name="error_does_not_exist">There is no account with that email address.</string>
     <string name="error_invalid_password">Invalid password. Please try again.</string>
     <string name="error_already_exists">An account with that email address already exists.</string>

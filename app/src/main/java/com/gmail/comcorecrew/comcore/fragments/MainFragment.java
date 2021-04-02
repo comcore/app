@@ -22,6 +22,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -34,8 +35,7 @@ public class MainFragment extends Fragment {
     }
 
     public static MainFragment newInstance() {
-        MainFragment fragment = new MainFragment();
-        return fragment;
+        return new MainFragment();
     }
 
     @Override
@@ -63,6 +63,7 @@ public class MainFragment extends Fragment {
     }
 
     public void refresh() {
+        InviteLinkDialog.showIfPossible(this);
         GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
     }
 

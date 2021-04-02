@@ -55,7 +55,7 @@ public class ChatMention {
      *
      * @param message    the message
      * @param startIndex the start index to parse from
-     * @return
+     * @return the parsed name substring
      */
     private static String getName(String message, int startIndex) {
         int endIndex;
