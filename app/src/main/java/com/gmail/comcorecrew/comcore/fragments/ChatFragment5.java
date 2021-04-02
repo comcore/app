@@ -118,6 +118,7 @@ public class ChatFragment5 extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.chatmenu, menu);
         if (messaging.getGroup().getGroupRole() == GroupRole.OWNER || messaging.getGroup().getGroupRole() == GroupRole.MODERATOR) {
             menu.setGroupVisible(R.id.pin_group, true);
         }
@@ -250,7 +251,7 @@ public class ChatFragment5 extends Fragment {
     private void pinMessage(MenuItem item) {
         item.getGroupId();
         messageEntry = messaging.getEntry(item.getGroupId());
-        boolean x = PinnedMessages.pinUnpinMessage(messageEntry);
+        int x = PinnedMessages.pinUnpinMessage(messageEntry);
         System.out.println(x);
     }
 }

@@ -146,14 +146,12 @@
     <!-- Pin Groups -->
     <string name="pin_group">Pin a Group</string>
     <string name="pin_group_desc">Choose a group to pin (or unpin)</string>
-<<<<<<< HEAD
 
     <!-- Pin Messages -->
     <string name="pin_message">Pin a Message</string>
 
-=======
     <string name="pinned_messages">Pinned Messages</string>
->>>>>>> 0dfa63136c053f623b5206a3e9b5f43c6ed6cc6e
+
 
 
 </resources>

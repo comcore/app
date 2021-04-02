@@ -9,8 +9,5 @@
         android:id="@+id/pinned_messages"
         android:title="@string/pinned_messages"/>
 
-    <item
-        android:id="@+id/pin_message"
-        android:title="@string/pin_message" />
 
 </menu>
