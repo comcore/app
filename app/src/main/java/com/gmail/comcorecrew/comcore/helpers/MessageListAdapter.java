@@ -195,19 +195,19 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             String mentionFormatted = "";
             String mention = "";
             int z = -1;
-            if (message.contents.contains("@")) {
-                String mention_with_at = "@";
-                z = message.contents.indexOf("@") + 1;
+            if (message.contents.contains("@<")) {
+                String mention_with_at = "@<";
+                z = message.contents.indexOf("@") + 2;
                 for (int i = z; i < message.contents.length(); i++) {
-                    if (message.contents.charAt(i) != ' ') {
+                    if (message.contents.charAt(i) != '>') {
                         mention += message.contents.charAt(i);
                     } else {
                         break;
                     }
                 }
-                mention_with_at += mention;
-                if (!mention_with_at.equals("@")) {
-                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+mention_with_at+"</font>");
+                mention_with_at += mention + '>';
+                if (!mention_with_at.equals("@<")) {
+                    mentionFormatted = message.contents.replaceAll(mention_with_at, "<font color='red'>"+ "@" + mention +"</font>");
                     System.out.println("MentionFormatted: " + mentionFormatted);
                 }
             }
