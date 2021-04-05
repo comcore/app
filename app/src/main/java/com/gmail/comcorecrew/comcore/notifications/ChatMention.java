@@ -114,17 +114,33 @@ public class ChatMention {
      * @return the parsed ChatMention
      */
     private static ChatMention parseMention(String message, int atIndex) {
+        // Start parsing after the at symbol
         int startIndex = atIndex + 1;
-        if (message.charAt(startIndex) == START_BLOCK) {
-            int endIndex = message.indexOf(END_BLOCK, startIndex + 1);
-            if (endIndex == -1) {
-                return null;
-            }
-
-            String name = message.substring(startIndex + 1, endIndex);
-            return new ChatMention(name, Style.BLOCK, atIndex);
+        if (startIndex >= message.length()) {
+            return null;
         }
 
+        // Check if this is a BLOCK style mention
+        if (message.charAt(startIndex) == START_BLOCK) {
+            // Parse the contents of the block mention
+            int offset;
+            for (offset = startIndex + 1; offset < message.length(); offset++) {
+                char ch = message.charAt(offset);
+                if (ch == END_BLOCK) {
+                    // If the block ends, then it is valid so return the parsed mention
+                    String name = message.substring(startIndex + 1, offset);
+                    return new ChatMention(name, Style.BLOCK, atIndex);
+                } else if (ch == '@' || ch == START_BLOCK) {
+                    // These characters are invalid in a block, so stop checking
+                    break;
+                }
+            }
+
+            // There was an invalid character or no closing delimiter, so it is invalid
+            return null;
+        }
+
+        // Parse code point by code point until a non-alphanumeric unicode character is found
         int ch, offset;
         for (offset = startIndex; offset < message.length(); offset += Character.charCount(ch)) {
             ch = message.codePointAt(offset);
@@ -133,10 +149,12 @@ public class ChatMention {
             }
         }
 
+        // If there was no name present, it is not valid
         if (offset == startIndex) {
             return null;
         }
 
+        // Return a mention with the specified substring for the name
         String name = message.substring(startIndex, offset);
         return new ChatMention(name, Style.WORD, atIndex);
     }
@@ -150,6 +168,7 @@ public class ChatMention {
     public static List<ChatMention> parseMentions(String message) {
         ArrayList<ChatMention> mentions = new ArrayList<>(0);
 
+        // Iterate through all of the at symbols in the message to find all of the mentions
         int index = 0;
         while ((index = message.indexOf('@', index)) != -1) {
             ChatMention mention = parseMention(message, index);
@@ -177,10 +196,12 @@ public class ChatMention {
             return "[deleted]";
         }
 
+        // Update the text and add a span for each mention in reverse order
         SpannableStringBuilder builder = new SpannableStringBuilder(message);
         List<ChatMention> mentions = parseMentions(message);
         Collections.reverse(mentions);
         for (ChatMention mention : mentions) {
+            // Only add the mention if they are part of the group
             if (mention.containsMentioned(group)) {
                 int start = mention.index;
                 int end = start + mention.length();
