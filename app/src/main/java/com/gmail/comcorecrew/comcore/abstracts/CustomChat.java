@@ -34,7 +34,6 @@ public abstract class CustomChat extends CustomModule {
         ArrayList<MessageEntry> messages = new ArrayList<>();
         ChatID fauxId = ((CustomModuleID) getId()).asChat();
         for (CustomItem item : getItems()) {
-            Log.d("Timestamp", String.valueOf(item.getTimestamp()));
             messages.add(item.toEntry(fauxId));
         }
         return messages;

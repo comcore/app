@@ -61,7 +61,6 @@ public class PinnedMessages extends CustomChat {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
-                        Log.d("ChatID", "" + chatID);
                         if (((PinnedMessages) module).pinMessage(message)) {
                             return 1;
                         }
@@ -160,8 +159,6 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
-        Log.d("ChatID", chatId);
-        //TODO Implement
 
         PinnedMessageAdapter pinnedAdapter;
         RecyclerView pinnedRecycler;
