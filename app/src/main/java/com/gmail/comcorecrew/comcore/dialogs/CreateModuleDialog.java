@@ -15,9 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.Module;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
+import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.ArrayList;
@@ -86,6 +91,23 @@ public class CreateModuleDialog extends DialogFragment {
                     this.dismiss();
                     fragment.refresh();
                 });
+            }
+            else if (false) { //TODO If create pinned messages is selected;
+                ChatID selectedChat = null; //TODO Prompt user for chat to create module for
+
+                if (selectedChat != null) {
+                    new PinnedMessages(moduleName.getText().toString(), AppData.getGroup(groupID),
+                            selectedChat);
+                }
+
+                this.dismiss();
+                fragment.refresh();
+            }
+            else if (false) { //TODO If create dummy module is selected;
+                new DummyButton(moduleName.getText().toString(), AppData.getGroup(groupID));
+
+                this.dismiss();
+                fragment.refresh();
             }
             else {
                 /** Throw an error if for some reason no radio button is checked **/

@@ -59,6 +59,21 @@ public class AppData {
     }
 
     /**
+     * Fetches the group with the given group id
+     *
+     * @param groupID   the group id of the requested group.
+     * @return          the requested group; null if it does not exist
+     */
+    public static Group getGroup(GroupID groupID) {
+        for (Group group : groups) {
+            if (group.getGroupId().id.equals(groupID.id)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Fetches the group with the given index
      *
      * @param index the index of the group
