@@ -43,6 +43,11 @@ public class DummyButton extends CustomChat {
                     .popBackStack();
         });
 
+        view.findViewById(R.id.dummy_button).setOnClickListener(clickedView -> {
+            press();
+            refreshView(view);
+        });
+
         refreshView(view);
     }
 
@@ -56,9 +61,9 @@ public class DummyButton extends CustomChat {
     public void refreshView(View view) {
 
         if (getState() == 1) {
-            view.findViewById(R.id.dummy_button).setBackgroundColor(R.color.blue);
+            view.findViewById(R.id.dummy_button).setBackgroundResource(R.color.blue);
         } else {
-            view.findViewById(R.id.dummy_button).setBackgroundColor(R.color.red);
+            view.findViewById(R.id.dummy_button).setBackgroundResource(R.color.red);
         }
     }
 

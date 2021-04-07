@@ -67,6 +67,9 @@
         <action
             android:id="@+id/action_groupFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_customFragment"
+            app:destination="@id/customFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
@@ -81,4 +84,8 @@
             android:id="@+id/action_taskListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/customFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.CustomFragment"
+        android:label="CustomFragment" />
 </navigation>

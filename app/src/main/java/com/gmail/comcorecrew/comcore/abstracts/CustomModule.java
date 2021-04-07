@@ -26,21 +26,18 @@ import java.util.ArrayList;
 
 public abstract class CustomModule extends Module {
 
-    private transient View view;
     private long cacheByteLimit;
     private transient ArrayList<CustomItem> items;
 
     public CustomModule(String name, CustomModuleID id, Group group) {
         super(name, id, group, Mdid.CSTM);
         cacheByteLimit = -1;
-        view = null;
         items = new ArrayList<>();
     }
 
     public CustomModule(String name, CustomModuleID id, Group group, long cacheByteLimit) {
         super(name, id, group, Mdid.CSTM);
         this.cacheByteLimit = cacheByteLimit;
-        view = null;
         items = new ArrayList<>();
     }
 
@@ -132,14 +129,6 @@ public abstract class CustomModule extends Module {
 
     protected ArrayList<CustomItem> getItems() {
         return items;
-    }
-
-    protected View getView() {
-        return view;
-    }
-
-    public void resetView() {
-        view = null;
     }
 
     protected void setItems(ArrayList<CustomItem> items) {
@@ -254,7 +243,6 @@ public abstract class CustomModule extends Module {
     }
 
     public void onViewCreated(@NonNull View view, Fragment fragment) {
-        this.view = view;
         viewInit(view, fragment);
     }
 
