@@ -250,6 +250,6 @@ public abstract class CustomModule extends Module {
 
     abstract public int getLayout();
 
-    abstract public void refreshView(View view);
+    abstract public void refreshView();
 
 }

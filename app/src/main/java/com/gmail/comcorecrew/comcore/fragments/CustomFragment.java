@@ -52,6 +52,6 @@ public class CustomFragment extends Fragment {
     }
 
     public void refresh() {
-        custom.refreshView(customView);
+        custom.refreshView();
     }
 }

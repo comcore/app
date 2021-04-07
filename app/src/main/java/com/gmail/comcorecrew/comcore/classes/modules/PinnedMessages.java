@@ -174,7 +174,7 @@ public class PinnedMessages extends CustomChat {
     }
 
     @Override
-    public void refreshView(View view) {
+    public void refreshView() {
 
     }
 

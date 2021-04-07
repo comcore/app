@@ -1,7 +1,5 @@
 package com.gmail.comcorecrew.comcore.abstracts;
 
-import android.util.Log;
-
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
