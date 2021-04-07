@@ -329,6 +329,10 @@ public class GroupStorage {
      * @return the Group object
      */
     public static Group getGroup(GroupID id) {
+        if (id == null) {
+            return null;
+        }
+
         for (Group group : AppData.groups) {
             if (group.getGroupId().equals(id)) {
                 return group;

@@ -108,10 +108,10 @@ public class TaskListFragment extends Fragment {
                 taskList.refresh();
                 return true;
             case R.id.settingsFragment:
-                /** Handle moving to the settings page. The GroupID is passed to settings. */
-                TaskListFragmentDirections.ActionTaskListFragmentToSettingsFragment action = TaskListFragmentDirections.actionTaskListFragmentToSettingsFragment(taskList.getGroup().getGroupId());
-                action.setGroupId(taskList.getGroup().getGroupId());
-                NavHostFragment.findNavController(TaskListFragment.this).navigate(action);
+                /** Handle moving to the settings page */
+                SettingsFragment.currentGroup = taskList.getGroup();
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_taskListFragment_to_settingsFragment);
                 return true;
             case R.id.create_task:
                 /** Handle creating a new task **/

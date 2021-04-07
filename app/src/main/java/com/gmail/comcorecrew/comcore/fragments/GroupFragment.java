@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
@@ -194,10 +195,9 @@ public class GroupFragment extends Fragment {
                 return true;
             case R.id.settingsFragment:
                 /** Handle passing the current GroupID to the settings page */
-                GroupFragmentDirections.ActionGroupFragmentToSettingsFragment action =
-                        GroupFragmentDirections.actionGroupFragmentToSettingsFragment(currentGroup.getGroupId());
-                action.setGroupId(currentGroup.getGroupId());
-                NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                SettingsFragment.currentGroup = currentGroup;
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_groupFragment_to_settingsFragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -236,7 +236,12 @@ public class GroupFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                if (currentModule instanceof Messaging) {
+                if (currentModule instanceof CustomModule) {
+                    CustomFragment.custom = (CustomModule) currentModule;
+                    NavHostFragment.findNavController(GroupFragment.this)
+                            .navigate(R.id.action_groupFragment_to_customFragment);
+                }
+                else if (currentModule instanceof Messaging) {
                     ChatFragment5.messaging = (Messaging) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_chatFragment5);

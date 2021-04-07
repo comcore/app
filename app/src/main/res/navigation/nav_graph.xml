@@ -12,11 +12,7 @@
         android:id="@+id/settingsFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" >
-        <argument
-            android:name="group_id"
-            app:argType="com.gmail.comcorecrew.comcore.server.id.GroupID" />
-    </fragment>
+        tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.MainFragment"
@@ -71,6 +67,9 @@
         <action
             android:id="@+id/action_groupFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_customFragment"
+            app:destination="@id/customFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
@@ -85,4 +84,8 @@
             android:id="@+id/action_taskListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/customFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.CustomFragment"
+        android:label="CustomFragment" />
 </navigation>

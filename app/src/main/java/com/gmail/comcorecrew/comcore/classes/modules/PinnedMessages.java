@@ -1,16 +1,23 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.helpers.PinnedMessageAdapter;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -54,7 +61,6 @@ public class PinnedMessages extends CustomChat {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
                             (((PinnedMessages) module).chatId.equals(chatID.id))) {
-                        ((PinnedMessages) module).pinMessage(message);
                         if (((PinnedMessages) module).pinMessage(message)) {
                             return 1;
                         }
@@ -98,7 +104,7 @@ public class PinnedMessages extends CustomChat {
 
     public boolean isPinned(MessageEntry message) {
         MsgCacheable cache;
-        for (MessageEntry messageEntry : getMessages()) {
+        for (MessageEntry messageEntry : readPinned()) {
             cache = new MsgCacheable(messageEntry);
             if (message.id.id == cache.getMessageid()) {
                 return true;
@@ -114,14 +120,15 @@ public class PinnedMessages extends CustomChat {
      * @return true if the message was pinned; false if it was not
      */
     public boolean pinMessage(MessageEntry message) {
-        if (!isPinned(message)) {
-            sendMessage(String.copyValueOf(new MsgCacheable(message).toCache()));
-            return true;
+        String contents = String.copyValueOf(new MsgCacheable(message).toCache());
+        for (MessageEntry entry : getMessages()) {
+            if (entry.contents.equals(contents)) {
+                deleteMessage(entry);
+                return false;
+            }
         }
-        else {
-            deleteMessage(message);
-            return false;
-        }
+        sendMessage(contents);
+        return true;
     }
 
     public void refreshChatID() {
@@ -142,9 +149,9 @@ public class PinnedMessages extends CustomChat {
         ChatID chId = new ChatID(getGroup().getGroupId(), chatId);
         ArrayList<MessageEntry> pinned = new ArrayList<>();
         for (CustomItem item : getItems()) {
-            MsgCacheable message = new MsgCacheable(item.getData());
-            if (!message.getData().equals("")) {
-                pinned.add(new MsgCacheable(item.getData()).toEntry(chId));
+            if (!item.getData().equals("")) {
+                MsgCacheable message = new MsgCacheable(item.getData());
+                pinned.add(message.toEntry(chId));
             }
         }
         return pinned;
@@ -152,7 +159,18 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
-        //TODO Implement
+
+        PinnedMessageAdapter pinnedAdapter;
+        RecyclerView pinnedRecycler;
+
+        pinnedRecycler = (RecyclerView) view.findViewById(R.id.recycler_pinned_messages);
+        LinearLayoutManager manager = new LinearLayoutManager(current.getContext());
+        manager.setStackFromEnd(true);
+        pinnedRecycler.setLayoutManager(manager);
+        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), readPinned());
+        pinnedRecycler.setAdapter(pinnedAdapter);
+        pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
+        refresh();
     }
 
     @Override
@@ -162,7 +180,7 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public int getLayout() {
-        return -1; //TODO Implement
+        return R.layout.fragment_pinned_messages;
     }
 
     @Override

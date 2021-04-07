@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.abstracts;
 
+import android.util.Log;
+
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -75,14 +77,16 @@ public abstract class CustomChat extends CustomModule {
 
     @Override
     public void refresh() {
+        ChatID chatID = getChatID();
         MessageID lastMessage;
         if (!isEmpty()) {
-            lastMessage = new MessageID(getChatID(), getLastItem().getItemId());
+            lastMessage = new MessageID(chatID, getLastItem().getItemId());
         } else {
             lastMessage = null;
         }
 
-        ServerConnector.getMessages((ChatID) getId(), lastMessage, null, result -> {
+        ServerConnector.getMessages(chatID, lastMessage,
+                null, result -> {
             if (result.isFailure()) {
                 return;
             }
@@ -115,9 +119,6 @@ public abstract class CustomChat extends CustomModule {
         }
 
         addMessage(message);
-        if (getView() != null) {
-            refreshView(getView());
-        }
     }
 
     @Override
@@ -127,8 +128,5 @@ public abstract class CustomChat extends CustomModule {
         }
 
         updateItem(message);
-        if (getView() != null) {
-            refreshView(getView());
-        }
     }
 }

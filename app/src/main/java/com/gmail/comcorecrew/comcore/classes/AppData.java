@@ -5,6 +5,7 @@ import android.content.Context;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
@@ -53,6 +54,23 @@ public class AppData {
         else {
             groups = new ArrayList<>();
         }
+        //test
+        //new DummyButton("Dummy", getGroup(0));
+    }
+
+    /**
+     * Fetches the group with the given group id
+     *
+     * @param groupID   the group id of the requested group.
+     * @return          the requested group; null if it does not exist
+     */
+    public static Group getGroup(GroupID groupID) {
+        for (Group group : groups) {
+            if (group.getGroupId().id.equals(groupID.id)) {
+                return group;
+            }
+        }
+        return null;
     }
 
     /**
