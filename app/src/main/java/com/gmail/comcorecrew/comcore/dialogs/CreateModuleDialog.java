@@ -6,26 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
-
-import java.util.ArrayList;
 
 public class CreateModuleDialog extends DialogFragment {
 
@@ -63,6 +55,8 @@ public class CreateModuleDialog extends DialogFragment {
 
             RadioButton chatRadio = view.findViewById(R.id.create_module_chat_radio);
             RadioButton tasklistRadio = view.findViewById(R.id.create_module_tasklist_radio);
+            RadioButton pinnedRadio = view.findViewById(R.id.create_module_pinned_chat_radio);
+            RadioButton dummyRadio = view.findViewById(R.id.create_module_dummy_radio);
             EditText moduleName = view.findViewById(R.id.create_module_name_edit);
 
             if (chatRadio.isChecked()) {
@@ -92,7 +86,7 @@ public class CreateModuleDialog extends DialogFragment {
                     fragment.refresh();
                 });
             }
-            else if (false) { //TODO If create pinned messages is selected;
+            else if (false) { //TODO use pinnedRadio.isChecked() once following line is fixed
                 ChatID selectedChat = null; //TODO Prompt user for chat to create module for
 
                 if (selectedChat != null) {
@@ -103,7 +97,7 @@ public class CreateModuleDialog extends DialogFragment {
                 this.dismiss();
                 fragment.refresh();
             }
-            else if (false) { //TODO If create dummy module is selected;
+            else if (dummyRadio.isChecked()) {
                 new DummyButton(moduleName.getText().toString(), AppData.getGroup(groupID));
 
                 this.dismiss();
