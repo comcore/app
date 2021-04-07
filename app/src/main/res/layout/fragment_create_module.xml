@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
-    android:layout_height="300dp">
+    android:layout_height="450dp">
 
     <Button
         android:id="@+id/create_module_back_button"
@@ -56,30 +56,42 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="200dp"
-        android:layout_height="47dp"
+        android:layout_width="151dp"
+        android:layout_height="190dp"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="90dp"
-        android:orientation="horizontal"
+        android:layout_marginBottom="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_module_type_label">
+
+        <RadioButton
+            android:id="@+id/create_module_tasklist_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/task_list_module_label" />
 
         <RadioButton
             android:id="@+id/create_module_chat_radio"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:checked="false"
             android:text="@string/chat_module_label" />
 
         <RadioButton
-            android:id="@+id/create_module_tasklist_radio"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:checked="false"
-            android:text="@string/task_list_module_label" />
+            android:id="@+id/create_module_pinned_chat_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pinned_module_label" />
+
+        <RadioButton
+            android:id="@+id/create_module_dummy_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy_module_label" />
 
     </RadioGroup>
 
@@ -88,11 +100,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="11dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:text="@string/create_module_type_label"
         app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_module_name_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

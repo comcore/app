@@ -60,10 +60,14 @@ public class DummyButton extends CustomChat {
     @Override
     public void refreshView(View view) {
 
+        TextView colorWords = view.findViewById(R.id.dummy_color_words);
+
         if (getState() == 1) {
-            view.findViewById(R.id.dummy_button).setBackgroundResource(R.color.blue);
+            colorWords.setTextColor(R.color.blue);
+            colorWords.setAllCaps(true);
         } else {
-            view.findViewById(R.id.dummy_button).setBackgroundResource(R.color.red);
+            colorWords.setTextColor(R.color.red);
+            colorWords.setAllCaps(false);
         }
     }
 
