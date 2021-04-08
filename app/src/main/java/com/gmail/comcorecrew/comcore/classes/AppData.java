@@ -36,6 +36,7 @@ public class AppData {
     private static Group[] groups; //Array containing the groups
     private static ArrayList<Group> groupsList; //Arraylist containing the groups
     //Lists are separate as to allow quick fetching of data
+    private static int[] positions;
     private static int groupLength; //Number of groups in the list
     private static final int initialGroupLength = 10;
     public static final int maxData = 0x001E8483; //4MB + 6 Bytes of chars
@@ -129,22 +130,7 @@ public class AppData {
         if ((index < 0) || (index >= groupLength)) {
             return -1;
         }
-
-        Group group;
-
-        for (int i = Math.min(groupsList.size() - 1, index); i >= 0; i--) {
-            group = groupsList.get(i);
-            if (group != null) {
-                if (group.getIndex() == index) {
-                    return i;
-                }
-                else if (group.getIndex() < index) {
-                    break;
-                }
-            }
-        }
-
-        return -1;
+        return positions[index];
     }
 
     /**
@@ -153,6 +139,7 @@ public class AppData {
     public static void clearGroups() {
         groupLength = 0;
         groups = new Group[initialGroupLength];
+        positions = new int[initialGroupLength];
         groupsList = new ArrayList<>();
     }
 
@@ -229,13 +216,41 @@ public class AppData {
      */
     public static void addGroup(Group group) {
         if (groupLength == groups.length) {
-            Group[] newGroup = new Group[groups.length * 2];
+            int[] newPositions = new int[groupLength * 2];
+            Group[] newGroup = new Group[groupLength * 2];
             for (int i = 0; i < groupLength; i++) {
                 newGroup[i] = groups[i];
+                newPositions[i] = positions[i];
             }
+            positions = newPositions;
             groups = newGroup;
         }
         groups[groupLength] = group;
+        groupsList.add(group);
+        group.setIndex(groupLength);
+        groupLength++;
+        normalizeGroupList();
+    }
+
+    /**
+     * Adds the given group to the group list. Sets the group's index to the new index
+     * Does not sort the group list at the end.
+     *
+     * @param group Group to add
+     */
+    public static void quickAddGroup(Group group) {
+        if (groupLength == groups.length) {
+            int[] newPositions = new int[groupLength * 2];
+            Group[] newGroup = new Group[groupLength * 2];
+            for (int i = 0; i < groupLength; i++) {
+                newGroup[i] = groups[i];
+                newPositions[i] = positions[i];
+            }
+            positions = newPositions;
+            groups = newGroup;
+        }
+        groups[groupLength] = group;
+        positions[groupLength] = groupsList.size();
         groupsList.add(group);
         group.setIndex(groupLength);
         groupLength++;
@@ -282,10 +297,25 @@ public class AppData {
      */
     public static void deleteFromPos(int position) {
         if ((position >= 0) && (position < groupsList.size())) {
-            deleteDirectory(new File(groupsDir, groupsList.get(position).getGroupId().id));
-            deleteDirectory(new File(cacheDir, groupsList.get(position).getGroupId().id));
-            groups[groupsList.get(position).getIndex()] = null;
+            Group group = groupsList.get(position);
+            deleteDirectory(new File(groupsDir, group.getGroupId().id));
+            deleteDirectory(new File(cacheDir, group.getGroupId().id));
+            groups[group.getIndex()] = null;
+            positions[group.getIndex()] = -1;
             groupsList.remove(position);
+            for (int i = position; i < groupsList.size(); i++) {
+                positions[groupsList.get(i).getIndex()] = i;
+            }
+        }
+    }
+
+    /**
+     * Sorts the groupList and updates each position.
+     */
+    public static void normalizeGroupList() {
+        Collections.sort(groupsList);
+        for (int i = 0; i < groupsList.size(); i++) {
+            positions[groupsList.get(i).getIndex()] = i;
         }
     }
 

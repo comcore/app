@@ -113,8 +113,9 @@ public class GroupStorage {
                 // Update the list of groups using the new info
                 if (newGroups != null) {
                     for (Group group : newGroups) {
-                        AppData.addGroup(group);
+                        AppData.quickAddGroup(group);
                     }
+                    AppData.normalizeGroupList();
                     for (Group group : oldGroups) {
                         AppData.deleteGroup(group);
                     }
