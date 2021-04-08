@@ -33,12 +33,19 @@ public class AppData {
     public static File cacheDir;
     public static File filesDir;
     public static File groupsDir;
-    private static Group[] groups;
-    private static ArrayList<Group> groupsList;
-    private static int groupLength;
-    private static int initialGroupLength = 10;
+    private static Group[] groups; //Array containing the groups
+    private static ArrayList<Group> groupsList; //Arraylist containing the groups
+    //Lists are separate as to allow quick fetching of data
+    private static int groupLength; //Number of groups in the list
+    private static final int initialGroupLength = 10;
     public static final int maxData = 0x001E8483; //4MB + 6 Bytes of chars
 
+    public static void PreInit(Context context) throws IOException {
+        File appStorage = new File(context.getFilesDir(), "main");
+        if (appStorage.createNewFile()) {
+            //WIP
+        }
+    }
     /**
      * Init method that should be run when app is opened.
      *
@@ -105,7 +112,7 @@ public class AppData {
      */
     public static int getPosition(GroupID groupID) {
         for (int i = 0; i < groupsList.size(); i++) {
-            if (groupID.id.equals(groupsList.get(i))) {
+            if (groupID.id.equals(groupsList.get(i).getGroupId().id)) {
                 return i;
             }
         }
@@ -125,7 +132,7 @@ public class AppData {
 
         Group group;
 
-        for (int i = Math.min(groupsList.size(), index) - 1; i >= 0; i--) {
+        for (int i = Math.min(groupsList.size() - 1, index); i >= 0; i--) {
             group = groupsList.get(i);
             if (group != null) {
                 if (group.getIndex() == index) {
@@ -240,7 +247,9 @@ public class AppData {
      * @param group     group to remove
      */
     public static void deleteGroup(Group group) {
-        deleteGroup(group.getIndex());
+        if (group != null) {
+            deleteGroup(group.getIndex());
+        }
     }
 
     /**
@@ -273,6 +282,8 @@ public class AppData {
      */
     public static void deleteFromPos(int position) {
         if ((position >= 0) && (position < groupsList.size())) {
+            deleteDirectory(new File(groupsDir, groupsList.get(position).getGroupId().id));
+            deleteDirectory(new File(cacheDir, groupsList.get(position).getGroupId().id));
             groups[groupsList.get(position).getIndex()] = null;
             groupsList.remove(position);
         }
@@ -333,5 +344,25 @@ public class AppData {
             throw new IOException();
         }
         return String.copyValueOf(buf);
+    }
+
+    public static void deleteDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                deleteDirectory(file);
+            }
+        }
+        directory.delete();
+    }
+
+    public static void clearDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                clearDirectory(file);
+                file.delete();
+            }
+        }
     }
 }

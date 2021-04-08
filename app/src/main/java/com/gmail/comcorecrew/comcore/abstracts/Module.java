@@ -83,6 +83,41 @@ public abstract class Module implements Serializable, NotificationListener {
     }
 
     /**
+     * Initializes the module to the server.
+     */
+    public void init() {
+        if (id != null) {
+            return;
+        }
+        switch (mdid) {
+            case CMSG: {
+                ServerConnector.createChat(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                    afterCreate();
+                });
+                break;
+            }
+            case CTSK: {
+                ServerConnector.createTaskList(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                    afterCreate();
+                });
+                break;
+            }
+            default: {
+                throw new RuntimeException("Invalid MDID");
+            }
+        }
+
+    }
+
+    /**
      * Constructor for initializing a custom module
      *
      * @param name name of the module
@@ -101,6 +136,24 @@ public abstract class Module implements Serializable, NotificationListener {
             muted = false;
             mentionMuted = false;
             mnum = group.addModule(this);
+            afterCreate();
+            try {
+                GroupStorage.storeModule(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void init(String type) {
+        if (id != null) {
+            return;
+        }
+        ServerConnector.createCustomModule(group.getGroupId(), name, type, result -> {
+            if (result.isFailure()) {
+                throw new RuntimeException(result.errorMessage);
+            }
+            this.id = result.data;
             afterCreate();
             try {
                 GroupStorage.storeModule(this);

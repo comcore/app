@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.caching;
 
+import android.util.Log;
+
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
@@ -59,6 +61,7 @@ public class GroupStorage {
         ServerConnector.getGroups(result -> {
             HashMap<GroupID, Group> ids;
             ArrayList<Group> newGroups;
+            ArrayList<Group> oldGroups = new ArrayList<>(AppData.getGroups());
             if (result.isSuccess()) {
                 // Update the list of groups if the request was successful
                 ids = new HashMap<>(existingIds.size());
@@ -67,6 +70,8 @@ public class GroupStorage {
                     // Check for an existing group object to reuse
                     Group group = existingIds.get(id);
                     if (group != null) {
+                        //If group is still active, removes from old group.
+                        oldGroups.set(AppData.getPosition(id), null);
                         ids.put(id, group);
                         continue;
                     }
@@ -109,6 +114,9 @@ public class GroupStorage {
                 if (newGroups != null) {
                     for (Group group : newGroups) {
                         AppData.addGroup(group);
+                    }
+                    for (Group group : oldGroups) {
+                        AppData.deleteGroup(group);
                     }
                 }
 
