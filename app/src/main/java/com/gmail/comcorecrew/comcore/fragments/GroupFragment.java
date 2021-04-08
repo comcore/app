@@ -22,6 +22,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
@@ -54,7 +55,7 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         GroupID id = GroupFragmentArgs.fromBundle(getArguments()).getGroupID();
-        currentGroup = GroupStorage.getGroup(id);
+        currentGroup = AppData.getGroup(id);
     }
 
     @Override

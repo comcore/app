@@ -56,7 +56,7 @@ public class PinnedMessages extends CustomChat {
     public static int pinUnpinMessage(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
-        for (Group group : AppData.groups) {
+        for (Group group : AppData.getGroups()) {
             if (group.getGroupId().equals(groupID)) {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&
@@ -84,7 +84,7 @@ public class PinnedMessages extends CustomChat {
     public static boolean isPined(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
-        for (Group group : AppData.groups) {
+        for (Group group : AppData.getGroups()) {
             if (group.getGroupId().equals(groupID)) {
                 for (Module module : group.getModules()) {
                     if ((module instanceof PinnedMessages) &&

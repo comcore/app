@@ -194,7 +194,7 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
-        Group info = GroupStorage.getGroup(group);
+        Group info = AppData.getGroup(group);
         if (info == null) {
             return;
         }
@@ -209,7 +209,7 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onMuteChanged(GroupID group, boolean muted) {
-        Group info = GroupStorage.getGroup(group);
+        Group info = AppData.getGroup(group);
         if (info == null) {
             return;
         }
@@ -249,6 +249,6 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public Collection<? extends NotificationListener> getChildren() {
-        return AppData.groups;
+        return AppData.getGroups();
     }
 }

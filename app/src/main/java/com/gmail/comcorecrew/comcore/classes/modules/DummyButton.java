@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 
 import android.annotation.SuppressLint;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,8 @@ import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
  */
 public class DummyButton extends CustomChat {
 
+    private Button dummyButton;
+
     public DummyButton(String name, CustomModuleID id, Group group) {
         super(name, id, group);
     }
@@ -38,17 +41,19 @@ public class DummyButton extends CustomChat {
         TextView welcomeText = (TextView) view.findViewById(R.id.label_dummy_fragment);
         welcomeText.setText("Dummy");
 
+        dummyButton = view.findViewById(R.id.dummy_button);
+
         view.findViewById(R.id.dummy_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(current)
                     .popBackStack();
         });
 
-        view.findViewById(R.id.dummy_button).setOnClickListener(clickedView -> {
+        dummyButton.setOnClickListener(clickedView -> {
             press();
-            refreshView(view);
+            refreshView();
         });
 
-        refreshView(view);
+        refreshView();
     }
 
     @Override
@@ -58,9 +63,9 @@ public class DummyButton extends CustomChat {
 
     @SuppressLint("ResourceAsColor")
     @Override
-    public void refreshView(View view) {
+    public void refreshView() {
 
-        TextView colorWords = view.findViewById(R.id.dummy_color_words);
+        TextView colorWords = dummyButton;
 
         if (getState() == 1) {
             colorWords.setTextColor(R.color.blue);

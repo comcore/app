@@ -109,13 +109,13 @@ public class ViewGroupsDialog extends DialogFragment {
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
             TextView nameText = viewHolder.itemView.findViewById(R.id.module_row_text);
-            nameText.setText(AppData.groups.get(position).getName());
-            viewHolder.setCurrentGroup(AppData.groups.get(position));
+            nameText.setText(AppData.getFromPos(position).getName());
+            viewHolder.setCurrentGroup(AppData.getFromPos(position));
         }
 
         @Override
         public int getItemCount() {
-            return AppData.groups.size();
+            return AppData.getGroupSize();
         }
     }
 

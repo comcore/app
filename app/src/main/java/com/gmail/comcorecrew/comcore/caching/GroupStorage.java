@@ -40,14 +40,15 @@ public class GroupStorage {
      */
     public static void refresh(Runnable callback) {
         // Get the group associated with each ID
-        HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.groups.size());
-        for (int i = 0; i < AppData.groups.size(); i++) {
-            Group group = AppData.groups.get(i);
+        HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.getGroupSize());
+        for (int i = 0; i < AppData.getGroupSize(); i++) {
+            Group group = AppData.getGroups().get(i);
             GroupID id = group.getGroupId();
 
             // Remove any duplicated groups
             if (existingIds.containsKey(id)) {
-                AppData.deleteGroup(i--);
+                AppData.deleteGroup(group);
+                i--;
                 continue;
             }
 
@@ -61,13 +62,12 @@ public class GroupStorage {
             if (result.isSuccess()) {
                 // Update the list of groups if the request was successful
                 ids = new HashMap<>(existingIds.size());
-                newGroups = new ArrayList<>(AppData.groups.size());
+                newGroups = new ArrayList<>(AppData.getGroupSize());
                 for (GroupID id : result.data) {
                     // Check for an existing group object to reuse
                     Group group = existingIds.get(id);
                     if (group != null) {
                         ids.put(id, group);
-                        newGroups.add(group);
                         continue;
                     }
 
@@ -107,8 +107,9 @@ public class GroupStorage {
 
                 // Update the list of groups using the new info
                 if (newGroups != null) {
-                    AppData.groups = newGroups;
-                    AppData.normalizeGroupList();
+                    for (Group group : newGroups) {
+                        AppData.addGroup(group);
+                    }
                 }
 
                 // Run the callback after setting all of the info
@@ -125,7 +126,7 @@ public class GroupStorage {
      * @throws IOException if an IO error occurs
      */
     public static void storeAllGroups() throws IOException {
-        for (Group group : AppData.groups) {
+        for (Group group : AppData.getGroups()) {
             storeGroup(group);
         }
     }
@@ -213,17 +214,16 @@ public class GroupStorage {
      * @throws IOException if an IO error occurs
      */
     public static void readAllGroups() throws IOException {
-        AppData.groups = new ArrayList<>();
+        AppData.clearGroups();
         File[] files = AppData.groupsDir.listFiles();
         if (files == null) {
             throw new InvalidFileFormatException("Cannot read groups directory!");
         }
         for (File file : files) {
             Group group = new Group(new GroupID(file.getName()));
-            AppData.groups.add(group);
+            AppData.addGroup(group);
             readGroup(group);
         }
-        AppData.normalizeGroupList();
     }
 
     /**
@@ -311,35 +311,14 @@ public class GroupStorage {
      * @throws IOException if an IO error occurs
      */
     public static boolean addGroup(Group group) throws IOException {
-        for (Group g : AppData.groups) {
+        for (Group g : AppData.getGroups()) {
             if (g.getGroupId().id.equals(group.getGroupId().id)) {
                 return false;
             }
         }
-        AppData.groups.add(group);
-        AppData.normalizeGroupList();
+        AppData.addGroup(group);
         storeGroup(group);
         return true;
-    }
-
-    /**
-     * Gets the Group object corresponding to a GroupID
-     *
-     * @param id the ID of the group
-     * @return the Group object
-     */
-    public static Group getGroup(GroupID id) {
-        if (id == null) {
-            return null;
-        }
-
-        for (Group group : AppData.groups) {
-            if (group.getGroupId().equals(id)) {
-                return group;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -349,7 +328,7 @@ public class GroupStorage {
      * @return the Module object
      */
     public static Module getModule(ModuleID id) {
-        Group group = getGroup(id.group);
+        Group group = AppData.getGroup(id.group);
         if (group != null) {
             return group.getModule(id);
         }
