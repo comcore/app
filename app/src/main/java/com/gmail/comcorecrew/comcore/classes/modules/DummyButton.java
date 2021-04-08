@@ -2,7 +2,6 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 
 import android.annotation.SuppressLint;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,8 +24,6 @@ import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
  */
 public class DummyButton extends CustomChat {
 
-    private transient Button dummyButton;
-
     public DummyButton(String name, CustomModuleID id, Group group) {
         super(name, id, group);
     }
@@ -38,22 +35,20 @@ public class DummyButton extends CustomChat {
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
 
-        dummyButton = view.findViewById(R.id.dummy_button);
-
         TextView welcomeText = (TextView) view.findViewById(R.id.label_dummy_fragment);
         welcomeText.setText("Dummy");
 
-        dummyButton.setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dummy_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(current)
                     .popBackStack();
         });
 
-        dummyButton.setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dummy_button).setOnClickListener(clickedView -> {
             press();
-            refreshView();
+            refreshView(view);
         });
 
-        refreshView();
+        refreshView(view);
     }
 
     @Override
@@ -63,12 +58,16 @@ public class DummyButton extends CustomChat {
 
     @SuppressLint("ResourceAsColor")
     @Override
-    public void refreshView() {
+    public void refreshView(View view) {
+
+        TextView colorWords = view.findViewById(R.id.dummy_color_words);
 
         if (getState() == 1) {
-            dummyButton.setText("This");
+            colorWords.setTextColor(R.color.blue);
+            colorWords.setAllCaps(true);
         } else {
-            dummyButton.setText("That");
+            colorWords.setTextColor(R.color.red);
+            colorWords.setAllCaps(false);
         }
     }
 
