@@ -1,12 +1,9 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,7 +11,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomChat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
-import com.gmail.comcorecrew.comcore.caching.MsgCacheable;
+import com.gmail.comcorecrew.comcore.caching.MessageItem;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.helpers.PinnedMessageAdapter;
@@ -23,7 +20,6 @@ import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.id.TaskID;
 
 import java.util.ArrayList;
 
@@ -103,9 +99,9 @@ public class PinnedMessages extends CustomChat {
     }
 
     public boolean isPinned(MessageEntry message) {
-        MsgCacheable cache;
+        MessageItem cache;
         for (MessageEntry messageEntry : readPinned()) {
-            cache = new MsgCacheable(messageEntry);
+            cache = new MessageItem(messageEntry);
             if (message.id.id == cache.getMessageid()) {
                 return true;
             }
@@ -120,7 +116,7 @@ public class PinnedMessages extends CustomChat {
      * @return true if the message was pinned; false if it was not
      */
     public boolean pinMessage(MessageEntry message) {
-        String contents = String.copyValueOf(new MsgCacheable(message).toCache());
+        String contents = String.copyValueOf(new MessageItem(message).toCache());
         for (MessageEntry entry : getMessages()) {
             if (entry.contents.equals(contents)) {
                 deleteMessage(entry);
@@ -150,7 +146,7 @@ public class PinnedMessages extends CustomChat {
         ArrayList<MessageEntry> pinned = new ArrayList<>();
         for (CustomItem item : getItems()) {
             if (!item.getData().equals("")) {
-                MsgCacheable message = new MsgCacheable(item.getData());
+                MessageItem message = new MessageItem(item.getData());
                 pinned.add(message.toEntry(chId));
             }
         }

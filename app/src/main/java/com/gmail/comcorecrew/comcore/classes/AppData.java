@@ -11,7 +11,12 @@ import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -40,12 +45,22 @@ public class AppData {
     private static int groupLength; //Number of groups in the list
     private static final int initialGroupLength = 10;
     public static final int maxData = 0x001E8483; //4MB + 6 Bytes of chars
+    public static final int cacheVersion = 0;
 
-    public static void PreInit(Context context) throws IOException {
+    public static void preInit(Context context) throws IOException {
         File appStorage = new File(context.getFilesDir(), "main");
         if (appStorage.createNewFile()) {
-            //WIP
+            updateCache(context);
         }
+        else {
+            FileReader reader = new FileReader(appStorage);
+            int curVersion = readInt(reader);
+            reader.close();
+            if (curVersion < cacheVersion) {
+                updateCache(context);
+            }
+        }
+
     }
     /**
      * Init method that should be run when app is opened.
@@ -394,5 +409,18 @@ public class AppData {
                 file.delete();
             }
         }
+    }
+
+    public static void updateCache(Context context) throws IOException {
+        File appStorage = new File(context.getFilesDir(), "main");
+        if (!appStorage.exists()) {
+            throw new IOException("Illegal updateCache() call");
+        }
+        clearDirectory(context.getCacheDir());
+        RandomAccessFile file = new RandomAccessFile(appStorage, "r");
+        file.seek(0);
+        file.write((char) (cacheVersion >> 16));
+        file.write((char) cacheVersion);
+        file.close();
     }
 }

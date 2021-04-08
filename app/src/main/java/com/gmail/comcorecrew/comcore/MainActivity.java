@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
@@ -24,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the application context
         Context context = getBaseContext();
+
+        try {
+            AppData.preInit(context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Initialize the notification manager using the application context
         NotificationHandler notificationHandler = new NotificationHandler(context);

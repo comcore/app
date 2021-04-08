@@ -1,0 +1,46 @@
+package com.gmail.comcorecrew.comcore.enums;
+
+public enum Reaction {
+
+    UNKNOWN,
+    NONE,
+    LIKE,
+    DISLIKE;
+
+    public static Reaction fromInt(int reaction) {
+        switch (reaction) {
+            case 0:
+                return NONE;
+            case 1:
+                return LIKE;
+            case 2:
+                return DISLIKE;
+            default:
+                return UNKNOWN;
+        }
+    }
+
+    public int toInt() {
+        switch (this) {
+            case NONE:
+                return 0;
+            case LIKE:
+                return 1;
+            case DISLIKE:
+                return 2;
+            default:
+                return -1; //UNKNOWN
+        }
+    }
+
+    public static Reaction[] getReactions() {
+        return new Reaction[] {
+                Reaction.LIKE,
+                Reaction.DISLIKE
+        };
+    }
+
+    public static int[] getEmptyReactionArray() {
+        return new int[getReactions().length];
+    }
+}
