@@ -230,9 +230,10 @@ public class GroupStorage {
         }
         for (File file : files) {
             Group group = new Group(new GroupID(file.getName()));
-            AppData.addGroup(group);
+            AppData.quickAddGroup(group);
             readGroup(group);
         }
+        AppData.normalizeGroupList();
     }
 
     /**
