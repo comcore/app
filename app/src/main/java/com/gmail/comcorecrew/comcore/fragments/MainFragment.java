@@ -178,8 +178,9 @@ public class MainFragment extends Fragment {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.getTextView().setText(AppData.getFromPos(position).getName());
-            viewHolder.setGroup(AppData.getFromPos(position));
+            Group group = AppData.getFromPos(position);
+            viewHolder.getTextView().setText(group.getName());
+            viewHolder.setGroup(group);
 
             /* Changes or removes the image on each group list item based on whether
              * the user is the owner, moderator, or neither. If the user is both owner and moderator,
@@ -188,7 +189,7 @@ public class MainFragment extends Fragment {
              * The shape of the image tag can be changed in group_row_item.xml
              * The colors can be changed in colors.xml
              */
-            switch (AppData.getFromPos(position).getGroupRole()) {
+            switch (group.getGroupRole()) {
                 case OWNER:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
                     viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
@@ -202,7 +203,7 @@ public class MainFragment extends Fragment {
                     break;
             }
 
-            if (AppData.getFromPos(position).isPinned()) {
+            if (group.isPinned()) {
                 viewHolder.textView.setTextColor(getResources().getColor(R.color.primary));
             }
             else {
