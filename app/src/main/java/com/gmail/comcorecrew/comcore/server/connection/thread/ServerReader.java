@@ -49,6 +49,7 @@ public final class ServerReader extends ServerThread {
                     }
                     break;
                 }
+                case "login":
                 case "setUser": {
                     UserInfo userData = UserInfo.fromJson(message.data);
                     connection.setUserInfo(userData);
