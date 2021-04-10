@@ -639,15 +639,19 @@ public final class ServerConnector {
     /**
      * Upload a file to the server. Returns a link which can be used to download the file.
      *
+     * @param name     the name of the file to upload (not including directory path)
      * @param contents the contents of the file to upload
      * @param handler  the handler for the response of the server
      */
-    public static void uploadFile(byte[] contents, ResultHandler<String> handler) {
-        if (contents == null) {
+    public static void uploadFile(String name, byte[] contents, ResultHandler<String> handler) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("file name cannot be null or empty");
+        } else if (contents == null) {
             throw new IllegalArgumentException("file contents cannot be null");
         }
 
         JsonObject data = new JsonObject();
+        data.addProperty("name", name);
         data.addProperty("contents", Base64.encodeToString(contents, Base64.NO_WRAP));
         getConnection().send(new ServerMsg("uploadFile", data), handler,
                 response -> response.get("link").getAsString());
