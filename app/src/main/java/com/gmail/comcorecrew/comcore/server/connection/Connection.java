@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
@@ -35,6 +36,11 @@ public interface Connection {
      * @param pass  the user's password
      */
     void setInformation(String email, String pass);
+
+    /**
+     * Log into the server using a token.
+     */
+    void login(LoginToken token);
 
     /**
      * Send a message to the server and handle the result asynchronously when it arrives.

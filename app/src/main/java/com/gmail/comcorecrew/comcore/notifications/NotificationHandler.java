@@ -18,6 +18,7 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -239,9 +240,9 @@ public class NotificationHandler implements NotificationListener {
     }
 
     @Override
-    public void onLoggedIn(UserInfo user) {
+    public void onLoggedIn(UserInfo user, LoginToken token) {
         try {
-            AppData.init(user, context);
+            AppData.init(user, token, context);
         } catch (IOException e) {
             e.printStackTrace();
         }

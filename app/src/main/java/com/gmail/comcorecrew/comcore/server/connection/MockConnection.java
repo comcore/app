@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
@@ -33,6 +34,9 @@ public final class MockConnection implements Connection {
 
     @Override
     public void setInformation(String email, String pass) {}
+
+    @Override
+    public void login(LoginToken token) {}
 
     @Override
     public <T> void send(ServerMsg message, ResultHandler<T> handler,

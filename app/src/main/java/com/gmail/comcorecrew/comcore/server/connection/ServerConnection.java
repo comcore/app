@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
@@ -33,6 +34,7 @@ public final class ServerConnection implements Connection {
 
     private String email;
     private String pass;
+    private LoginToken token;
     private UserInfo userInfo;
 
     private Socket socket;
@@ -144,6 +146,12 @@ public final class ServerConnection implements Connection {
         String pass;
 
         synchronized (this) {
+            // Try logging in with a token if there is one
+            if (token != null) {
+                login(token);
+                return;
+            }
+
             email = this.email;
             pass = this.pass;
         }
@@ -197,9 +205,11 @@ public final class ServerConnection implements Connection {
      * Set the information of the user when the server sends it.
      *
      * @param userData the user data
+     * @param token    the login token
      */
-    public synchronized void setUserInfo(UserInfo userData) {
+    public synchronized void setLoginInfo(UserInfo userData, LoginToken token) {
         this.userInfo = userData;
+        this.token = token;
     }
 
     /**
@@ -319,6 +329,15 @@ public final class ServerConnection implements Connection {
         }
 
         this.pass = pass;
+    }
+
+    @Override
+    public synchronized void login(LoginToken token) {
+        this.token = token;
+
+        JsonObject data = new JsonObject();
+        data.addProperty("token", token.token);
+        addTask(new ServerTask(new ServerMsg("connect", data), null));
     }
 
     @Override

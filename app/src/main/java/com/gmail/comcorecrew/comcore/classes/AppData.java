@@ -7,6 +7,7 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
@@ -62,12 +63,15 @@ public class AppData {
         }
 
     }
+
     /**
      * Init method that should be run when app is opened.
      *
+     * @param user the user's info
+     * @param token the login token
      * @param context App context
      */
-    public static void init(UserInfo user, Context context) throws IOException {
+    public static void init(UserInfo user, LoginToken token, Context context) throws IOException {
         self = new User(user);
         cacheDir = new File(context.getCacheDir(), self.getID().id);
         filesDir = new File(context.getFilesDir(), self.getID().id);

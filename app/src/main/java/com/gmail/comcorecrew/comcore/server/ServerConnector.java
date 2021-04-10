@@ -120,7 +120,7 @@ public final class ServerConnector {
     }
 
     /**
-     * Log out if logged in. It will be necessary to call authenticate() again.
+     * Log out if logged in. It will be necessary to call login() again.
      */
     public static void logout() {
         getConnection().logout();
@@ -133,6 +133,21 @@ public final class ServerConnector {
      */
     public static UserInfo getUser() {
         return getConnection().getUserInfo();
+    }
+
+    /**
+     * Log into the server using the given LoginToken. This should be assumed to succeed, because
+     * it will in the majority of cases. If the login token becomes invalid, then the method
+     * NotificationListener.onLoggedOut() will be called.
+     *
+     * @param token the token to log in with
+     */
+    public static void login(LoginToken token) {
+        if (token == null) {
+            throw new IllegalArgumentException("LoginToken cannot be null");
+        }
+
+        getConnection().login(token);
     }
 
     /**

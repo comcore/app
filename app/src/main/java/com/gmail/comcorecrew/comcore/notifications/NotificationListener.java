@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.*;
@@ -84,7 +85,7 @@ public interface NotificationListener {
     /**
      * Handle the user logging in successfully. This could be used to update the cached data.
      */
-    default void onLoggedIn(UserInfo user) {}
+    default void onLoggedIn(UserInfo user, LoginToken token) {}
 
     /**
      * Handle being logged out forcibly by the server. This could be used to go back to the login
