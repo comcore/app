@@ -28,6 +28,8 @@ public final class ServerConnection implements Connection {
     private static final String SERVER_URL = "comcore.ml";
     private static final int SERVER_PORT = 4433;
 
+    private final String url;
+
     private SSLContext sslContext;
     private ServerWriter writerThread;
     private ServerReader readerThread;
@@ -42,9 +44,18 @@ public final class ServerConnection implements Connection {
     private PrintWriter out;
 
     /**
-     * Create a new ServerConnector.
+     * Create a new ServerConnection.
      */
     public ServerConnection() {
+        this(SERVER_URL);
+    }
+
+    /**
+     * Create a new ServerConnection at a given URL.
+     */
+    public ServerConnection(String url) {
+        this.url = url;
+
         try {
             // Initialize the SSLContext
             sslContext = SSLContext.getDefault();
@@ -77,13 +88,13 @@ public final class ServerConnection implements Connection {
 
         try {
             // Create a Socket connected to the server
-            InetSocketAddress endPoint = new InetSocketAddress(SERVER_URL, SERVER_PORT);
+            InetSocketAddress endPoint = new InetSocketAddress(url, SERVER_PORT);
             socket = new Socket();
             socket.connect(endPoint, 5_000);
 
             // Add SSL to the socket
             socket = sslContext.getSocketFactory()
-                    .createSocket(socket, SERVER_URL, SERVER_PORT, true);
+                    .createSocket(socket, url, SERVER_PORT, true);
 
             // Initialize input and output streams
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

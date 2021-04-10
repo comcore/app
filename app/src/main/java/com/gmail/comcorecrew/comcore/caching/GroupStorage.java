@@ -102,11 +102,9 @@ public class GroupStorage {
                         group.setGroupRole(info.role);
                         group.setMuted(info.muted);
 
-                        // Refresh the group's users (and store the group data)
-                        group.refreshUsers(alreadyRefreshed, null);
-
-                        // Refresh the group's modules (and store the module data)
-                        group.refreshModules(null);
+                        // Refresh the group's users, then refresh the modules
+                        group.refreshUsers(alreadyRefreshed, () ->
+                            group.refreshModules(null));
                     }
                 }
 

@@ -195,7 +195,7 @@ public class Group implements NotificationListener, Comparable<Group> {
                 // Tell the module to refresh its contents
                 module.refresh();
 
-                // Store the updated group data
+                // Store the updated module data
                 try {
                     GroupStorage.storeModule(module);
                 } catch (IOException e) {

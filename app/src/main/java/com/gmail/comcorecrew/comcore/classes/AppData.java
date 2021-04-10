@@ -421,7 +421,7 @@ public class AppData {
             throw new IOException("Illegal updateCache() call");
         }
         clearDirectory(context.getCacheDir());
-        RandomAccessFile file = new RandomAccessFile(appStorage, "r");
+        RandomAccessFile file = new RandomAccessFile(appStorage, "rw");
         file.seek(0);
         file.write((char) (cacheVersion >> 16));
         file.write((char) cacheVersion);
