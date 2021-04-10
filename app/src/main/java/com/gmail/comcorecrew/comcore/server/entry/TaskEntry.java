@@ -37,9 +37,10 @@ public final class TaskEntry {
     public final boolean completed;
 
     /**
-     * Create a TaskEntry with a description of the task and whether it has been completed.
+     * Create a TaskEntry with an owner, a description of the task, and whether it is completed.
      *
-     * @param id          the MessageID of the message
+     * @param id          the TaskID of the task
+     * @param owner       the user that created the task
      * @param description the description of the task
      * @param completed   whether the task has been completed
      */
@@ -84,13 +85,15 @@ public final class TaskEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntry taskEntry = (TaskEntry) o;
-        return completed == taskEntry.completed &&
+        return timestamp == taskEntry.timestamp &&
+                completed == taskEntry.completed &&
                 id.equals(taskEntry.id) &&
+                owner.equals(taskEntry.owner) &&
                 description.equals(taskEntry.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, completed);
+        return Objects.hash(id, owner, timestamp, description, completed);
     }
 }

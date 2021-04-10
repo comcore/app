@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.server;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
@@ -331,6 +332,18 @@ public final class ServerConnector {
     }
 
     /**
+     * Create a new calendar with a given name.
+     *
+     * @param group   the parent group of the calendar
+     * @param name    the name of the calendar
+     * @param handler the handler for the response of the server
+     */
+    public static void createCalendar(GroupID group, String name,
+                                      ResultHandler<CalendarID> handler) {
+        createModule("calendar", group, name, handler, id -> new CalendarID(group, id));
+    }
+
+    /**
      * Create a new custom module with a given name and type.
      *
      * @param group   the parent group of the task list
@@ -624,6 +637,23 @@ public final class ServerConnector {
     }
 
     /**
+     * Upload a file to the server. Returns a link which can be used to download the file.
+     *
+     * @param contents the contents of the file to upload
+     * @param handler  the handler for the response of the server
+     */
+    public static void uploadFile(byte[] contents, ResultHandler<String> handler) {
+        if (contents == null) {
+            throw new IllegalArgumentException("file contents cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("contents", Base64.encodeToString(contents, Base64.NO_WRAP));
+        getConnection().send(new ServerMsg("uploadFile", data), handler,
+                response -> response.get("link").getAsString());
+    }
+
+    /**
      * Send a message in a chat.
      *
      * @param chat    the chat to send the message in
@@ -778,6 +808,89 @@ public final class ServerConnector {
         data.addProperty("taskList", task.module.id);
         data.addProperty("id", task.id);
         getConnection().send(new ServerMsg("deleteTask", data), handler, response -> null);
+    }
+
+    /**
+     * Add an event to a calendar.
+     *
+     * @param calendar    the calendar to add the event to
+     * @param timestamp   the timestamp of the event
+     * @param description the description of the event
+     * @param handler     the handler for the response of the server
+     */
+    public static void addEvent(CalendarID calendar, long timestamp, String description,
+                                ResultHandler<EventEntry> handler) {
+        if (calendar == null) {
+            throw new IllegalArgumentException("CalendarID cannot be null");
+        } else if (timestamp < 1) {
+            throw new IllegalArgumentException("event timestamp cannot be less than 1");
+        } else if (description == null) {
+            throw new IllegalArgumentException("event description cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", calendar.group.id);
+        data.addProperty("taskList", calendar.id);
+        data.addProperty("timestamp", timestamp);
+        data.addProperty("description", description);
+        getConnection().send(new ServerMsg("addEvent", data), handler,
+                response -> EventEntry.fromJson(calendar, response));
+    }
+
+    /**
+     * Get a list of the events in a calendar.
+     *
+     * @param calendar the calendar to request events from
+     * @param handler  the handler for the response of the server
+     */
+    public static void getEvents(CalendarID calendar, ResultHandler<EventEntry[]> handler) {
+        if (calendar == null) {
+            throw new IllegalArgumentException("CalendarID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", calendar.group.id);
+        data.addProperty("calendar", calendar.id);
+        requestArray(new ServerMsg("getEvents", data), handler, EventEntry.class,
+                "events", json -> EventEntry.fromJson(calendar, json));
+    }
+
+    /**
+     * As a moderator, approve or deny an event created by a user. If the event is denied, the
+     * event will be deleted so the EventID becomes invalid and can no longer be used.
+     *
+     * @param event   the event to approve
+     * @param handler the handler for the response of the server
+     */
+    public static void approveEvent(EventID event, boolean approve, ResultHandler<Void> handler) {
+        if (event == null) {
+            throw new IllegalArgumentException("EventID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", event.module.group.id);
+        data.addProperty("calendar", event.module.id);
+        data.addProperty("id", event.id);
+        data.addProperty("approve", approve);
+        getConnection().send(new ServerMsg("approveEvent", data), handler, response -> null);
+    }
+
+    /**
+     * Delete an event from a calendar. The EventID becomes invalid and can no longer be used.
+     *
+     * @param event   the event to delete
+     * @param handler the handler for the response of the server
+     */
+    public static void deleteEvent(EventID event, ResultHandler<Void> handler) {
+        if (event == null) {
+            throw new IllegalArgumentException("EventID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", event.module.group.id);
+        data.addProperty("calendar", event.module.id);
+        data.addProperty("id", event.id);
+        getConnection().send(new ServerMsg("deleteEvent", data), handler, response -> null);
     }
 
     /**

@@ -5,7 +5,7 @@ package com.gmail.comcorecrew.comcore.server.id;
  */
 public final class TaskListID extends ModuleID {
     /**
-     * Create a TaskList from a parent group and an ID string.
+     * Create a TaskListID from a parent group and an ID string.
      *
      * @param group the parent group
      * @param id    the ID string
