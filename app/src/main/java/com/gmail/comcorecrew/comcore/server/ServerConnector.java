@@ -136,18 +136,17 @@ public final class ServerConnector {
     }
 
     /**
-     * Log into the server using the given LoginToken. This should be assumed to succeed, because
-     * it will in the majority of cases. If the login token becomes invalid, then the method
+     * Connect to the server using the given LoginToken. If the LoginToken becomes invalid, then
      * NotificationListener.onLoggedOut() will be called.
      *
-     * @param token the token to log in with
+     * @param token the LoginToken to connect with
      */
-    public static void login(LoginToken token) {
+    public static void connect(LoginToken token) {
         if (token == null) {
             throw new IllegalArgumentException("LoginToken cannot be null");
         }
 
-        getConnection().login(token);
+        getConnection().connect(token);
     }
 
     /**

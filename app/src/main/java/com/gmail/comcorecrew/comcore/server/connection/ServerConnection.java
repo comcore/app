@@ -157,9 +157,9 @@ public final class ServerConnection implements Connection {
         String pass;
 
         synchronized (this) {
-            // Try logging in with a token if there is one
+            // Try connecting with a token if there is one
             if (token != null) {
-                login(token);
+                connect(token);
                 return;
             }
 
@@ -343,7 +343,7 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
-    public synchronized void login(LoginToken token) {
+    public synchronized void connect(LoginToken token) {
         this.token = token;
 
         JsonObject data = new JsonObject();

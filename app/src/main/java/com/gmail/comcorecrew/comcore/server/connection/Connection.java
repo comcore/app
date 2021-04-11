@@ -38,9 +38,9 @@ public interface Connection {
     void setInformation(String email, String pass);
 
     /**
-     * Log into the server using a token.
+     * Connect to the server using a token.
      */
-    void login(LoginToken token);
+    void connect(LoginToken token);
 
     /**
      * Send a message to the server and handle the result asynchronously when it arrives.

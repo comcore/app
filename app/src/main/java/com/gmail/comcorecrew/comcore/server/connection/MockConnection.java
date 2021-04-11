@@ -36,7 +36,7 @@ public final class MockConnection implements Connection {
     public void setInformation(String email, String pass) {}
 
     @Override
-    public void login(LoginToken token) {}
+    public void connect(LoginToken token) {}
 
     @Override
     public <T> void send(ServerMsg message, ResultHandler<T> handler,
