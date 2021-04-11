@@ -154,6 +154,10 @@
 
     <string name="pinned_messages">Pinned Messages</string>
 
+    <!-- Create Event -->
+    <string name="create_event_label">Create an Event</string>
+    <string name="pick_date_label">Choose a Date</string>
+
 
 
 </resources>
