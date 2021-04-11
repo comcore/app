@@ -38,7 +38,8 @@ public class ViewTasksDialog extends DialogFragment {
     private TaskList currentTaskList;
 
     /** 0 - Delete Task
-     * 1 - Update Task
+     * 1 - Complete Task
+     * 2 - Work On Task
      */
     private int flag;
 
@@ -71,7 +72,10 @@ public class ViewTasksDialog extends DialogFragment {
             labelViewTasks.setText(R.string.delete_task);
         }
         else if (flag == 1) {
-            labelViewTasks.setText(R.string.update_task);
+            labelViewTasks.setText(R.string.complete_task);
+        }
+        else if (flag == 2) {
+            labelViewTasks.setText(R.string.in_progress_task);
         }
 
         /**
@@ -113,7 +117,31 @@ public class ViewTasksDialog extends DialogFragment {
                 if (flag == 0) {
                     currentTaskList.deleteTask(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
                 } else if (flag == 1) {
-                    currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                    /** TODO Check if the user is an owner, moderator, or the task completer before
+                     * allowing them to un-complete a task **/
+                    if (currentTask.isCompleted()) {
+                        if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
+                            new ErrorDialog(R.string.error_cannot_uncomplete).show(getParentFragmentManager(), null);
+                        }
+                        else {
+                            currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                        }
+                    }
+                    else {
+                        currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                    }
+                }
+                else if (flag == 2) {
+                    if (currentTask.isCompleted()) {
+                        new ErrorDialog(R.string.error_already_complete).show(getParentFragmentManager(), null);
+                    }
+                    /** TODO display an error message if the task is already in progress. **/
+                    else if (false) {
+                        new ErrorDialog(R.string.error_already_in_progress).show(getParentFragmentManager(), null);
+                    }
+                    else {
+                        /** TODO the clicked task should be marked as "in progress" **/
+                    }
                 }
                 dismiss();
             }
@@ -141,10 +169,20 @@ public class ViewTasksDialog extends DialogFragment {
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             dataText.setText(currentTaskList.getTasks().get(position).getData());
             if (currentTaskList.getTasks().get(position).isCompleted()) {
-                completedText.setText(R.string.completed);
+                if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
+                    completedText.setText(R.string.completed);
+                }
+                /** TODO display the name of the user who completed the task **/
+                else {
+                    completedText.setText("Completed By: ");
+                }
+            }
+            /** TODO If the task is in progress, display the name of the user who is working on the task **/
+            else if (false){
+                completedText.setText("In Progress By: ");
             }
             else {
-                completedText.setText(R.string.not_completed);
+                completedText.setText("Not Completed");
             }
             viewHolder.setCurrentTask(currentTaskList.getTasks().get(position));
 
