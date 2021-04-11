@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,42 +20,44 @@ import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 
 import java.util.ArrayList;
 
-public class ViewInvitesDialog extends DialogFragment {
-    private RecyclerView recycleView;
-    private CustomAdapter adapter;
-    private ArrayList<GroupInviteEntry> inviteList;
-    private MainFragment fragment;
+public class ViewPendingEventsDialog extends DialogFragment {
 
-    public ViewInvitesDialog (MainFragment fragment) {
-        this.fragment = fragment;
+    private CustomAdapter adapter;
+    private ArrayList<EventEntry> unapprovedEventList = new ArrayList<>();
+    private CalendarID currentCalendar;
+
+    public ViewPendingEventsDialog (CalendarID currentCalendar) {
+        this.currentCalendar = currentCalendar;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
-        inviteList = new ArrayList<>();
 
-        ServerConnector.getInvites(result -> {
+        ServerConnector.getEvents(currentCalendar, result -> {
             if (result.isFailure()) {
-                // TODO display error message
                 this.dismiss();
                 return;
             }
 
+            /** Only add pending events to unapprovedEventList **/
             for (int i = 0; i < result.data.length; i++) {
-                GroupInviteEntry groupInvite = result.data[i];
-                inviteList.add(groupInvite);
+                if (!result.data[i].approved) {
+                    unapprovedEventList.add(result.data[i]);
+                }
             }
 
             // Create the RecyclerView
             RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
             rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-            adapter = new CustomAdapter(inviteList);
+            adapter = new CustomAdapter();
             rvGroups.setAdapter(adapter);
             rvGroups.setItemAnimator(new DefaultItemAnimator());
         });
@@ -76,16 +79,13 @@ public class ViewInvitesDialog extends DialogFragment {
 
 
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
-     * the list of invites in the GUI
+     * the list of pending calendar events in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        private ArrayList<GroupInviteEntry> inviteList;
-
         public class ViewHolder extends RecyclerView.ViewHolder {
             private final TextView textView;
-            private GroupInviteEntry currentInviteEntry;
-
+            private EventEntry currentEventEntry;
 
             public ViewHolder(View view) {
                 super(view);
@@ -93,28 +93,27 @@ public class ViewInvitesDialog extends DialogFragment {
                 textView = (TextView) view.findViewById(R.id.label_invite);
 
                 view.findViewById(R.id.accept_invite_button).setOnClickListener(clickedView -> {
-                    ServerConnector.replyToInvite(currentInviteEntry.id, true, result -> {
+                    ServerConnector.approveEvent(currentEventEntry.id, true, result -> {
                         if (result.isFailure()) {
                             new ErrorDialog(R.string.error_cannot_connect)
                                     .show(getParentFragmentManager(), null);
                             return;
                         }
 
-                        inviteList.remove(currentInviteEntry);
+                        unapprovedEventList.remove(currentEventEntry);
                         notifyDataSetChanged();
-                        fragment.refresh();
                     });
                 });
 
                 view.findViewById(R.id.reject_invite_button).setOnClickListener(clickedView -> {
-                    ServerConnector.replyToInvite(currentInviteEntry.id, false, result -> {
+                    ServerConnector.approveEvent(currentEventEntry.id, false, result -> {
                         if (result.isFailure()) {
                             new ErrorDialog(R.string.error_cannot_connect)
                                     .show(getParentFragmentManager(), null);
                             return;
                         }
 
-                        inviteList.remove(currentInviteEntry);
+                        unapprovedEventList.remove(currentEventEntry);
                         notifyDataSetChanged();
                     });
                 });
@@ -124,21 +123,16 @@ public class ViewInvitesDialog extends DialogFragment {
                 return textView;
             }
 
-            public void setGroupInviteEntry(GroupInviteEntry newEntry) {
-                this.currentInviteEntry = newEntry;
+            public void setCurrentEventEntry(EventEntry newEntry) {
+                this.currentEventEntry = newEntry;
             }
 
-        }
-
-        public CustomAdapter(ArrayList<GroupInviteEntry> inviteList) {
-
-            this.inviteList = inviteList;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.invite_row_item, viewGroup, false);
+                    .inflate(R.layout.pending_event_row_item, viewGroup, false);
 
             return new ViewHolder(view);
         }
@@ -146,16 +140,20 @@ public class ViewInvitesDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            viewHolder.getTextView().setText(inviteList.get(position).name);
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.pending_event_desc);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.pending_event_date);
 
-            viewHolder.setGroupInviteEntry(inviteList.get(position));
+            eventDesc.setText(unapprovedEventList.get(position).description);
+            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).timestamp).toString();
+            eventDate.setText(parsedDate);
 
+            viewHolder.setCurrentEventEntry(unapprovedEventList.get(position));
 
         }
 
         @Override
         public int getItemCount() {
-            return inviteList.size();
+            return unapprovedEventList.size();
         }
     }
 

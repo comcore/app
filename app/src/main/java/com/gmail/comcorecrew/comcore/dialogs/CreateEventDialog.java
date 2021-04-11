@@ -39,13 +39,13 @@ public class CreateEventDialog extends DialogFragment {
         this.calendarID = calendarID;
     }
 
-    private void createEvent(long expireTimestamp) {
+    private void createEvent(long eventTimestamp) {
 
         EditText createEventDesc = getView().findViewById(R.id.create_event_desc);
 
         /** If the user is a moderator or an owner, the event can be created **/
         if (AppData.getGroup(calendarID.group).getGroupRole() != GroupRole.USER) {
-            ServerConnector.addEvent(calendarID, expireTimestamp, createEventDesc.getText().toString(), result -> {
+            ServerConnector.addEvent(calendarID, eventTimestamp, createEventDesc.getText().toString(), result -> {
                 if (result.isFailure()) {
                     new ErrorDialog(R.string.error_cannot_connect)
                             .show(fragment.getParentFragmentManager(), null);
@@ -148,8 +148,8 @@ public class CreateEventDialog extends DialogFragment {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
 
-            long expireTimestamp = calendar.getTimeInMillis();
-            if (expireTimestamp < System.currentTimeMillis()) {
+            long eventTimestamp = calendar.getTimeInMillis();
+            if (eventTimestamp < System.currentTimeMillis()) {
                 new ErrorDialog(R.string.error_expire_past)
                         .show(parent.fragment.getParentFragmentManager(), null);
                 return;
