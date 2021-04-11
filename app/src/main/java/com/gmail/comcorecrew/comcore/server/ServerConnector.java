@@ -637,7 +637,8 @@ public final class ServerConnector {
     }
 
     /**
-     * Upload a file to the server. Returns a link which can be used to download the file.
+     * Upload a file to the server. Returns a string which can be added to a message to display a
+     * link to download the file from the server.
      *
      * @param name     the name of the file to upload (not including directory path)
      * @param contents the contents of the file to upload
@@ -654,7 +655,7 @@ public final class ServerConnector {
         data.addProperty("name", name);
         data.addProperty("contents", Base64.encodeToString(contents, Base64.NO_WRAP));
         getConnection().send(new ServerMsg("uploadFile", data), handler,
-                response -> response.get("link").getAsString());
+                response -> "@<https://" + response.get("link").getAsString() + ">");
     }
 
     /**

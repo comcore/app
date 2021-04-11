@@ -120,7 +120,7 @@ public abstract class ChatMention {
      * A mention of an uploaded file.
      */
     public static final class UploadMention extends ChatMention {
-        private static final Pattern REGEX = Pattern.compile("^(?:https?://)?(?:www\\.)?" +
+        private static final Pattern REGEX = Pattern.compile("^https?://(?:www\\.)?" +
                 "comcore\\.ml/file/[A-Za-z0-9]+-([a-zA-Z0-9._-]+)$");
 
         /**
