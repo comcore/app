@@ -48,7 +48,7 @@ public abstract class ModuleID extends ItemID {
                 return new ChatID(group, id);
             case "task":
                 return new TaskListID(group, id);
-            case "calendar":
+            case "cal":
                 return new CalendarID(group, id);
             default:
                 return new CustomModuleID(group, id, type);
@@ -62,7 +62,15 @@ public abstract class ModuleID extends ItemID {
      * @return true if it corresponds to a type of module, false otherwise
      */
     public static boolean isKnownType(String type) {
-        return type.equals("chat") || type.equals("task") || type.equals("calendar");
+        switch (type) {
+            case "chat":
+            case "task":
+            case "cal":
+            case "poll":
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**

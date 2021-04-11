@@ -17,14 +17,13 @@ import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.fragments.MainFragment;
+import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.info.ModuleInfo;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.IOException;
@@ -121,7 +120,8 @@ public class NotificationHandler implements NotificationListener {
         // Check for mentions for the current user in the notification
         String name = ServerConnector.getUser().name;
         boolean mentioned = false;
-        for (ChatMention mention : ChatMention.parseMentions(message.contents)) {
+        List<ChatMention> mentions = ChatMention.parseMentions(message.contents);
+        for (ChatMention mention : mentions) {
             if (mention.mentionsUser(name)) {
                 if (module.isMentionMuted()) {
                     return;
@@ -136,11 +136,15 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
+        // Format the mentions as if in a message
+        Group group = module.getGroup();
+        String formatted = ChatMention.formatMentions(message.contents, group, mentions).toString();
+
         UserStorage.lookup(message.sender, user ->
             notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())
-                    .setContentText(user.getName() + ": " + message.contents)
+                    .setContentText(user.getName() + ": " + formatted)
                     .setWhen(message.timestamp)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()));
