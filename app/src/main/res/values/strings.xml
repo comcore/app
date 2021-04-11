@@ -85,6 +85,10 @@
     <string name="error_cannot_unmute">The user could not be unmuted.</string>
     <string name="error_module_not_selected">No module type selected.</string>
     <string name="error_unknown_module_type">An unknown type of module was received.</string>
+    <string name="error_already_complete">The task has already been completed.</string>
+    <string name="error_already_in_progress">The task is already in progress.</string>
+    <string name="error_cannot_uncomplete">You do not have the permission to remove the completion status.</string>
+
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
@@ -124,7 +128,10 @@
     <string name="not_completed">Not Completed</string>
     <string name="completed">Completed!</string>
     <string name="delete_task">Delete A Task</string>
-    <string name="update_task">Mark A Task As Completed</string>
+    <string name="complete_task">Set (or Unset) A Task As Completed</string>
+    <string name="in_progress_task">Set (or Unset) A Task As In Progress</string>
+    <string name="complete_task_short">Complete A Task</string>
+    <string name="in_progress_task_short">Work On A Task</string>
 
     <!-- Create Module Dialog -->
     <string name="create_module">Create Module</string>

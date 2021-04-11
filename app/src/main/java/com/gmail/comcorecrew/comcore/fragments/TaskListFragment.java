@@ -122,9 +122,13 @@ public class TaskListFragment extends Fragment {
                 ViewTasksDialog deleteTaskDialog = new ViewTasksDialog(taskList, 0);
                 deleteTaskDialog.show(getParentFragmentManager(), null);
                 return true;
-            case R.id.update_task:
-                ViewTasksDialog updateTaskDialog = new ViewTasksDialog(taskList, 1);
-                updateTaskDialog.show(getParentFragmentManager(), null);
+            case R.id.complete_task:
+                ViewTasksDialog completeTaskDialog = new ViewTasksDialog(taskList, 1);
+                completeTaskDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.progress_task:
+                ViewTasksDialog progressTaskDialog = new ViewTasksDialog(taskList, 2);
+                progressTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -162,9 +166,16 @@ public class TaskListFragment extends Fragment {
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
+
+            /** TODO Display the name of the user who completed the task **/
             if (task.completed) {
-                completedText.setText(R.string.completed);
-            } else {
+                completedText.setText("Completed By: ");
+            }
+            /** TODO Display the name of the user who is working on the task **/
+            else if (false){
+                completedText.setText("In Progress By: ");
+            }
+            else {
                 completedText.setText(R.string.not_completed);
             }
         }
