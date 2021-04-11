@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,6 +42,7 @@ public class ChatFragment5 extends Fragment {
     public static final int ID_EDIT_BUTTON = 121;
     public static final int ID_DELETE_BUTTON = 122;
     public static final int ID_PIN_BUTTON = 123;
+    public static final int ID_REACT_BUTTON = 124;
 
     public static Messaging messaging;
 
@@ -48,6 +50,7 @@ public class ChatFragment5 extends Fragment {
 
     private Button sendButton;
     private EditText messageToBeSent;
+    private Toolbar toolBar;
 
     private RecyclerView messageRecycler;
     private MessageListAdapter messageAdapter;
@@ -71,7 +74,12 @@ public class ChatFragment5 extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = this.getArguments();
         setHasOptionsMenu(true);
+    }
 
+    @Override
+    public void onDestroy() {
+        getActivity().setTitle("Comcore");
+        super.onDestroy();
     }
 
     @Override
@@ -97,7 +105,6 @@ public class ChatFragment5 extends Fragment {
         messaging.refresh();
 
         sendButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 if (!isEditMode & !isDeleteMode) {
@@ -117,13 +124,7 @@ public class ChatFragment5 extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.chatmenu, menu);
-        if (messaging.getGroup().getGroupRole() == GroupRole.OWNER || messaging.getGroup().getGroupRole() == GroupRole.MODERATOR) {
-            menu.setGroupVisible(R.id.pin_group, true);
-        }
-        else {
-            menu.setGroupVisible(R.id.pin_group, true);
-        }
-
+        menu.setGroupVisible(R.id.pin_group, true);
     }
 
     /**
@@ -137,11 +138,10 @@ public class ChatFragment5 extends Fragment {
                 /** Handle back button **/
                 NavHostFragment.findNavController(this).popBackStack();
                 return true;
-
-            case R.id.pinned_messages:
-                /**Handle pinned messages button **/
+            case R.id.upload_file:
+                /**Handle Upload File button **/
+                uploadFile();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -155,7 +155,6 @@ public class ChatFragment5 extends Fragment {
     }
 
     // Listens for selection of an item in the ContextMenu in messageAdapter
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -168,6 +167,9 @@ public class ChatFragment5 extends Fragment {
             case ID_PIN_BUTTON:
                 pinMessage(item);
                 return true;
+            case ID_REACT_BUTTON:
+                reactMessage(item);
+                return true;
             default:
                 return true;
         }
@@ -175,6 +177,9 @@ public class ChatFragment5 extends Fragment {
 
     // Initializes objects in GUI
     public void initialize(View view) {
+        toolBar = (Toolbar) view.findViewById(R.id.toolbar_gchannel);
+        toolBar.setTitle(((ChatID) messaging.getId()).id);
+        getActivity().setTitle(messaging.getName());
         sendButton = (Button) view.findViewById(R.id.button_gchat_send);
         messageToBeSent = (EditText) view.findViewById(R.id.edit_gchat_message);
         messageRecycler = (RecyclerView) view.findViewById(R.id.recycler_gchat);
@@ -199,7 +204,6 @@ public class ChatFragment5 extends Fragment {
     }
 
     // Used for deleteMessage() and editMessage()
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendMessage(MessageEntry messageEntry1) {
         // If you're editing a message
         if (isEditMode) {
@@ -227,13 +231,12 @@ public class ChatFragment5 extends Fragment {
                     messaging.onMessageUpdated(result.data);
                     refresh();
                     messageToBeSent.getText().clear();
-                    isDeleteMode = false;
                 }
+                isDeleteMode = false;
             });
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void deleteMessage (MenuItem item){
         messageEntry = messaging.getEntry(item.getGroupId());
         isDeleteMode = true;
@@ -247,9 +250,15 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void pinMessage(MenuItem item) {
-        item.getGroupId();
         messageEntry = messaging.getEntry(item.getGroupId());
         int x = PinnedMessages.pinUnpinMessage(messageEntry);
         System.out.println(x);
+    }
+
+    private void reactMessage(MenuItem item) {
+    }
+
+    private void uploadFile() {
+
     }
 }
