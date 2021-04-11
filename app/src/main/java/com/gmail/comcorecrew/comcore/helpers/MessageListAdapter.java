@@ -1,9 +1,8 @@
 package com.gmail.comcorecrew.comcore.helpers;
 
-
 import android.content.Context;
 import android.os.Build;
-import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
-import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
@@ -98,6 +96,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             super(itemView);
 
             messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
+            messageText.setMovementMethod(LinkMovementMethod.getInstance());
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
@@ -147,6 +146,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             super(itemView);
 
             messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
+            messageText.setMovementMethod(LinkMovementMethod.getInstance());
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);

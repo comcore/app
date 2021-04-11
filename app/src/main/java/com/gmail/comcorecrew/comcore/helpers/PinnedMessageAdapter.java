@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
-import com.gmail.comcorecrew.comcore.notifications.ChatMention;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
