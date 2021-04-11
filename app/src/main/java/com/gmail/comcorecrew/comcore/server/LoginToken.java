@@ -9,8 +9,16 @@ import java.util.Objects;
  * in the future without needed an email and password.
  */
 public class LoginToken {
+    /**
+     * The token string sent by the server.
+     */
     public final String token;
 
+    /**
+     * Create a LoginToken from a token string.
+     *
+     * @param token the token string
+     */
     public LoginToken(String token) {
         if (token == null || token.isEmpty()) {
             throw new IllegalArgumentException("token cannot be null or empty");
