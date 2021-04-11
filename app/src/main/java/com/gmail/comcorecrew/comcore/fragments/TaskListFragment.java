@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
@@ -167,9 +168,14 @@ public class TaskListFragment extends Fragment {
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
 
-            /** TODO Display the name of the user who completed the task **/
             if (task.completed) {
-                completedText.setText("Completed By: ");
+                if (taskList.getGroup().getGroupRole() == GroupRole.USER) {
+                    completedText.setText(R.string.completed);
+                }
+                /** TODO Display the name of the user who completed the task **/
+                else {
+                    completedText.setText("Completed By: ");
+                }
             }
             /** TODO Display the name of the user who is working on the task **/
             else if (false){

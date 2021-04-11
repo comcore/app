@@ -168,9 +168,14 @@ public class ViewTasksDialog extends DialogFragment {
             TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             dataText.setText(currentTaskList.getTasks().get(position).getData());
-            /** TODO display the name of the user who completed the task **/
             if (currentTaskList.getTasks().get(position).isCompleted()) {
-                completedText.setText("Completed By: ");
+                if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
+                    completedText.setText(R.string.completed);
+                }
+                /** TODO display the name of the user who completed the task **/
+                else {
+                    completedText.setText("Completed By: ");
+                }
             }
             /** TODO If the task is in progress, display the name of the user who is working on the task **/
             else if (false){
