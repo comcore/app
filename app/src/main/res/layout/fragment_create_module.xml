@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
-    android:layout_height="450dp">
+    android:layout_height="500dp">
 
     <Button
         android:id="@+id/create_module_back_button"
@@ -57,11 +57,11 @@
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="151dp"
-        android:layout_height="190dp"
+        android:layout_height="240dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,6 +86,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pinned_module_label" />
+
+        <RadioButton
+            android:id="@+id/create_module_calendar_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/calendar_module_label" />
 
         <RadioButton
             android:id="@+id/create_module_dummy_radio"

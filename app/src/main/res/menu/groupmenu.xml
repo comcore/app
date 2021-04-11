@@ -33,16 +33,20 @@
             android:title="@string/create_module"
             app:showAsAction="never" />
     </group>
+
+    <!-- These menu items are only showed to the group owner -->
     <group android:id="@+id/menu_group_owner_actions">
 
         <item
             android:id="@+id/transfer_ownership"
             android:title="@string/transfer_ownership"
             app:showAsAction="never" />
+        <item
+            android:id="@+id/create_sub_group"
+            android:title="@string/create_sub_group"
+            app:showAsAction="never" />
 
     </group>
-
-    <!-- These menu items are only showed to the group owner -->
 
     <!-- These menu items are only showed in a group fragment -->
     <group android:id="@+id/menu_group_actions">

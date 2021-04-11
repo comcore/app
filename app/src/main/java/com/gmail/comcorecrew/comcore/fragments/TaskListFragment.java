@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
@@ -122,9 +123,13 @@ public class TaskListFragment extends Fragment {
                 ViewTasksDialog deleteTaskDialog = new ViewTasksDialog(taskList, 0);
                 deleteTaskDialog.show(getParentFragmentManager(), null);
                 return true;
-            case R.id.update_task:
-                ViewTasksDialog updateTaskDialog = new ViewTasksDialog(taskList, 1);
-                updateTaskDialog.show(getParentFragmentManager(), null);
+            case R.id.complete_task:
+                ViewTasksDialog completeTaskDialog = new ViewTasksDialog(taskList, 1);
+                completeTaskDialog.show(getParentFragmentManager(), null);
+                return true;
+            case R.id.progress_task:
+                ViewTasksDialog progressTaskDialog = new ViewTasksDialog(taskList, 2);
+                progressTaskDialog.show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -162,9 +167,21 @@ public class TaskListFragment extends Fragment {
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
+
             if (task.completed) {
-                completedText.setText(R.string.completed);
-            } else {
+                if (taskList.getGroup().getGroupRole() == GroupRole.USER) {
+                    completedText.setText(R.string.completed);
+                }
+                /** TODO Display the name of the user who completed the task **/
+                else {
+                    completedText.setText("Completed By: ");
+                }
+            }
+            /** TODO Display the name of the user who is working on the task **/
+            else if (false){
+                completedText.setText("In Progress By: ");
+            }
+            else {
                 completedText.setText(R.string.not_completed);
             }
         }

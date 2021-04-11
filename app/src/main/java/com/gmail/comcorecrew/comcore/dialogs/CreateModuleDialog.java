@@ -56,6 +56,7 @@ public class CreateModuleDialog extends DialogFragment {
             RadioButton chatRadio = view.findViewById(R.id.create_module_chat_radio);
             RadioButton tasklistRadio = view.findViewById(R.id.create_module_tasklist_radio);
             RadioButton pinnedRadio = view.findViewById(R.id.create_module_pinned_chat_radio);
+            RadioButton calendarRadio = view.findViewById(R.id.create_module_calendar_radio);
             RadioButton dummyRadio = view.findViewById(R.id.create_module_dummy_radio);
             EditText moduleName = view.findViewById(R.id.create_module_name_edit);
 
@@ -93,6 +94,13 @@ public class CreateModuleDialog extends DialogFragment {
                     new PinnedMessages(moduleName.getText().toString(), AppData.getGroup(groupID),
                             selectedChat);
                 }
+
+                this.dismiss();
+                fragment.refresh();
+            }
+            else if (calendarRadio.isChecked()) {
+
+                /** TODO Create CalendarModule **/
 
                 this.dismiss();
                 fragment.refresh();
