@@ -163,7 +163,9 @@
     <string name="pin_message">Pin a Message</string>
 
     <string name="pinned_messages">Pinned Messages</string>
-
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="upload_file">Upload File</string>
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
