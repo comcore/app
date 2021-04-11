@@ -140,6 +140,7 @@
     <string name="task_list_module_label">Task List</string>
     <string name="chat_module_label">Chat</string>
     <string name="pinned_module_label">Pinned Messages</string>
+    <string name="calendar_module_label">Calendar</string>
     <string name="dummy_module_label">Dummy Button</string>
 
     <!-- Notification Settings -->
