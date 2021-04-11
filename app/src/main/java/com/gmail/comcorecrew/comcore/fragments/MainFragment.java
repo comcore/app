@@ -109,8 +109,8 @@ public class MainFragment extends Fragment {
                 refresh();
                 return true;
             case R.id.createGroupFragment:
-                NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_mainFragment_to_createGroupFragment);
+                MainFragmentDirections.ActionMainFragmentToCreateGroupFragment action = MainFragmentDirections.actionMainFragmentToCreateGroupFragment(null);
+                NavHostFragment.findNavController(MainFragment.this).navigate(action);
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page */
@@ -135,7 +135,6 @@ public class MainFragment extends Fragment {
             public ViewHolder(View view) {
                 super(view);
                 view.setOnClickListener(this);
-                // Define click listener for the ViewHolder's View
 
                 textView = (TextView) view.findViewById(R.id.group_row_text);
                 viewTag = (ImageView) view.findViewById(R.id.group_row_tag);
@@ -162,7 +161,6 @@ public class MainFragment extends Fragment {
             }
         }
 
-        // Create new views (invoked by the layout manager)
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             // Create a new view, which defines the UI of the list item
@@ -172,12 +170,9 @@ public class MainFragment extends Fragment {
             return new ViewHolder(view);
         }
 
-        // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            // Get element from your dataset at this position and replace the
-            // contents of the view with that element
             Group group = AppData.getFromPos(position);
             viewHolder.getTextView().setText(group.getName());
             viewHolder.setGroup(group);
@@ -211,7 +206,6 @@ public class MainFragment extends Fragment {
             }
         }
 
-        // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
             return AppData.getGroupSize();

@@ -103,6 +103,37 @@
             app:layout_constraintEnd_toStartOf="@+id/create_group_submit_button"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <ScrollView
+            android:id="@+id/create_group_scroller"
+            android:layout_width="283dp"
+            android:layout_height="195dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="144dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/create_group_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/total_members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/list_of_members"
+            app:layout_constraintBottom_toTopOf="@+id/create_group_scroller"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_calendar" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

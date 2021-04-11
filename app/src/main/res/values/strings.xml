@@ -29,6 +29,7 @@
     <string name="label_add_f">Add Features To Your Group</string>
     <string name="add_m_contacts">Add From Contacts</string>
     <string name="add_m_email">Add From Email</string>
+    <string name="list_of_members">Total Members: </string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -61,6 +62,7 @@
     <string name="remove_moderator">Remove Moderator</string>
     <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
+    <string name="create_sub_group">Create Sub Group</string>
 
     <!-- Create Link -->
     <string name="create_link_does_expire">Do you want the invite link to expire?</string>
