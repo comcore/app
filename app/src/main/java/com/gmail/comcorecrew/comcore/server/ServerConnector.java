@@ -284,7 +284,7 @@ public final class ServerConnector {
     /**
      * Create a new group with a given name.
      *
-     * @param name the name of the group
+     * @param name    the name of the group
      * @param handler the handler for the response of the server
      */
     public static void createGroup(String name, ResultHandler<GroupID> handler) {
@@ -295,6 +295,59 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("name", name);
         getConnection().send(new ServerMsg("createGroup", data), handler, response ->
+                new GroupID(response.get("id").getAsString()));
+    }
+
+    /**
+     * Create a sub-group with members from a specific group. If any users are not in the group,
+     * they will not be added to the sub-group. The current user will be added regardless of whether
+     * they are selected in the list.
+     *
+     * @param group   the group to create a sub-group from
+     * @param name    the name of the sub-group
+     * @param users   the users to put in the sub-group
+     * @param handler the handler for the response of the server
+     */
+    public static void createSubGroup(GroupID group, String name, Collection<UserID> users,
+                                      ResultHandler<GroupID> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        } else if (users == null) {
+            throw new IllegalArgumentException("user list cannot be null");
+        } else if (name == null) {
+            throw new IllegalArgumentException("sub-group name cannot be null");
+        }
+
+        JsonArray array = new JsonArray();
+        for (UserID user : users) {
+            if (user == null) {
+                throw new IllegalArgumentException("UserID cannot be null");
+            }
+            array.add(user.id);
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("name", name);
+        data.add("users", array);
+        getConnection().send(new ServerMsg("createSubGroup", data), handler, response ->
+                new GroupID(response.get("id").getAsString()));
+    }
+
+    /**
+     * Create a direct messaging group with another user.
+     *
+     * @param target  the user to create the direct messaging group with
+     * @param handler the handler for the response of the server
+     */
+    public static void createDirectMessage(UserID target, ResultHandler<GroupID> handler) {
+        if (target == null) {
+            throw new IllegalArgumentException("UserID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("target", target.id);
+        getConnection().send(new ServerMsg("createDirectMessage", data), handler, response ->
                 new GroupID(response.get("id").getAsString()));
     }
 
@@ -340,7 +393,7 @@ public final class ServerConnector {
      */
     public static void createCalendar(GroupID group, String name,
                                       ResultHandler<CalendarID> handler) {
-        createModule("calendar", group, name, handler, id -> new CalendarID(group, id));
+        createModule("cal", group, name, handler, id -> new CalendarID(group, id));
     }
 
     /**

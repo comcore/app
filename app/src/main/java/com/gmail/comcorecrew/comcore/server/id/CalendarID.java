@@ -16,6 +16,6 @@ public final class CalendarID extends ModuleID {
 
     @Override
     public String getType() {
-        return "calendar";
+        return "cal";
     }
 }

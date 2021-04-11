@@ -194,6 +194,11 @@ public class GroupFragment extends Fragment {
                 transferOwnershipDialog.show(getParentFragmentManager(), null);
 
                 return true;
+            case R.id.create_sub_group:
+                /** Handle creating sub group **/
+                GroupFragmentDirections.ActionGroupFragmentToCreateGroupFragment action = GroupFragmentDirections.actionGroupFragmentToCreateGroupFragment(currentGroup.getGroupId());
+                NavHostFragment.findNavController(GroupFragment.this).navigate(action);
+                return true;
             case R.id.settingsFragment:
                 /** Handle passing the current GroupID to the settings page */
                 SettingsFragment.currentGroup = currentGroup;

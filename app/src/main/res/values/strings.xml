@@ -29,6 +29,7 @@
     <string name="label_add_f">Add Features To Your Group</string>
     <string name="add_m_contacts">Add From Contacts</string>
     <string name="add_m_email">Add From Email</string>
+    <string name="list_of_members">Total Members: </string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
@@ -61,6 +62,7 @@
     <string name="remove_moderator">Remove Moderator</string>
     <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
+    <string name="create_sub_group">Create Sub Group</string>
 
     <!-- Create Link -->
     <string name="create_link_does_expire">Do you want the invite link to expire?</string>
@@ -85,6 +87,10 @@
     <string name="error_cannot_unmute">The user could not be unmuted.</string>
     <string name="error_module_not_selected">No module type selected.</string>
     <string name="error_unknown_module_type">An unknown type of module was received.</string>
+    <string name="error_already_complete">The task has already been completed.</string>
+    <string name="error_already_in_progress">The task is already in progress.</string>
+    <string name="error_cannot_uncomplete">You do not have the permission to remove the completion status.</string>
+
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
@@ -124,7 +130,10 @@
     <string name="not_completed">Not Completed</string>
     <string name="completed">Completed!</string>
     <string name="delete_task">Delete A Task</string>
-    <string name="update_task">Mark A Task As Completed</string>
+    <string name="complete_task">Set (or Unset) A Task As Completed</string>
+    <string name="in_progress_task">Set (or Unset) A Task As In Progress</string>
+    <string name="complete_task_short">Complete A Task</string>
+    <string name="in_progress_task_short">Work On A Task</string>
 
     <!-- Create Module Dialog -->
     <string name="create_module">Create Module</string>
@@ -133,6 +142,7 @@
     <string name="task_list_module_label">Task List</string>
     <string name="chat_module_label">Chat</string>
     <string name="pinned_module_label">Pinned Messages</string>
+    <string name="calendar_module_label">Calendar</string>
     <string name="dummy_module_label">Dummy Button</string>
 
     <!-- Notification Settings -->
@@ -153,6 +163,10 @@
     <string name="pin_message">Pin a Message</string>
 
     <string name="pinned_messages">Pinned Messages</string>
+
+    <!-- Create Event -->
+    <string name="create_event_label">Create an Event</string>
+    <string name="pick_date_label">Choose a Date</string>
 
 
 
