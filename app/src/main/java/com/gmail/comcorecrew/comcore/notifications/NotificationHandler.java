@@ -27,6 +27,7 @@ import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Handles displaying notifications by forwarding them to Android.
@@ -118,7 +119,8 @@ public class NotificationHandler implements NotificationListener {
         // Check for mentions for the current user in the notification
         String name = ServerConnector.getUser().name;
         boolean mentioned = false;
-        for (ChatMention mention : ChatMention.parseMentions(message.contents)) {
+        List<ChatMention> mentions = ChatMention.parseMentions(message.contents);
+        for (ChatMention mention : mentions) {
             if (mention.mentionsUser(name)) {
                 if (module.isMentionMuted()) {
                     return;
@@ -133,11 +135,15 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
+        // Format the mentions as if in a message
+        Group group = module.getGroup();
+        String formatted = ChatMention.formatMentions(message.contents, group, mentions).toString();
+
         UserStorage.lookup(message.sender, user ->
             notify(new NotificationCompat.Builder(context, CHANNEL_MESSAGE)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())
-                    .setContentText(user.getName() + ": " + message.contents)
+                    .setContentText(user.getName() + ": " + formatted)
                     .setWhen(message.timestamp)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()));

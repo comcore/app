@@ -217,11 +217,11 @@ public abstract class ChatMention {
     /**
      * Parse the contents of a mention from a string.
      *
-     * @param message the message
      * @param atIndex the index of the at symbol
+     * @param message the message
      * @return the parsed ChatMention
      */
-    private static ChatMention parseMention(String message, int atIndex) {
+    private static ChatMention parseMention(int atIndex, String message) {
         // Start parsing after the at symbol
         int startIndex = atIndex + 1;
         if (startIndex >= message.length()) {
@@ -287,7 +287,7 @@ public abstract class ChatMention {
         // Iterate through all of the at symbols in the message to find all of the mentions
         int index = 0;
         while ((index = message.indexOf('@', index)) != -1) {
-            ChatMention mention = parseMention(message, index);
+            ChatMention mention = parseMention(index, message);
             if (mention == null) {
                 index++;
                 continue;
@@ -303,20 +303,25 @@ public abstract class ChatMention {
     /**
      * Format a message to include a special color for mentions of users in the group.
      *
-     * @param message the message to parse
-     * @param group   the current group
+     * @param message  the message to parse
+     * @param group    the current group
+     * @param mentions the mentions to format
      * @return the formatted string
      */
-    public static CharSequence formatMentions(String message, Group group) {
+    public static CharSequence formatMentions(String message, Group group,
+                                              List<ChatMention> mentions) {
         if (message == null || message.isEmpty()) {
             return "[deleted]";
         }
 
+        if (mentions == null) {
+            mentions = parseMentions(message);
+        }
+
         // Update the text and add a span for each mention in reverse order
         SpannableStringBuilder builder = new SpannableStringBuilder(message);
-        List<ChatMention> mentions = parseMentions(message);
-        Collections.reverse(mentions);
-        for (ChatMention mention : mentions) {
+        for (int i = mentions.size() - 1; i >= 0; i--) {
+            ChatMention mention = mentions.get(i);
             // Only add the mention if they are part of the group
             if (mention.shouldDisplayIn(group)) {
                 int start = mention.index;
