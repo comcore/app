@@ -240,16 +240,11 @@ public class TaskList extends Module {
                 return;
             }
 
-            tasks = new ArrayList<>();
+            tasks.clear();
             for (TaskEntry taskEntry : result.data) {
                 tasks.add(new TaskItem(taskEntry));
             }
             toCache();
         });
-    }
-
-    @Override
-    public void clearCache() {
-        tasks.clear();
     }
 }
