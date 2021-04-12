@@ -133,7 +133,7 @@ public class Messaging extends Module {
 
             // If the message isn't immediately after the existing messages, clear the cache
             if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
-                messages.clear();
+                clearCache();
             }
 
             for (MessageEntry entry : result.data) {
@@ -184,8 +184,11 @@ public class Messaging extends Module {
                 msg.setTimestamp(message.timestamp);
                 msg.setData(message.contents);
                 this.toCache();
+                return;
             }
         }
+
+        refresh();
     }
 
     public void createPinnedMessages(String name) {
