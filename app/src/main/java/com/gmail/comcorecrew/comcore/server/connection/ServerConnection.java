@@ -347,6 +347,7 @@ public final class ServerConnection implements Connection {
         this.token = token;
 
         JsonObject data = new JsonObject();
+        data.addProperty("user", token.user.id);
         data.addProperty("token", token.token);
         addTask(new ServerTask(new ServerMsg("connect", data), null));
     }

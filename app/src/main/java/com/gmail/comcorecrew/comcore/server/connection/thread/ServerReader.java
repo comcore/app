@@ -109,7 +109,8 @@ public final class ServerReader extends ServerThread {
                 }
                 case "login": {
                     UserInfo userData = UserInfo.fromJson(message.data);
-                    LoginToken token = new LoginToken(message.data.get("token").getAsString());
+                    String tokenString = message.data.get("token").getAsString();
+                    LoginToken token = new LoginToken(userData.id, tokenString);
                     connection.setLoginInfo(userData, token);
                     ServerConnector.sendNotification(listener ->
                             listener.onLoggedIn(userData, token));

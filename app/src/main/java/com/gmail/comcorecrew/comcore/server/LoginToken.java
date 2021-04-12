@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore.server;
 
 import androidx.annotation.NonNull;
 
+import com.gmail.comcorecrew.comcore.server.id.UserID;
+
 import java.util.Objects;
 
 /**
@@ -10,6 +12,11 @@ import java.util.Objects;
  */
 public class LoginToken {
     /**
+     * The UserID of the user to log in.
+     */
+    public final UserID user;
+
+    /**
      * The token string sent by the server.
      */
     public final String token;
@@ -17,13 +24,17 @@ public class LoginToken {
     /**
      * Create a LoginToken from a token string.
      *
+     * @param user  the ID of the user
      * @param token the token string
      */
-    public LoginToken(String token) {
-        if (token == null || token.isEmpty()) {
+    public LoginToken(UserID user, String token) {
+        if (user == null) {
+            throw new IllegalArgumentException("UserID cannot be null");
+        } else if (token == null || token.isEmpty()) {
             throw new IllegalArgumentException("token cannot be null or empty");
         }
 
+        this.user = user;
         this.token = token;
     }
 
@@ -32,12 +43,13 @@ public class LoginToken {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LoginToken that = (LoginToken) o;
-        return token.equals(that.token);
+        return user.equals(that.user) &&
+                token.equals(that.token);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token);
+        return Objects.hash(user, token);
     }
 
     @Override
