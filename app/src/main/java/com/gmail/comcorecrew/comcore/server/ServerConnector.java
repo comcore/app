@@ -869,28 +869,33 @@ public final class ServerConnector {
     }
 
     /**
-     * Add an event to a calendar.
+     * Add an event to a calendar. If the user is a moderator, the event will be added directly.
+     * Otherwise, a moderator will have to approve the event before it will show up in the calendar.
      *
      * @param calendar    the calendar to add the event to
-     * @param timestamp   the timestamp of the event
      * @param description the description of the event
+     * @param start       the start timestamp of the event
+     * @param end         the end timestamp of the event
      * @param handler     the handler for the response of the server
      */
-    public static void addEvent(CalendarID calendar, long timestamp, String description,
+    public static void addEvent(CalendarID calendar, String description, long start, long end,
                                 ResultHandler<EventEntry> handler) {
         if (calendar == null) {
             throw new IllegalArgumentException("CalendarID cannot be null");
-        } else if (timestamp < 1) {
-            throw new IllegalArgumentException("event timestamp cannot be less than 1");
         } else if (description == null) {
             throw new IllegalArgumentException("event description cannot be null");
+        } else if (start < 1) {
+            throw new IllegalArgumentException("event start timestamp cannot be less than 1");
+        } else if (end < start) {
+            throw new IllegalArgumentException("event end cannot come before start");
         }
 
         JsonObject data = new JsonObject();
         data.addProperty("group", calendar.group.id);
         data.addProperty("taskList", calendar.id);
-        data.addProperty("timestamp", timestamp);
         data.addProperty("description", description);
+        data.addProperty("start", start);
+        data.addProperty("end", end);
         getConnection().send(new ServerMsg("addEvent", data), handler,
                 response -> EventEntry.fromJson(calendar, response));
     }

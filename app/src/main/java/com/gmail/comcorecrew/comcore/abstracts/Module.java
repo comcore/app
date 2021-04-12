@@ -299,7 +299,7 @@ public abstract class Module implements Serializable, NotificationListener {
 
     public abstract void refresh();
 
-    public abstract void clearCache();
+    public void clearCache() {}
 
     /**
      * Run after the module is initialized to the server to avoid
