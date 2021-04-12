@@ -33,6 +33,8 @@ import java.util.HashSet;
  * NOTE: AppData.init() must be run before this module works!
  */
 public class GroupStorage {
+    private static boolean isRefreshing = false;
+
     private GroupStorage() {}
 
     /**
@@ -41,6 +43,14 @@ public class GroupStorage {
      * @param callback the callback to run (or null)
      */
     public static void refresh(Runnable callback) {
+        // If there is already a refresh happening, don't do anything
+        if (isRefreshing) {
+            return;
+        }
+
+        // Record that a refresh is in progress
+        isRefreshing = true;
+
         // Get the group associated with each ID
         HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.getGroupSize());
         for (int i = 0; i < AppData.getGroupSize(); i++) {
@@ -123,6 +133,9 @@ public class GroupStorage {
                 if (callback != null) {
                     callback.run();
                 }
+
+                // Mark the refresh as completed
+                isRefreshing = false;
             });
         });
     }

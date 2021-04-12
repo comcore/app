@@ -27,6 +27,7 @@ import javax.net.ssl.SSLContext;
 public final class ServerConnection implements Connection {
     private static final String SERVER_URL = "comcore.ml";
     private static final int SERVER_PORT = 4433;
+    private static final boolean DEBUG = false;
 
     private final String url;
 
@@ -86,6 +87,10 @@ public final class ServerConnection implements Connection {
             return true;
         }
 
+        if (DEBUG) {
+            System.err.println("ServerConnection.start()");
+        }
+
         try {
             // Create a Socket connected to the server
             InetSocketAddress endPoint = new InetSocketAddress(url, SERVER_PORT);
@@ -121,6 +126,10 @@ public final class ServerConnection implements Connection {
         // If the connection is already closed, nothing needs to be done
         if (socket == null) {
             return;
+        }
+
+        if (DEBUG) {
+            System.err.println("ServerConnection.close()");
         }
 
         // Close the socket, ignoring any errors
@@ -240,6 +249,10 @@ public final class ServerConnection implements Connection {
             return;
         }
 
+        if (DEBUG) {
+            System.err.println("--> " + task.message.toJson());
+        }
+
         out.println(task.message.toJson());
 
         if (out.checkError()) {
@@ -284,6 +297,10 @@ public final class ServerConnection implements Connection {
         try {
             String line = in.readLine();
             if (line != null && !line.isEmpty()) {
+                if (DEBUG) {
+                    System.err.println("<-- " + line);
+                }
+
                 JsonObject json = JsonParser.parseString(line).getAsJsonObject();
                 return ServerMsg.fromJson(json);
             }
@@ -319,7 +336,10 @@ public final class ServerConnection implements Connection {
 
     @Override
     public void logout()  {
-        setInformation(null, null);
+        synchronized (this) {
+            setInformation(null, null);
+            token = null;
+        }
 
         addTask(new ServerTask(new ServerMsg("logout"), null));
     }
