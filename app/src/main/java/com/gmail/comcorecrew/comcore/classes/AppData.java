@@ -3,10 +3,14 @@ package com.gmail.comcorecrew.comcore.classes;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.abstracts.Module;
+import com.gmail.comcorecrew.comcore.caching.EventItem;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
@@ -22,6 +26,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 //NOTE: The position of the group is the group's position in the list of groups. This can change
 //      if the group list gets rearranged or a new group is added. The group index is static and
@@ -332,6 +337,26 @@ public class AppData {
         for (int i = 0; i < groupsList.size(); i++) {
             positions[groupsList.get(i).getIndex()] = i;
         }
+    }
+
+    public static ArrayList<EventEntry> getUpcoming() {
+        ArrayList<EventEntry> upcoming = new ArrayList<>();
+        long now = new Date().getTime();
+        long then = now + 604800; //seconds in a week
+        for (Group group : groups) {
+            if (group != null) {
+                for (Module module : group.getModules()) {
+                    if (module instanceof Calendar) {
+                        for (EventEntry entry : ((Calendar) module).getEntries()) {
+                            if (entry.start >= now && entry.end <= then) {
+                                upcoming.add(entry);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return upcoming;
     }
 
     public static void writeBool(boolean b, Writer writer) throws IOException {

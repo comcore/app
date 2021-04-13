@@ -1,11 +1,15 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
+import android.app.usage.UsageEvents;
+
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.EventItem;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -14,6 +18,7 @@ import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.EventID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
 
@@ -25,13 +30,26 @@ import java.util.ArrayList;
 public class Calendar extends Module {
 
     private transient ArrayList<EventItem> events;
+    private boolean allowCreate;
 
     public Calendar(String name, CalendarID calendarID, Group group) {
         super(name, calendarID, group, Mdid.CCLD);
+        events = new ArrayList<>();
+        allowCreate = true;
     }
 
     public Calendar(String name, Group group) {
         super(name, null, group, Mdid.CSTM);
+        events = new ArrayList<>();
+        allowCreate = true;
+    }
+
+    public boolean isAllowCreate() {
+        return allowCreate;
+    }
+
+    public void setAllowCreate(boolean allowCreate) {
+        this.allowCreate = allowCreate;
     }
 
     public ArrayList<EventItem> getEvents() {
@@ -86,6 +104,19 @@ public class Calendar extends Module {
             }
 
             addEvent(result.data);
+            //Automatically approves if user has access.
+            if ((!allowCreate) ||
+                    (getGroup().getOwner() != null) &&
+                    !(getGroup().getOwner().id.equals(AppData.self.getID().id))) {
+                for (UserID user : getGroup().getModerators()) {
+                    if (user.id.equals(AppData.self.getID().id)) {
+                        break;
+                    }
+                }
+                return;
+            }
+            approve(result.data.id);
+
         });
     }
 
@@ -112,10 +143,39 @@ public class Calendar extends Module {
         });
     }
 
+    public void modifyEvent(EventID eventID, long start, long end, String description) {
+        int index = getEventIndex(eventID);
+        EventItem event = events.get(index);
+        if (start < 0) {
+            start = event.getStart();
+        }
+        if (end < 0) {
+            end = event.getEnd();
+        }
+        if (description == null) {
+            description = event.getData();
+        }
+        deleteEvent(eventID);
+        sendEvent(description, start, end);
+
+    }
+
     public ArrayList<EventEntry> getEntries() {
         ArrayList<EventEntry> entries = new ArrayList<>();
         for (EventItem event : events) {
-            entries.add(event.toEntry((CalendarID) getId()));
+            if (event.isApproved()) {
+                entries.add(event.toEntry((CalendarID) getId()));
+            }
+        }
+        return entries;
+    }
+
+    public ArrayList<EventEntry> getRequests() {
+        ArrayList<EventEntry> entries = new ArrayList<>();
+        for (EventItem event : events) {
+            if (!event.isApproved()) {
+                entries.add(event.toEntry((CalendarID) getId()));
+            }
         }
         return entries;
     }
