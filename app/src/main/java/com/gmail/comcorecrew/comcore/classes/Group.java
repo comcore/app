@@ -53,8 +53,21 @@ public class Group implements NotificationListener, Comparable<Group> {
         modules = new ArrayList<>();
         users = new ArrayList<>();
         moderators = new ArrayList<>();
-        /** Commenting out this line so that the app will run **/
-        //owner = UserStorage.getUser(0).getID();
+
+        File cacheDir = new File(AppData.cacheDir, this.groupID.id);
+        cacheDir.mkdir();
+
+        refreshUsers(null, null);
+    }
+
+    public Group(String name, GroupID groupID, GroupRole groupRole, boolean isMuted, boolean isDirect) {
+        this.groupID = groupID;
+        this.groupName = name;
+        this.groupRole = groupRole;
+        this.isMuted = isMuted;
+        modules = new ArrayList<>();
+        users = new ArrayList<>();
+        moderators = new ArrayList<>();
 
         File cacheDir = new File(AppData.cacheDir, this.groupID.id);
         cacheDir.mkdir();
@@ -289,6 +302,10 @@ public class Group implements NotificationListener, Comparable<Group> {
             disabledModules = new ArrayList<>(0);
         }
         return disabledModules;
+    }
+
+    public boolean isDirect() {
+        return owner == null;
     }
 
     public int getIndex() {

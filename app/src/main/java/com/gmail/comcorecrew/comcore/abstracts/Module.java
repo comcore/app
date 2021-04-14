@@ -110,6 +110,15 @@ public abstract class Module implements Serializable, NotificationListener {
                 });
                 break;
             }
+            case CCLD: {
+                ServerConnector.createCalendar(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                    afterCreate();
+                });
+            }
             default: {
                 throw new RuntimeException("Invalid MDID");
             }

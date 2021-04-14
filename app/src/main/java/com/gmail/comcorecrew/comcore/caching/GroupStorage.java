@@ -194,7 +194,12 @@ public class GroupStorage {
         for (UserID id : group.getModerators()) {
             AppData.writeInt(UserStorage.getInternalId(id), writer);
         }
-        AppData.writeInt(UserStorage.getInternalId(group.getOwner()), writer);
+        if (group.getOwner() == null) {
+            AppData.writeInt(-2, writer);
+        }
+        else {
+            AppData.writeInt(UserStorage.getInternalId(group.getOwner()), writer);
+        }
 
         writer.close();
     }
@@ -290,9 +295,11 @@ public class GroupStorage {
         group.setModerators(moderators);
         user = UserStorage.getUser(AppData.readInt(reader));
         if (user == null) {
-            throw new InvalidFileFormatException("Null user stored");
+            group.setOwner(null);
         }
-        group.setOwner(user.getID());
+        else {
+            group.setOwner(user.getID());
+        }
 
         reader.close();
 
