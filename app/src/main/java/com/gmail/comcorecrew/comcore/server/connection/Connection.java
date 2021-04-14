@@ -21,13 +21,6 @@ public interface Connection {
     void logout();
 
     /**
-     * Get the information of the currently logged in user.
-     *
-     * @return the user data or null if there is no logged in user
-     */
-    UserInfo getUserInfo();
-
-    /**
      * Set the login information to use for connecting to the server. Note that this doesn't
      * actually start the login process, it just stores the credentials in case the client is
      * disconnected and needs to try to log in automatically.

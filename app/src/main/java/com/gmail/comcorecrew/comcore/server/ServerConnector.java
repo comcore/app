@@ -127,15 +127,6 @@ public final class ServerConnector {
     }
 
     /**
-     * Get the information of the currently logged in user.
-     *
-     * @return the user data or null if there is no logged in user
-     */
-    public static UserInfo getUser() {
-        return getConnection().getUserInfo();
-    }
-
-    /**
      * Connect to the server using the given LoginToken. If the LoginToken becomes invalid, then
      * NotificationListener.onLoggedOut() will be called.
      *

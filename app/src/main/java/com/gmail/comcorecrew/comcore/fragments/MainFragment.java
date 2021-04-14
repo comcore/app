@@ -78,7 +78,7 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         TextView welcomeText = (TextView) view.findViewById(R.id.label_main_fragment);
-        welcomeText.setText("Welcome " + ServerConnector.getUser().name);
+        welcomeText.setText("Welcome " + AppData.self.getName());
     }
 
     @Override
