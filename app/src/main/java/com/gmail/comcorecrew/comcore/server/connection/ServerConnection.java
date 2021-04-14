@@ -315,11 +315,6 @@ public final class ServerConnection implements Connection {
     }
 
     @Override
-    public synchronized UserInfo getUserInfo() {
-        return userInfo;
-    }
-
-    @Override
     public synchronized void setInformation(String email, String pass) {
         if (pass == null) {
             this.userInfo = null;

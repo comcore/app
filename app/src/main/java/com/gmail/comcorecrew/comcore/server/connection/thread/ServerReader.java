@@ -115,7 +115,7 @@ public final class ServerReader extends ServerThread {
                     break;
                 }
                 case "logout": {
-                    ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+                    connection.loggedOut();
                     break;
                 }
                 default:

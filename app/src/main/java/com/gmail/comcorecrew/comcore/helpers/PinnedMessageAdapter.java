@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
@@ -42,7 +43,7 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         MessageEntry message = messageEntry.get(position);
 
-        if (message.sender.equals(ServerConnector.getUser().id)) {
+        if (message.sender.equals(AppData.self.getID())) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;
         } else {
