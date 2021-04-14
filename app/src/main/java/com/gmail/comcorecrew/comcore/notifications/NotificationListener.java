@@ -27,7 +27,7 @@ public interface NotificationListener {
     /**
      * Handle a message's contents being updated. The new contents will never be null.
      *
-     * @param message the updated task
+     * @param message the updated message
      */
     default void onMessageUpdated(MessageEntry message) {}
 
@@ -79,11 +79,15 @@ public interface NotificationListener {
      * Handle being kicked from a group.
      *
      * @param group the group
+     * @param name  the name of the group
      */
     default void onKicked(GroupID group, String name) {}
 
     /**
      * Handle the user logging in successfully. This could be used to update the cached data.
+     *
+     * @param user  the information of the user
+     * @param token the login token of the user
      */
     default void onLoggedIn(UserInfo user, LoginToken token) {}
 

@@ -38,7 +38,6 @@ public final class ServerConnection implements Connection {
     private String email;
     private String pass;
     private LoginToken token;
-    private UserInfo userInfo;
 
     private Socket socket;
     private BufferedReader in;
@@ -211,25 +210,32 @@ public final class ServerConnection implements Connection {
     }
 
     /**
-     * Record that the user was logged out from the server and that their email and password must
-     * be entered again to continue. This could happen if their password was changed or if the
-     * client wasn't able to log in after being automatically reconnected.
+     * Record that the user was logged out from the server, sending a notification if the user
+     * wasn't already logged out.
      */
     public void loggedOut() {
-        setInformation(null, null);
+        if (token != null) {
+            ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+        }
 
-        ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+        setInformation(null, null);
     }
 
     /**
-     * Set the information of the user when the server sends it.
+     * Record that the user was logged into the server with the given information, sending a
+     * notification if the user wasn't already logged in or was logged into a different account.
      *
-     * @param userData the user data
-     * @param token    the login token
+     * @param userInfo the information of the user
+     * @param token    the login token of the user
      */
-    public synchronized void setLoginInfo(UserInfo userData, LoginToken token) {
-        this.userInfo = userData;
+    public void loggedIn(UserInfo userInfo, LoginToken token) {
+        if (token == this.token) {
+            return;
+        }
+
         this.token = token;
+        ServerConnector.sendNotification(listener ->
+                listener.onLoggedIn(userInfo, token));
     }
 
     /**
@@ -336,10 +342,7 @@ public final class ServerConnection implements Connection {
 
     @Override
     public void logout()  {
-        synchronized (this) {
-            setInformation(null, null);
-            token = null;
-        }
+        loggedOut();
 
         addTask(new ServerTask(new ServerMsg("logout"), null));
     }
@@ -347,7 +350,7 @@ public final class ServerConnection implements Connection {
     @Override
     public synchronized void setInformation(String email, String pass) {
         if (pass == null) {
-            this.userInfo = null;
+            token = null;
         }
 
         if (email != null || pass == null) {
