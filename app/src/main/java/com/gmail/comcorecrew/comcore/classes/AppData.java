@@ -6,8 +6,10 @@ import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -133,6 +135,32 @@ public class AppData {
      */
     public static LoginToken getToken() {
         return token;
+    }
+
+    /**
+     * Creates a sub group containing the users given
+     *
+     * @param parent    Group to create the subgroup from
+     * @param name      name of the subgroup
+     * @param users     users to add to the subgroup
+     */
+    public static void createSubGroup(Group parent, String name, ArrayList<User> users) {
+        ArrayList<UserID> ids = new ArrayList<>();
+        for (User user : users) {
+            ids.add(user.getID());
+        }
+        ServerConnector.createSubGroup(parent.getGroupId(), name, ids, result -> {
+            if (result.isFailure()) {
+                return;
+            }
+            Group group = new Group(name, result.data, GroupRole.OWNER, false);
+            addGroup(group);
+            try {
+                GroupStorage.storeGroup(group);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
