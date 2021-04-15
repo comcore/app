@@ -3,30 +3,23 @@ package com.gmail.comcorecrew.comcore.classes;
 import android.content.Context;
 
 import com.gmail.comcorecrew.comcore.abstracts.Module;
-import com.gmail.comcorecrew.comcore.caching.EventItem;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 
 //NOTE: The position of the group is the group's position in the list of groups. This can change
