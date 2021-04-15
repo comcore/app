@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Base64;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
@@ -836,11 +837,11 @@ public final class ServerConnector {
     /**
      * Update a task's completed status.
      *
-     * @param task      the task to update
-     * @param completed whether the task has been completed
-     * @param handler   the handler for the response of the server
+     * @param task    the task to update
+     * @param status  the status to set for the task
+     * @param handler the handler for the response of the server
      */
-    public static void updateTask(TaskID task, boolean completed,
+    public static void updateTask(TaskID task, TaskStatus status,
                                   ResultHandler<TaskEntry> handler) {
         if (task == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
@@ -850,7 +851,8 @@ public final class ServerConnector {
         data.addProperty("group", task.module.group.id);
         data.addProperty("taskList", task.module.id);
         data.addProperty("id", task.id);
-        data.addProperty("completed", completed);
+        data.addProperty("completed", status == TaskStatus.COMPLETED);
+        data.addProperty("inProgress", status == TaskStatus.IN_PROGRESS);
         getConnection().send(new ServerMsg("updateTask", data), handler,
                 response -> TaskEntry.fromJson(task.module, response));
     }

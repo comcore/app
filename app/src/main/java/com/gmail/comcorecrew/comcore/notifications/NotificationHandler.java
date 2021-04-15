@@ -17,6 +17,7 @@ import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
@@ -167,8 +168,8 @@ public class NotificationHandler implements NotificationListener {
 
     @Override
     public void onTaskUpdated(TaskEntry task) {
-        if (!task.completed) {
-            // If the task was marked un-completed, don't send a notification
+        if (task.getStatus() != TaskStatus.COMPLETED) {
+            // If the task wasn't marked completed, don't send a notification
             return;
         }
 

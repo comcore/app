@@ -18,17 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.caching.TaskItem;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
-import com.gmail.comcorecrew.comcore.server.id.TaskListID;
-
-import java.util.ArrayList;
 
 public class TaskListFragment extends Fragment {
     public static TaskList taskList;
@@ -168,21 +164,20 @@ public class TaskListFragment extends Fragment {
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
 
-            if (task.completed) {
-                if (taskList.getGroup().getGroupRole() == GroupRole.USER) {
-                    completedText.setText(R.string.completed);
-                }
-                /** TODO Display the name of the user who completed the task **/
-                else {
-                    completedText.setText("Completed By: ");
-                }
-            }
-            /** TODO Display the name of the user who is working on the task **/
-            else if (false){
-                completedText.setText("In Progress By: ");
-            }
-            else {
-                completedText.setText(R.string.not_completed);
+            switch (task.getStatus()) {
+                case UNASSIGNED:
+                    completedText.setText(R.string.not_completed);
+                    break;
+                case IN_PROGRESS:
+                    UserStorage.lookup(task.assigned, user -> {
+                        completedText.setText("Assigned to " + user.getName());
+                    });
+                    break;
+                case COMPLETED:
+                    UserStorage.lookup(task.completer, user -> {
+                        completedText.setText("Completed by " + user.getName());
+                    });
+                    break;
             }
         }
 

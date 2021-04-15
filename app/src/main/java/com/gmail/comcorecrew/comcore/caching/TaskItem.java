@@ -1,8 +1,10 @@
 package com.gmail.comcorecrew.comcore.caching;
 
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 public class TaskItem implements Cacheable {
 
@@ -16,7 +18,7 @@ public class TaskItem implements Cacheable {
         id = UserStorage.getInternalId(entry.creator);
         taskid = entry.id.id;
         timestamp = entry.timestamp;
-        completed = entry.completed;
+        completed = entry.getStatus() == TaskStatus.COMPLETED;
         data = entry.description;
     }
 
@@ -62,7 +64,12 @@ public class TaskItem implements Cacheable {
 
     public TaskEntry toEntry(TaskListID listID) {
         TaskID taskID = new TaskID(listID, taskid);
-        return new TaskEntry(taskID, UserStorage.getUser(id).getID(), timestamp, data, completed);
+
+        // TODO add cached information for completer of task and user assigned to task and replace this info (and in CustomItem)
+        UserID completer = completed ? UserStorage.getUser(id).getID() : null;
+        UserID assigned = null;
+
+        return new TaskEntry(taskID, UserStorage.getUser(id).getID(), timestamp, data, completer, assigned);
     }
 
     @Override
