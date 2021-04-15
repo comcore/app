@@ -10,11 +10,13 @@ import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.Writer;
@@ -37,6 +39,7 @@ public class AppData {
     public static File cacheDir;
     public static File filesDir;
     public static File groupsDir;
+    private static LoginToken token;
     private static Group[] groups; //Array containing the groups
     private static ArrayList<Group> groupsList; //Arraylist containing the groups
     //Lists are separate as to allow quick fetching of data
@@ -44,32 +47,42 @@ public class AppData {
     private static int groupLength; //Number of groups in the list
     private static final int initialGroupLength = 10;
     public static final int maxData = 0x001E8483; //4MB + 6 Bytes of chars
-    public static final int cacheVersion = 0;
+    public static final int cacheVersion = 1;
 
+    /**
+     * Runs functions to read stored data from the app before initialization.
+     *
+     * @param context       App context
+     * @throws IOException  if an IO error occurs
+     */
     public static void preInit(Context context) throws IOException {
         File appStorage = new File(context.getFilesDir(), "main");
+        token = null;
         if (appStorage.createNewFile()) {
             updateCache(context);
         }
         else {
             FileReader reader = new FileReader(appStorage);
             int curVersion = readInt(reader);
+            String userId = readString(reader);
+            if (userId != null) {
+                token = new LoginToken(new UserID(userId), readString(reader));
+            }
             reader.close();
             if (curVersion < cacheVersion) {
                 updateCache(context);
             }
         }
-
     }
 
     /**
      * Init method that should be run when app is opened.
      *
      * @param user the user's info
-     * @param token the login token
+     * @param loginToken the login token
      * @param context App context
      */
-    public static void init(UserInfo user, LoginToken token, Context context) throws IOException {
+    public static void init(UserInfo user, LoginToken loginToken, Context context) throws IOException {
         self = new User(user);
         cacheDir = new File(context.getCacheDir(), self.getID().id);
         filesDir = new File(context.getFilesDir(), self.getID().id);
@@ -87,6 +100,21 @@ public class AppData {
         } else {
             clearGroups();
         }
+        token = loginToken;
+        if (token != null) {
+            File appStorage = new File(context.getFilesDir(), "main");
+            if (!appStorage.exists()) {
+                throw new IOException("Illegal init() call!");
+            }
+            FileReader reader = new FileReader(appStorage);
+            int version = readInt(reader);
+            reader.close();
+            PrintWriter writer = new PrintWriter(appStorage);
+            writeInt(version, writer);
+            writeString(token.user.id, writer);
+            writeString(token.token, writer);
+            writer.close();
+        }
     }
 
     /**
@@ -96,6 +124,15 @@ public class AppData {
      */
     public static ArrayList<Group> getGroups() {
         return groupsList;
+    }
+
+    /**
+     * Fetches the latest login token saved.
+     *
+     * @return last used login token
+     */
+    public static LoginToken getToken() {
+        return token;
     }
 
     /**
@@ -406,6 +443,9 @@ public class AppData {
 
     public static String readString(Reader reader) throws IOException {
         int length = readInt(reader);
+        if (length < 0) {
+            return null;
+        }
         char[] buf = new char[length];
         if (reader.read(buf) != length) {
             throw new IOException();
@@ -444,5 +484,19 @@ public class AppData {
         file.write((char) (cacheVersion >> 16));
         file.write((char) cacheVersion);
         file.close();
+    }
+
+    public static void clearToken(Context context) throws IOException {
+        File appStorage = new File(context.getFilesDir(), "main");
+        if (!appStorage.exists()) {
+            throw new IOException("Illegal clearToken() call");
+        }
+        token = null;
+        FileReader reader = new FileReader(appStorage);
+        int version = readInt(reader);
+        reader.close();
+        PrintWriter writer = new PrintWriter(appStorage);
+        writeInt(version, writer);
+        writer.close();
     }
 }
