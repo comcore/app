@@ -1127,10 +1127,10 @@ public final class ServerConnector {
             throw new IllegalArgumentException(field + " cannot be null");
         }
 
-        if (ids.isEmpty()) {
-            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
-            return;
-        }
+//        if (ids.isEmpty()) {
+//            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
+//            return;
+//        }
 
         JsonArray array = new JsonArray();
         for (ItemID id : ids) {

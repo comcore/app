@@ -80,17 +80,9 @@ public class UserStorage {
      * @param callback the callback to run (or null)
      */
     public static void refresh(List<UserID> userIds, Runnable callback) {
-        // Finish immediately if no users are being refreshed
-        if (userIds.isEmpty()) {
-            if (callback != null) {
-                callback.run();
-            }
-            return;
-        }
-
         // Get the info of the users from the server
         ServerConnector.getUserInfo(userIds, 0, result -> {
-            if (result.isSuccess()) {
+            if (result.isSuccess() && result.data.length != 0) {
                 // Create a User object for each user
                 ArrayList<User> users = new ArrayList<>();
                 for (UserInfo userInfo : result.data) {

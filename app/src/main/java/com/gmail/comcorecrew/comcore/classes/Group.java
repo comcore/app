@@ -116,7 +116,13 @@ public class Group implements NotificationListener, Comparable<Group> {
                 ArrayList<UserID> groupModerators = new ArrayList<>();
                 UserID groupOwner = null;
                 for (GroupUserEntry entry : entries) {
-                    groupUsers.add(UserStorage.getUser(entry.id));
+                    User user = UserStorage.getUser(entry.id);
+                    if (user == null) {
+                        System.err.println("no information for user: " + entry.id);
+                        continue;
+                    }
+
+                    groupUsers.add(user);
 
                     if (entry.role == GroupRole.MODERATOR) {
                         groupModerators.add(entry.id);
@@ -127,10 +133,6 @@ public class Group implements NotificationListener, Comparable<Group> {
 
                         groupOwner = entry.id;
                     }
-                }
-
-                if (groupOwner == null) {
-                    throw new IllegalStateException("group has no owner");
                 }
 
                 // Update the user list of the group
