@@ -840,6 +840,7 @@ public final class ServerConnector {
      * @param task    the task to update
      * @param status  the status to set for the task
      * @param handler the handler for the response of the server
+     * @see TaskStatus
      */
     public static void updateTask(TaskID task, TaskStatus status,
                                   ResultHandler<TaskEntry> handler) {
@@ -930,6 +931,7 @@ public final class ServerConnector {
      * event will be deleted so the EventID becomes invalid and can no longer be used.
      *
      * @param event   the event to approve
+     * @param approve whether to approve the event
      * @param handler the handler for the response of the server
      */
     public static void approveEvent(EventID event, boolean approve, ResultHandler<Void> handler) {
@@ -961,31 +963,6 @@ public final class ServerConnector {
         data.addProperty("calendar", event.module.id);
         data.addProperty("id", event.id);
         getConnection().send(new ServerMsg("deleteEvent", data), handler, response -> null);
-    }
-
-    /**
-     * Get the info of a GroupID. The info will only be retrieved if it has been updated more
-     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the group
-     * info will always be retrieved.
-     *
-     * @param group       the group to retrieve the info of
-     * @param lastRefresh the last time the cached info was refreshed or 0
-     * @param handler     the handler for the response of the server
-     * @see GroupInfo
-     */
-    public static void getGroupInfo(GroupID group, long lastRefresh,
-                                    ResultHandler<GroupInfo> handler) {
-        getGroupInfo(Collections.singleton(group), lastRefresh, result ->
-            handler.handleResult(result.map(groups -> {
-                switch (groups.length) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return groups[0];
-                    default:
-                        throw new IllegalArgumentException("multiple groups returned");
-                }
-            })));
     }
 
     /**
@@ -1043,27 +1020,6 @@ public final class ServerConnector {
                                    ResultHandler<UserInfo[]> handler) {
         getInfo(UserInfo.class, "users", "getUserInfo", UserInfo::fromJson,
                 users, lastRefresh, handler);
-    }
-
-    /**
-     * Get the info of a ModuleID.
-     *
-     * @param module  the module to retrieve the info of
-     * @param handler the handler for the response of the server
-     * @see ModuleInfo
-     */
-    public static void getModuleInfo(ModuleID module, ResultHandler<ModuleInfo> handler) {
-        getModuleInfo(Collections.singleton(module), result ->
-            handler.handleResult(result.map(modules -> {
-                switch (modules.length) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return modules[0];
-                    default:
-                        throw new IllegalArgumentException("multiple modules returned");
-                }
-            })));
     }
 
     /**
