@@ -897,7 +897,7 @@ public final class ServerConnector {
 
         JsonObject data = new JsonObject();
         data.addProperty("group", calendar.group.id);
-        data.addProperty("taskList", calendar.id);
+        data.addProperty("calendar", calendar.id);
         data.addProperty("description", description);
         data.addProperty("start", start);
         data.addProperty("end", end);

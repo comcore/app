@@ -13,7 +13,7 @@ public class TaskItem implements Cacheable {
     private String data;
 
     public TaskItem(TaskEntry entry) {
-        id = UserStorage.getInternalId(entry.owner);
+        id = UserStorage.getInternalId(entry.creator);
         taskid = entry.id.id;
         timestamp = entry.timestamp;
         completed = entry.completed;

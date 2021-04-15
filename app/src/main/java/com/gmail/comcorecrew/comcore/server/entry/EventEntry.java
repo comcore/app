@@ -83,7 +83,7 @@ public final class EventEntry {
      */
     public static EventEntry fromJson(CalendarID calendar, JsonObject json) {
         EventID id = EventID.fromJson(calendar, json);
-        UserID creator = new UserID(json.get("creator").getAsString());
+        UserID creator = new UserID(json.get("owner").getAsString());
         String description = json.get("description").getAsString();
         long start = json.get("start").getAsLong();
         long end = json.get("end").getAsLong();
