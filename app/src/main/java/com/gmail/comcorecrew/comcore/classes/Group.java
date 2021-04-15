@@ -38,6 +38,7 @@ public class Group implements NotificationListener, Comparable<Group> {
     private ArrayList<UserID> moderators;
     private UserID owner;
     private transient int index;
+    private boolean requireApproval;
 
     public Group(GroupID groupID) {
         this.groupID = groupID;
@@ -53,6 +54,7 @@ public class Group implements NotificationListener, Comparable<Group> {
         modules = new ArrayList<>();
         users = new ArrayList<>();
         moderators = new ArrayList<>();
+        requireApproval = true;
 
         File cacheDir = new File(AppData.cacheDir, this.groupID.id);
         cacheDir.mkdir();
@@ -68,6 +70,7 @@ public class Group implements NotificationListener, Comparable<Group> {
         modules = new ArrayList<>();
         users = new ArrayList<>();
         moderators = new ArrayList<>();
+        requireApproval = true;
 
         File cacheDir = new File(AppData.cacheDir, this.groupID.id);
         cacheDir.mkdir();
@@ -314,6 +317,23 @@ public class Group implements NotificationListener, Comparable<Group> {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public boolean isRequireApproval() {
+        return requireApproval;
+    }
+
+    public void setRequireApproval(boolean requireApproval) {
+        this.requireApproval = requireApproval;
+    }
+
+    public void updateRequireApproval(boolean requireApproval) {
+        //TODO Implement on server
+        try {
+            GroupStorage.storeGroup(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

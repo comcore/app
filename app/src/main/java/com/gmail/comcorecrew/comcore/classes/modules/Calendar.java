@@ -30,26 +30,15 @@ import java.util.ArrayList;
 public class Calendar extends Module {
 
     private transient ArrayList<EventItem> events;
-    private boolean allowCreate;
 
     public Calendar(String name, CalendarID calendarID, Group group) {
         super(name, calendarID, group, Mdid.CCLD);
         events = new ArrayList<>();
-        allowCreate = true;
     }
 
     public Calendar(String name, Group group) {
         super(name, null, group, Mdid.CCLD);
         events = new ArrayList<>();
-        allowCreate = true;
-    }
-
-    public boolean isAllowCreate() {
-        return allowCreate;
-    }
-
-    public void setAllowCreate(boolean allowCreate) {
-        this.allowCreate = allowCreate;
     }
 
     public ArrayList<EventItem> getEvents() {
@@ -104,18 +93,6 @@ public class Calendar extends Module {
             }
 
             addEvent(result.data);
-            //Automatically approves if user has access.
-            if ((!allowCreate) ||
-                    (getGroup().getOwner() != null) &&
-                    !(getGroup().getOwner().id.equals(AppData.self.getID().id))) {
-                for (UserID user : getGroup().getModerators()) {
-                    if (user.id.equals(AppData.self.getID().id)) {
-                        break;
-                    }
-                }
-                return;
-            }
-            approve(result.data.id);
 
         });
     }
