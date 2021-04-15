@@ -19,7 +19,7 @@ public final class TaskEntry {
     /**
      * The user that created the task.
      */
-    public final UserID owner;
+    public final UserID creator;
 
     /**
      * The UNIX timestamp representing when the task was added.
@@ -40,16 +40,16 @@ public final class TaskEntry {
      * Create a TaskEntry with an owner, a description of the task, and whether it is completed.
      *
      * @param id          the TaskID of the task
-     * @param owner       the user that created the task
+     * @param creator     the user that created the task
      * @param description the description of the task
      * @param completed   whether the task has been completed
      */
-    public TaskEntry(TaskID id, UserID owner, long timestamp, String description,
+    public TaskEntry(TaskID id, UserID creator, long timestamp, String description,
                      boolean completed) {
         if (id == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
-        } else if (owner == null) {
-            throw new IllegalArgumentException("task owner cannot be null");
+        } else if (creator == null) {
+            throw new IllegalArgumentException("task creator cannot be null");
         } else if (timestamp < 1) {
             throw new IllegalArgumentException("task timestamp cannot be less than 1");
         } else if (description == null || description.isEmpty()) {
@@ -57,7 +57,7 @@ public final class TaskEntry {
         }
 
         this.id = id;
-        this.owner = owner;
+        this.creator = creator;
         this.timestamp = timestamp;
         this.description = description;
         this.completed = completed;
@@ -73,11 +73,11 @@ public final class TaskEntry {
      */
     public static TaskEntry fromJson(TaskListID taskList, JsonObject json) {
         TaskID id = TaskID.fromJson(taskList, json);
-        UserID owner = new UserID(json.get("owner").getAsString());
+        UserID creator = new UserID(json.get("owner").getAsString());
         long timestamp = json.get("timestamp").getAsLong();
         String description = json.get("description").getAsString();
         boolean completed = json.get("completed").getAsBoolean();
-        return new TaskEntry(id, owner, timestamp, description, completed);
+        return new TaskEntry(id, creator, timestamp, description, completed);
     }
 
     @Override
@@ -88,12 +88,12 @@ public final class TaskEntry {
         return timestamp == taskEntry.timestamp &&
                 completed == taskEntry.completed &&
                 id.equals(taskEntry.id) &&
-                owner.equals(taskEntry.owner) &&
+                creator.equals(taskEntry.creator) &&
                 description.equals(taskEntry.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, owner, timestamp, description, completed);
+        return Objects.hash(id, creator, timestamp, description, completed);
     }
 }

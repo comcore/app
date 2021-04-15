@@ -24,7 +24,7 @@ public class CustomItem implements Cacheable {
     }
 
     public CustomItem(TaskEntry entry) {
-        id = UserStorage.getInternalId(entry.owner);
+        id = UserStorage.getInternalId(entry.creator);
         itemId = entry.id.id;
         timestamp = entry.timestamp;
         completed = entry.completed;

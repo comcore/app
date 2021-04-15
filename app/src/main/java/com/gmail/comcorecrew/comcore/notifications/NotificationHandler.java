@@ -19,7 +19,6 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
@@ -157,7 +156,7 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
-        UserStorage.lookup(task.owner, user ->
+        UserStorage.lookup(task.creator, user ->
             notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())
@@ -178,7 +177,7 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
-        UserStorage.lookup(task.owner, user ->
+        UserStorage.lookup(task.creator, user ->
             notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())

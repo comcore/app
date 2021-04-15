@@ -5,7 +5,6 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -164,7 +163,7 @@ public abstract class CustomModule extends Module {
         long itemId = entry.id.id;
         for (CustomItem item : items) {
             if (item.getItemId() == itemId) {
-                item.setId(UserStorage.getInternalId(entry.owner));
+                item.setId(UserStorage.getInternalId(entry.creator));
                 item.setItemId(entry.id.id);
                 item.setTimestamp(entry.timestamp);
                 item.setCompleted(entry.completed);
