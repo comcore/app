@@ -79,6 +79,24 @@ public final class ServerReader extends ServerThread {
                             listener.onTaskDeleted(id));
                     break;
                 }
+                case "event": {
+                    EventEntry entry = EventEntry.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventAdded(entry));
+                    break;
+                }
+                case "eventApproved": {
+                    EventID id = EventID.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventApproved(id));
+                    break;
+                }
+                case "eventDeleted": {
+                    EventID id = EventID.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventDeleted(id));
+                    break;
+                }
                 case "invite": {
                     GroupInviteEntry entry = GroupInviteEntry.fromJson(message.data);
                     ServerConnector.sendNotification(listener ->

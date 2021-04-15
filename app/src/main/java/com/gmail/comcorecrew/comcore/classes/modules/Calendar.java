@@ -81,6 +81,9 @@ public class Calendar extends Module {
         int index = getEventIndex(eventID);
         if (index != -1) {
             ServerConnector.approveEvent(eventID, true, result -> {
+                if (result.isFailure()) {
+                    return;
+                }
                 events.get(index).setApproved(true);
                 toCache();
             });
@@ -91,7 +94,10 @@ public class Calendar extends Module {
         int index = getEventIndex(eventID);
         if (index != -1) {
             ServerConnector.approveEvent(eventID, false, result -> {
-                events.get(index).setApproved(false);
+                if (result.isFailure()) {
+                    return;
+                }
+                events.remove(index);
                 toCache();
             });
         }
@@ -104,19 +110,6 @@ public class Calendar extends Module {
             }
 
             addEvent(result.data);
-            //Automatically approves if user has access.
-            if ((!allowCreate) ||
-                    (getGroup().getOwner() != null) &&
-                    !(getGroup().getOwner().id.equals(AppData.self.getID().id))) {
-                for (UserID user : getGroup().getModerators()) {
-                    if (user.id.equals(AppData.self.getID().id)) {
-                        break;
-                    }
-                }
-                return;
-            }
-            approve(result.data.id);
-
         });
     }
 
@@ -178,6 +171,45 @@ public class Calendar extends Module {
             }
         }
         return entries;
+    }
+
+    @Override
+    public void onEventAdded(EventEntry event) {
+        if (!event.id.module.equals(getId())) {
+            return;
+        }
+
+        addEvent(event);
+    }
+
+    @Override
+    public void onEventApproved(EventID event) {
+        if (!event.module.equals(getId())) {
+            return;
+        }
+
+        int index = getEventIndex(event);
+        if (index == -1) {
+            return;
+        }
+
+        events.get(index).setApproved(true);
+        toCache();
+    }
+
+    @Override
+    public void onEventDeleted(EventID event) {
+        if (!event.module.equals(getId())) {
+            return;
+        }
+
+        int index = getEventIndex(event);
+        if (index == -1) {
+            return;
+        }
+
+        events.remove(index);
+        toCache();
     }
 
     @Override
