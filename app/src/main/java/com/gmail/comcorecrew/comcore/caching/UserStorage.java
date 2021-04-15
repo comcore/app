@@ -174,7 +174,7 @@ public class UserStorage {
      * @return the internal id corresponding to the given user id
      */
     public static int getInternalId(UserID userID) {
-        return getInternalId(idList, userID);
+        return userID != null ? getInternalId(idList, userID) : -1;
     }
 
     /**

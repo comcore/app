@@ -167,7 +167,8 @@ public abstract class CustomModule extends Module {
                 item.setId(UserStorage.getInternalId(entry.creator));
                 item.setItemId(entry.id.id);
                 item.setTimestamp(entry.timestamp);
-                item.setCompleted(entry.getStatus() == TaskStatus.COMPLETED);
+                item.setMetaInt(UserStorage.getInternalId(entry.completer));
+                item.setAltId(UserStorage.getInternalId(entry.assigned));
                 item.setData(entry.description);
                 toCache();
                 return;

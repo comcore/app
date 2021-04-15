@@ -3,6 +3,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
@@ -190,7 +191,8 @@ public class TaskList extends Module {
             if (item.getTaskid() == id) {
                 item.setTimestamp(task.timestamp);
                 item.setData(task.description);
-                item.setCompleted(task.getStatus() == TaskStatus.COMPLETED);
+                item.setCompleterId(UserStorage.getInternalId(task.completer));
+                item.setAssignedId(UserStorage.getInternalId(task.assigned));
                 this.toCache();
                 return;
             }

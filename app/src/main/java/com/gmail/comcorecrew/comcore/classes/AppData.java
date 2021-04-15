@@ -47,7 +47,7 @@ public class AppData {
     private static int groupLength; //Number of groups in the list
     private static final int initialGroupLength = 10;
     public static final int maxData = 0x001E8483; //4MB + 6 Bytes of chars
-    public static final int cacheVersion = 1;
+    public static final int cacheVersion = 2;
 
     /**
      * Runs functions to read stored data from the app before initialization.
