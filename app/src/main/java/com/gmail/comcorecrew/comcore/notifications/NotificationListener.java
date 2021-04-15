@@ -39,7 +39,7 @@ public interface NotificationListener {
     default void onTaskAdded(TaskEntry task) {}
 
     /**
-     * Handle a task's completion status being updated.
+     * Handle a task's status being updated.
      *
      * @param task the updated task
      */
@@ -51,6 +51,27 @@ public interface NotificationListener {
      * @param task the task being deleted
      */
     default void onTaskDeleted(TaskID task) {}
+
+    /**
+     * Handle a new event being added to a calendar.
+     *
+     * @param event the event received from the server
+     */
+    default void onEventAdded(EventEntry event) {}
+
+    /**
+     * Handle a user's event being approved by a moderator.
+     *
+     * @param event the event being approved
+     */
+    default void onEventApproved(EventID event) {}
+
+    /**
+     * Handle an event being deleted.
+     *
+     * @param event the event being deleted
+     */
+    default void onEventDeleted(EventID event) {}
 
     /**
      * Handle being sent a group invite.

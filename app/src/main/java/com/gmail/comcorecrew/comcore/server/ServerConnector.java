@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Base64;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.connection.Connection;
 import com.gmail.comcorecrew.comcore.server.connection.Function;
@@ -836,11 +837,12 @@ public final class ServerConnector {
     /**
      * Update a task's completed status.
      *
-     * @param task      the task to update
-     * @param completed whether the task has been completed
-     * @param handler   the handler for the response of the server
+     * @param task    the task to update
+     * @param status  the status to set for the task
+     * @param handler the handler for the response of the server
+     * @see TaskStatus
      */
-    public static void updateTask(TaskID task, boolean completed,
+    public static void updateTask(TaskID task, TaskStatus status,
                                   ResultHandler<TaskEntry> handler) {
         if (task == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
@@ -850,7 +852,8 @@ public final class ServerConnector {
         data.addProperty("group", task.module.group.id);
         data.addProperty("taskList", task.module.id);
         data.addProperty("id", task.id);
-        data.addProperty("completed", completed);
+        data.addProperty("completed", status == TaskStatus.COMPLETED);
+        data.addProperty("inProgress", status == TaskStatus.IN_PROGRESS);
         getConnection().send(new ServerMsg("updateTask", data), handler,
                 response -> TaskEntry.fromJson(task.module, response));
     }
@@ -928,6 +931,7 @@ public final class ServerConnector {
      * event will be deleted so the EventID becomes invalid and can no longer be used.
      *
      * @param event   the event to approve
+     * @param approve whether to approve the event
      * @param handler the handler for the response of the server
      */
     public static void approveEvent(EventID event, boolean approve, ResultHandler<Void> handler) {
@@ -959,31 +963,6 @@ public final class ServerConnector {
         data.addProperty("calendar", event.module.id);
         data.addProperty("id", event.id);
         getConnection().send(new ServerMsg("deleteEvent", data), handler, response -> null);
-    }
-
-    /**
-     * Get the info of a GroupID. The info will only be retrieved if it has been updated more
-     * recently than lastRefresh, otherwise null will be returned. If lastRefresh is 0, the group
-     * info will always be retrieved.
-     *
-     * @param group       the group to retrieve the info of
-     * @param lastRefresh the last time the cached info was refreshed or 0
-     * @param handler     the handler for the response of the server
-     * @see GroupInfo
-     */
-    public static void getGroupInfo(GroupID group, long lastRefresh,
-                                    ResultHandler<GroupInfo> handler) {
-        getGroupInfo(Collections.singleton(group), lastRefresh, result ->
-            handler.handleResult(result.map(groups -> {
-                switch (groups.length) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return groups[0];
-                    default:
-                        throw new IllegalArgumentException("multiple groups returned");
-                }
-            })));
     }
 
     /**
@@ -1041,27 +1020,6 @@ public final class ServerConnector {
                                    ResultHandler<UserInfo[]> handler) {
         getInfo(UserInfo.class, "users", "getUserInfo", UserInfo::fromJson,
                 users, lastRefresh, handler);
-    }
-
-    /**
-     * Get the info of a ModuleID.
-     *
-     * @param module  the module to retrieve the info of
-     * @param handler the handler for the response of the server
-     * @see ModuleInfo
-     */
-    public static void getModuleInfo(ModuleID module, ResultHandler<ModuleInfo> handler) {
-        getModuleInfo(Collections.singleton(module), result ->
-            handler.handleResult(result.map(modules -> {
-                switch (modules.length) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return modules[0];
-                    default:
-                        throw new IllegalArgumentException("multiple modules returned");
-                }
-            })));
     }
 
     /**
@@ -1127,10 +1085,10 @@ public final class ServerConnector {
             throw new IllegalArgumentException(field + " cannot be null");
         }
 
-        if (ids.isEmpty()) {
-            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
-            return;
-        }
+//        if (ids.isEmpty()) {
+//            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
+//            return;
+//        }
 
         JsonArray array = new JsonArray();
         for (ItemID id : ids) {

@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
@@ -166,7 +167,7 @@ public abstract class CustomModule extends Module {
                 item.setId(UserStorage.getInternalId(entry.creator));
                 item.setItemId(entry.id.id);
                 item.setTimestamp(entry.timestamp);
-                item.setCompleted(entry.completed);
+                item.setCompleted(entry.getStatus() == TaskStatus.COMPLETED);
                 item.setData(entry.description);
                 toCache();
                 return;
@@ -204,7 +205,7 @@ public abstract class CustomModule extends Module {
         });
     }
 
-    protected void modifyItem(ModuleItemID<TaskListID> itemId, boolean completed) {
+    protected void modifyItem(ModuleItemID<TaskListID> itemId, TaskStatus completed) {
         TaskListID taskListID = ((CustomModuleID) getId()).asTaskList();
         ServerConnector.updateTask((TaskID) itemId, completed, result -> {
             if (result.isFailure()) {

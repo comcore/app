@@ -17,6 +17,7 @@ import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
@@ -36,6 +37,7 @@ public class NotificationHandler implements NotificationListener {
     // Android notification channel identifiers
     private static final String CHANNEL_MESSAGE = "message";
     private static final String CHANNEL_TASK = "task";
+    private static final String CHANNEL_EVENT = "event";
     private static final String CHANNEL_INVITE = "invite";
     private static final String CHANNEL_STATUS = "status";
 
@@ -90,6 +92,10 @@ public class NotificationHandler implements NotificationListener {
         createNotificationChannel(
                 R.string.ch_name_task, R.string.ch_desc_task,
                 CHANNEL_TASK, NotificationManager.IMPORTANCE_HIGH);
+
+        createNotificationChannel(
+                R.string.ch_name_event, R.string.ch_desc_event,
+                CHANNEL_EVENT, NotificationManager.IMPORTANCE_HIGH);
 
         createNotificationChannel(
                 R.string.ch_name_invite, R.string.ch_desc_invite,
@@ -160,15 +166,15 @@ public class NotificationHandler implements NotificationListener {
             notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())
-                    .setContentText("Added: " + task.description)
+                    .setContentText(user.getName() + " added: " + task.description)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()));
     }
 
     @Override
     public void onTaskUpdated(TaskEntry task) {
-        if (!task.completed) {
-            // If the task was marked un-completed, don't send a notification
+        if (task.getStatus() != TaskStatus.COMPLETED) {
+            // If the task wasn't marked completed, don't send a notification
             return;
         }
 
@@ -177,11 +183,11 @@ public class NotificationHandler implements NotificationListener {
             return;
         }
 
-        UserStorage.lookup(task.creator, user ->
+        UserStorage.lookup(task.completer, user ->
             notify(new NotificationCompat.Builder(context, CHANNEL_TASK)
                     .setSmallIcon(R.drawable.receivedmsg)
                     .setContentTitle(module.getName())
-                    .setContentText("Completed: " + task.description)
+                    .setContentText(user.getName() + " completed: " + task.description)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()));
     }

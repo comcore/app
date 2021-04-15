@@ -1,8 +1,10 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -32,9 +34,14 @@ public final class TaskEntry {
     public final String description;
 
     /**
-     * Whether the task has been marked as completed.
+     * Who completed the task, or null if it has not yet been completed.
      */
-    public final boolean completed;
+    public final UserID completer;
+
+    /**
+     * Who is assigned to the task, or null if nobody is assigned.
+     */
+    public final UserID assigned;
 
     /**
      * Create a TaskEntry with an owner, a description of the task, and whether it is completed.
@@ -42,10 +49,11 @@ public final class TaskEntry {
      * @param id          the TaskID of the task
      * @param creator     the user that created the task
      * @param description the description of the task
-     * @param completed   whether the task has been completed
+     * @param completer   who completed the task (or null)
+     * @param assigned    who is working on the task (or null)
      */
     public TaskEntry(TaskID id, UserID creator, long timestamp, String description,
-                     boolean completed) {
+                     UserID completer, UserID assigned) {
         if (id == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
         } else if (creator == null) {
@@ -60,7 +68,8 @@ public final class TaskEntry {
         this.creator = creator;
         this.timestamp = timestamp;
         this.description = description;
-        this.completed = completed;
+        this.completer = completer;
+        this.assigned = assigned;
     }
 
     /**
@@ -77,7 +86,32 @@ public final class TaskEntry {
         long timestamp = json.get("timestamp").getAsLong();
         String description = json.get("description").getAsString();
         boolean completed = json.get("completed").getAsBoolean();
-        return new TaskEntry(id, creator, timestamp, description, completed);
+        UserID completer = null;
+        UserID assigned = null;
+        if (completed) {
+            completer = new UserID(json.get("completedBy").getAsString());
+        } else {
+            JsonElement inProgress = json.get("inProgress");
+            if (!inProgress.isJsonNull()) {
+                assigned = new UserID(inProgress.getAsString());
+            }
+        }
+        return new TaskEntry(id, creator, timestamp, description, completer, assigned);
+    }
+
+    /**
+     * Get the status of the task.
+     *
+     * @return the status of the task
+     */
+    public TaskStatus getStatus() {
+        if (completer != null) {
+            return TaskStatus.COMPLETED;
+        } else if (assigned != null) {
+            return TaskStatus.IN_PROGRESS;
+        } else {
+            return TaskStatus.UNASSIGNED;
+        }
     }
 
     @Override
@@ -86,14 +120,15 @@ public final class TaskEntry {
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntry taskEntry = (TaskEntry) o;
         return timestamp == taskEntry.timestamp &&
-                completed == taskEntry.completed &&
                 id.equals(taskEntry.id) &&
                 creator.equals(taskEntry.creator) &&
-                description.equals(taskEntry.description);
+                description.equals(taskEntry.description) &&
+                Objects.equals(completer, taskEntry.completer) &&
+                Objects.equals(assigned, taskEntry.assigned);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creator, timestamp, description, completed);
+        return Objects.hash(id, creator, timestamp, description, completer, assigned);
     }
 }
