@@ -5,6 +5,7 @@ import android.os.Parcel;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
@@ -330,6 +331,8 @@ public class Group implements NotificationListener, Comparable<Group> {
             return new Messaging(info.name, (ChatID) id, this);
         } else if (id instanceof TaskListID) {
             return new TaskList(info.name, (TaskListID) id, this);
+        } else if (id instanceof CalendarID) {
+            return new Calendar(info.name, (CalendarID) id, this);
         } else if (id instanceof CustomModuleID) {
             CustomModuleID customId = (CustomModuleID) id;
             switch (customId.type) {
@@ -475,7 +478,7 @@ public class Group implements NotificationListener, Comparable<Group> {
 
         // Sort by group ID last
         a = groupID == null ? "" : groupID.id;
-        a = o.groupID == null ? "" : o.groupID.id;
-        return groupID.id.compareTo(o.groupID.id);
+        b = o.groupID == null ? "" : o.groupID.id;
+        return a.compareTo(b);
     }
 }
