@@ -24,6 +24,7 @@ import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
@@ -278,6 +279,8 @@ public class GroupFragment extends Fragment {
                 viewHolder.getTextView().setText("Chat: " + name);
             } else if (module instanceof TaskList) {
                 viewHolder.getTextView().setText("Task List: " + name);
+            } else if (module instanceof Calendar) {
+                viewHolder.getTextView().setText("Calendar: " + name);
             } else {
                 viewHolder.getTextView().setText(name);
             }

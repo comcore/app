@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
@@ -20,13 +21,6 @@ public interface Connection {
     void logout();
 
     /**
-     * Get the information of the currently logged in user.
-     *
-     * @return the user data or null if there is no logged in user
-     */
-    UserInfo getUserInfo();
-
-    /**
      * Set the login information to use for connecting to the server. Note that this doesn't
      * actually start the login process, it just stores the credentials in case the client is
      * disconnected and needs to try to log in automatically.
@@ -35,6 +29,11 @@ public interface Connection {
      * @param pass  the user's password
      */
     void setInformation(String email, String pass);
+
+    /**
+     * Connect to the server using a token.
+     */
+    void connect(LoginToken token);
 
     /**
      * Send a message to the server and handle the result asynchronously when it arrives.

@@ -3,25 +3,28 @@ package com.gmail.comcorecrew.comcore.caching;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 public class TaskItem implements Cacheable {
 
-    private int id;
+    private int userId;
     private long taskid;
     private long timestamp;
-    private boolean completed;
+    private int completerId;
+    private int assignedId;
     private String data;
 
     public TaskItem(TaskEntry entry) {
-        id = UserStorage.getInternalId(entry.owner);
+        userId = UserStorage.getInternalId(entry.creator);
         taskid = entry.id.id;
         timestamp = entry.timestamp;
-        completed = entry.completed;
+        completerId = entry.completer == null ? -1 : UserStorage.getInternalId(entry.completer);
+        assignedId = entry.assigned == null ? -1 : UserStorage.getInternalId(entry.assigned);
         data = entry.description;
     }
 
     public int getId() {
-        return id;
+        return userId;
     }
 
     public long getTaskid() {
@@ -33,11 +36,19 @@ public class TaskItem implements Cacheable {
     }
 
     public boolean isCompleted() {
-        return completed;
+        return completerId != -1;
     }
 
     public String getData() {
         return data;
+    }
+
+    public int getCompleterId() {
+        return completerId;
+    }
+
+    public int getAssignedId() {
+        return assignedId;
     }
 
     public void setData(String data) {
@@ -45,71 +56,83 @@ public class TaskItem implements Cacheable {
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.userId = id;
     }
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
     public void setTaskid(long taskid) {
         this.taskid = taskid;
     }
 
+    public void setCompleterId(int completerId) {
+        this.completerId = completerId;
+    }
+
+    public void setAssignedId(int assignedId) {
+        this.assignedId = assignedId;
+    }
+
     public TaskEntry toEntry(TaskListID listID) {
         TaskID taskID = new TaskID(listID, taskid);
-        return new TaskEntry(taskID, UserStorage.getUser(id).getID(), timestamp, data, completed);
+
+        return new TaskEntry(taskID, UserStorage.getUser(userId).getID(), timestamp, data,
+                isCompleted() ? UserStorage.getUser(completerId).getID() : null,
+                assignedId >= 0 ? UserStorage.getUser(assignedId).getID() : null);
     }
 
     @Override
     public char[] toCache() {
-        char[] cache = new char[2 + 4 + 4 + 1 + data.length()];
+        char[] cache = new char[2 + 4 + 4 + 2 + 2 + data.length()];
 
-        cache[0] = (char) (id >> 16);
-        cache[1] = (char) id;
-        cache[2] = (char) (taskid >> 48);
-        cache[3] = (char) (taskid >> 32);
-        cache[4] = (char) (taskid >> 16);
-        cache[5] = (char) taskid;
-        cache[6] = (char) (timestamp >> 48);
-        cache[7] = (char) (timestamp >> 32);
-        cache[8] = (char) (timestamp >> 16);
-        cache[9] = (char) timestamp;
-        if (completed) {
-            cache[10] = 1;
-        }
-        else {
-            cache[10] = 0;
-        }
+        int index = 0;
+
+        cache[index++] = (char) (userId >> 16);
+        cache[index++] = (char) userId;
+        cache[index++] = (char) (taskid >> 48);
+        cache[index++] = (char) (taskid >> 32);
+        cache[index++] = (char) (taskid >> 16);
+        cache[index++] = (char) taskid;
+        cache[index++] = (char) (timestamp >> 48);
+        cache[index++] = (char) (timestamp >> 32);
+        cache[index++] = (char) (timestamp >> 16);
+        cache[index++] = (char) timestamp;
+        cache[index++] = (char) (completerId >> 16);
+        cache[index++] = (char) completerId;
+        cache[index++] = (char) (assignedId >> 16);
+        cache[index++] = (char) assignedId;
         for (int i = 0; i < data.length(); i++) {
-            cache[11 + i] = data.charAt(i);
+            cache[index++] = data.charAt(i);
         }
 
         return cache;
     }
 
     public TaskItem(char[] cache) {
-        if (cache.length < 11) { //Makes sure the array length is valid.
+        if (cache.length < 14) { //Makes sure the array length is valid.
             throw new IllegalArgumentException();
         }
 
+        int index = 0;
+
         //Reads the array into the object.
-        id = cache[0];
-        id = (id << 16) | cache[1];
-        taskid = cache[2];
-        taskid = (taskid << 16) | cache[3];
-        taskid = (taskid << 16) | cache[4];
-        taskid = (taskid << 16) | cache[5];
-        timestamp = cache[6];
-        timestamp = (timestamp << 16) | cache[7];
-        timestamp = (timestamp << 16) | cache[8];
-        timestamp = (timestamp << 16) | cache[9];
-        completed = cache[10] != 0;
-        data = new String(cache, 11, cache.length - 11);
+        userId = cache[index++];
+        userId = (userId << 16) | cache[index++];
+        taskid = cache[index++];
+        taskid = (taskid << 16) | cache[index++];
+        taskid = (taskid << 16) | cache[index++];
+        taskid = (taskid << 16) | cache[index++];
+        timestamp = cache[index++];
+        timestamp = (timestamp << 16) | cache[index++];
+        timestamp = (timestamp << 16) | cache[index++];
+        timestamp = (timestamp << 16) | cache[index++];
+        completerId = cache[index++];
+        completerId = (completerId << 16) | cache[index++];
+        assignedId = cache[index++];
+        assignedId = (assignedId << 16) | cache[index++];
+        data = new String(cache, index, cache.length - index);
 
     }
 }

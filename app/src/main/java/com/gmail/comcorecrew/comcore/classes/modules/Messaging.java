@@ -70,20 +70,8 @@ public class Messaging extends Module {
     /*
      * Adds a message and saves the user data.
      */
-    private boolean addMessage(MessageEntry entry) {
-        int internalId = UserStorage.getInternalId(entry.sender);
-        if (internalId == -1) {/*
-            try {
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }*/
-            return false; //TODO remove temporary handling.
-        }
-        MessageItem newMsg = new MessageItem(internalId, entry.id.id,
-                entry.timestamp, entry.contents);
-        messages.add(newMsg);
-        return true;
+    private void addMessage(MessageEntry entry) {
+        messages.add(new MessageItem(entry));
     }
 
     public int numEntries() {
@@ -133,7 +121,7 @@ public class Messaging extends Module {
 
             // If the message isn't immediately after the existing messages, clear the cache
             if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
-                messages.clear();
+                clearCache();
             }
 
             for (MessageEntry entry : result.data) {
@@ -184,8 +172,11 @@ public class Messaging extends Module {
                 msg.setTimestamp(message.timestamp);
                 msg.setData(message.contents);
                 this.toCache();
+                return;
             }
         }
+
+        refresh();
     }
 
     public void createPinnedMessages(String name) {

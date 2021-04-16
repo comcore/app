@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.*;
@@ -26,7 +27,7 @@ public interface NotificationListener {
     /**
      * Handle a message's contents being updated. The new contents will never be null.
      *
-     * @param message the updated task
+     * @param message the updated message
      */
     default void onMessageUpdated(MessageEntry message) {}
 
@@ -38,7 +39,7 @@ public interface NotificationListener {
     default void onTaskAdded(TaskEntry task) {}
 
     /**
-     * Handle a task's completion status being updated.
+     * Handle a task's status being updated.
      *
      * @param task the updated task
      */
@@ -50,6 +51,27 @@ public interface NotificationListener {
      * @param task the task being deleted
      */
     default void onTaskDeleted(TaskID task) {}
+
+    /**
+     * Handle a new event being added to a calendar.
+     *
+     * @param event the event received from the server
+     */
+    default void onEventAdded(EventEntry event) {}
+
+    /**
+     * Handle a user's event being approved by a moderator.
+     *
+     * @param event the event being approved
+     */
+    default void onEventApproved(EventID event) {}
+
+    /**
+     * Handle an event being deleted.
+     *
+     * @param event the event being deleted
+     */
+    default void onEventDeleted(EventID event) {}
 
     /**
      * Handle being sent a group invite.
@@ -78,13 +100,17 @@ public interface NotificationListener {
      * Handle being kicked from a group.
      *
      * @param group the group
+     * @param name  the name of the group
      */
     default void onKicked(GroupID group, String name) {}
 
     /**
      * Handle the user logging in successfully. This could be used to update the cached data.
+     *
+     * @param user  the information of the user
+     * @param token the login token of the user
      */
-    default void onLoggedIn(UserInfo user) {}
+    default void onLoggedIn(UserInfo user, LoginToken token) {}
 
     /**
      * Handle being logged out forcibly by the server. This could be used to go back to the login

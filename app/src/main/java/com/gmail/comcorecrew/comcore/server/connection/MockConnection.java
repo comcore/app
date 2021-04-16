@@ -1,8 +1,8 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
-import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonObject;
 
 /**
@@ -27,12 +27,10 @@ public final class MockConnection implements Connection {
     public void logout() {}
 
     @Override
-    public UserInfo getUserInfo() {
-        return null;
-    }
+    public void setInformation(String email, String pass) {}
 
     @Override
-    public void setInformation(String email, String pass) {}
+    public void connect(LoginToken token) {}
 
     @Override
     public <T> void send(ServerMsg message, ResultHandler<T> handler,

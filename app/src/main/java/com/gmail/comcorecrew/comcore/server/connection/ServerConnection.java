@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection;
 
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ResultHandler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
@@ -26,6 +27,7 @@ import javax.net.ssl.SSLContext;
 public final class ServerConnection implements Connection {
     private static final String SERVER_URL = "comcore.ml";
     private static final int SERVER_PORT = 4433;
+    private static final boolean DEBUG = false;
 
     private final String url;
 
@@ -35,7 +37,7 @@ public final class ServerConnection implements Connection {
 
     private String email;
     private String pass;
-    private UserInfo userInfo;
+    private LoginToken token;
 
     private Socket socket;
     private BufferedReader in;
@@ -84,6 +86,10 @@ public final class ServerConnection implements Connection {
             return true;
         }
 
+        if (DEBUG) {
+            System.err.println("ServerConnection.start()");
+        }
+
         try {
             // Create a Socket connected to the server
             InetSocketAddress endPoint = new InetSocketAddress(url, SERVER_PORT);
@@ -121,6 +127,10 @@ public final class ServerConnection implements Connection {
             return;
         }
 
+        if (DEBUG) {
+            System.err.println("ServerConnection.close()");
+        }
+
         // Close the socket, ignoring any errors
         try {
             socket.close();
@@ -155,6 +165,12 @@ public final class ServerConnection implements Connection {
         String pass;
 
         synchronized (this) {
+            // Try connecting with a token if there is one
+            if (token != null) {
+                connect(token);
+                return;
+            }
+
             email = this.email;
             pass = this.pass;
         }
@@ -194,23 +210,32 @@ public final class ServerConnection implements Connection {
     }
 
     /**
-     * Record that the user was logged out from the server and that their email and password must
-     * be entered again to continue. This could happen if their password was changed or if the
-     * client wasn't able to log in after being automatically reconnected.
+     * Record that the user was logged out from the server, sending a notification if the user
+     * wasn't already logged out.
      */
     public void loggedOut() {
-        setInformation(null, null);
+        if (token != null) {
+            ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+        }
 
-        ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+        setInformation(null, null);
     }
 
     /**
-     * Set the information of the user when the server sends it.
+     * Record that the user was logged into the server with the given information, sending a
+     * notification if the user wasn't already logged in or was logged into a different account.
      *
-     * @param userData the user data
+     * @param userInfo the information of the user
+     * @param token    the login token of the user
      */
-    public synchronized void setUserInfo(UserInfo userData) {
-        this.userInfo = userData;
+    public void loggedIn(UserInfo userInfo, LoginToken token) {
+        if (token == this.token) {
+            return;
+        }
+
+        this.token = token;
+        ServerConnector.sendNotification(listener ->
+                listener.onLoggedIn(userInfo, token));
     }
 
     /**
@@ -228,6 +253,10 @@ public final class ServerConnection implements Connection {
         if (!start()) {
             task.handleResult(ServerResult.failure("cannot connect to server"));
             return;
+        }
+
+        if (DEBUG) {
+            System.err.println("--> " + task.message.toJson());
         }
 
         out.println(task.message.toJson());
@@ -274,6 +303,10 @@ public final class ServerConnection implements Connection {
         try {
             String line = in.readLine();
             if (line != null && !line.isEmpty()) {
+                if (DEBUG) {
+                    System.err.println("<-- " + line);
+                }
+
                 JsonObject json = JsonParser.parseString(line).getAsJsonObject();
                 return ServerMsg.fromJson(json);
             }
@@ -309,20 +342,15 @@ public final class ServerConnection implements Connection {
 
     @Override
     public void logout()  {
-        setInformation(null, null);
+        loggedOut();
 
         addTask(new ServerTask(new ServerMsg("logout"), null));
     }
 
     @Override
-    public synchronized UserInfo getUserInfo() {
-        return userInfo;
-    }
-
-    @Override
     public synchronized void setInformation(String email, String pass) {
         if (pass == null) {
-            this.userInfo = null;
+            token = null;
         }
 
         if (email != null || pass == null) {
@@ -330,6 +358,16 @@ public final class ServerConnection implements Connection {
         }
 
         this.pass = pass;
+    }
+
+    @Override
+    public synchronized void connect(LoginToken token) {
+        this.token = token;
+
+        JsonObject data = new JsonObject();
+        data.addProperty("id", token.user.id);
+        data.addProperty("token", token.token);
+        addTask(new ServerTask(new ServerMsg("connect", data), null));
     }
 
     @Override

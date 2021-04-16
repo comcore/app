@@ -39,26 +39,22 @@ public class CreateEventDialog extends DialogFragment {
         this.calendarID = calendarID;
     }
 
-    private void createEvent(long eventTimestamp) {
+    private void createEvent(long startTimestamp) {
 
         EditText createEventDesc = getView().findViewById(R.id.create_event_desc);
+        String description = createEventDesc.getText().toString();
 
-        /** If the user is a moderator or an owner, the event can be created **/
-        if (AppData.getGroup(calendarID.group).getGroupRole() != GroupRole.USER) {
-            ServerConnector.addEvent(calendarID, eventTimestamp, createEventDesc.getText().toString(), result -> {
-                if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(fragment.getParentFragmentManager(), null);
-                    return;
-                }
+        // TODO: also let the user pick an end time for the event
+        long endTimestamp = startTimestamp;
+        ServerConnector.addEvent(calendarID, description, startTimestamp, endTimestamp, result -> {
+            if (result.isFailure()) {
+                new ErrorDialog(R.string.error_cannot_connect)
+                        .show(fragment.getParentFragmentManager(), null);
+                return;
+            }
 
-                this.dismiss();
-            });
-        }
-        /** TODO If the user is a normal group user, the event must be sent to a moderator **/
-        else {
-
-        }
+            this.dismiss();
+        });
     }
 
     @Override

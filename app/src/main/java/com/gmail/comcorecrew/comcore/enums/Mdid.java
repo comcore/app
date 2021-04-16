@@ -5,7 +5,9 @@ public enum Mdid {
     TEST, //TESTING ONLY
     CSTM, //Custom Module
     CMSG, //Comcore Messaging
-    CTSK; //Comcore Tasks
+    CTSK, //Comcore Tasks
+    CCLD, //Comcore Calendar
+    CPLS; //Comcore Polls
 
     public static Mdid fromString(String mdid) {
         switch (mdid) {
@@ -17,6 +19,10 @@ public enum Mdid {
                 return CMSG;
             case "ctsk":
                 return CTSK;
+            case "ccld":
+                return CCLD;
+            case "cpls":
+                return CPLS;
             default:
                 throw new IllegalArgumentException("Invalid mdid: " + mdid);
         }
@@ -32,6 +38,10 @@ public enum Mdid {
                 return "cmsg";
             case CTSK:
                 return "ctsk";
+            case CCLD:
+                return "ccld";
+            case CPLS:
+                return "cpls";
             default:
                 throw new IllegalStateException("Invalid mdid");
         }

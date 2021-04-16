@@ -1,7 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.connection.thread;
 
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.ServerMsg;
@@ -49,14 +49,6 @@ public final class ServerReader extends ServerThread {
                     }
                     break;
                 }
-                case "login":
-                case "setUser": {
-                    UserInfo userData = UserInfo.fromJson(message.data);
-                    connection.setUserInfo(userData);
-                    ServerConnector.sendNotification(listener ->
-                            listener.onLoggedIn(userData));
-                    break;
-                }
                 case "message": {
                     MessageEntry entry = MessageEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
@@ -87,6 +79,24 @@ public final class ServerReader extends ServerThread {
                             listener.onTaskDeleted(id));
                     break;
                 }
+                case "event": {
+                    EventEntry entry = EventEntry.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventAdded(entry));
+                    break;
+                }
+                case "eventApproved": {
+                    EventID id = EventID.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventApproved(id));
+                    break;
+                }
+                case "eventDeleted": {
+                    EventID id = EventID.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventDeleted(id));
+                    break;
+                }
                 case "invite": {
                     GroupInviteEntry entry = GroupInviteEntry.fromJson(message.data);
                     ServerConnector.sendNotification(listener ->
@@ -114,8 +124,15 @@ public final class ServerReader extends ServerThread {
                         listener.onKicked(group, name));
                     break;
                 }
+                case "login": {
+                    UserInfo userInfo = UserInfo.fromJson(message.data);
+                    String tokenString = message.data.get("token").getAsString();
+                    LoginToken token = new LoginToken(userInfo.id, tokenString);
+                    connection.loggedIn(userInfo, token);
+                    break;
+                }
                 case "logout": {
-                    ServerConnector.sendNotification(NotificationListener::onLoggedOut);
+                    connection.loggedOut();
                     break;
                 }
                 default:

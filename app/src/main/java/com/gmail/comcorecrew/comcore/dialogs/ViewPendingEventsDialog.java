@@ -144,7 +144,8 @@ public class ViewPendingEventsDialog extends DialogFragment {
             TextView eventDate = viewHolder.itemView.findViewById(R.id.pending_event_date);
 
             eventDesc.setText(unapprovedEventList.get(position).description);
-            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).timestamp).toString();
+            // TODO: display end time as well
+            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).start).toString();
             eventDate.setText(parsedDate);
 
             viewHolder.setCurrentEventEntry(unapprovedEventList.get(position));

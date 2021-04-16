@@ -3,8 +3,10 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
+import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
@@ -84,7 +86,11 @@ public class TaskList extends Module {
         int index = getTaskIndex(taskID);
         if (index != -1) {
             boolean completed = !tasks.get(index).isCompleted();
-            ServerConnector.updateTask(taskID, completed, result -> {
+            ServerConnector.updateTask(taskID, completed ? TaskStatus.COMPLETED : TaskStatus.UNASSIGNED, result -> {
+                if (result.isFailure()) {
+                    return;
+                }
+
                 tasks.set(index, new TaskItem(result.data));
                 toCache();
             });
@@ -185,7 +191,8 @@ public class TaskList extends Module {
             if (item.getTaskid() == id) {
                 item.setTimestamp(task.timestamp);
                 item.setData(task.description);
-                item.setCompleted(task.completed);
+                item.setCompleterId(UserStorage.getInternalId(task.completer));
+                item.setAssignedId(UserStorage.getInternalId(task.assigned));
                 this.toCache();
                 return;
             }
@@ -240,16 +247,11 @@ public class TaskList extends Module {
                 return;
             }
 
-            tasks = new ArrayList<>();
+            tasks.clear();
             for (TaskEntry taskEntry : result.data) {
                 tasks.add(new TaskItem(taskEntry));
             }
             toCache();
         });
-    }
-
-    @Override
-    public void clearCache() {
-        tasks.clear();
     }
 }

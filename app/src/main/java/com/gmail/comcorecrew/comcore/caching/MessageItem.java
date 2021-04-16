@@ -24,6 +24,9 @@ public class MessageItem implements Cacheable {
         messageId = entry.id.id;
         timestamp = entry.timestamp;
         data = entry.contents;
+        //TODO from entry
+        myReaction = Reaction.NONE;
+        reactions = new ReactionHolder();
     }
 
     public MessageItem(int userId, long messageId, long timestamp, String data) {

@@ -33,6 +33,8 @@ import java.util.HashSet;
  * NOTE: AppData.init() must be run before this module works!
  */
 public class GroupStorage {
+    private static boolean isRefreshing = false;
+
     private GroupStorage() {}
 
     /**
@@ -41,6 +43,14 @@ public class GroupStorage {
      * @param callback the callback to run (or null)
      */
     public static void refresh(Runnable callback) {
+        // If there is already a refresh happening, don't do anything
+        if (isRefreshing) {
+            return;
+        }
+
+        // Record that a refresh is in progress
+        isRefreshing = true;
+
         // Get the group associated with each ID
         HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.getGroupSize());
         for (int i = 0; i < AppData.getGroupSize(); i++) {
@@ -123,6 +133,9 @@ public class GroupStorage {
                 if (callback != null) {
                     callback.run();
                 }
+
+                // Mark the refresh as completed
+                isRefreshing = false;
             });
         });
     }
@@ -172,6 +185,7 @@ public class GroupStorage {
         AppData.writeString(group.getGroupRole().toString(), writer);
         AppData.writeBool(group.getMuted(), writer);
         AppData.writeBool(group.isPinned(), writer);
+        AppData.writeBool(group.isRequireApproval(), writer);
 
         AppData.writeInt(group.getUsers().size(), writer);
         for (User user : group.getUsers()) {
@@ -181,7 +195,12 @@ public class GroupStorage {
         for (UserID id : group.getModerators()) {
             AppData.writeInt(UserStorage.getInternalId(id), writer);
         }
-        AppData.writeInt(UserStorage.getInternalId(group.getOwner()), writer);
+        if (group.getOwner() == null) {
+            AppData.writeInt(-2, writer);
+        }
+        else {
+            AppData.writeInt(UserStorage.getInternalId(group.getOwner()), writer);
+        }
 
         writer.close();
     }
@@ -251,6 +270,7 @@ public class GroupStorage {
         group.setGroupRole(GroupRole.fromString(AppData.readString(reader)));
         group.setMuted(AppData.readBool(reader));
         group.setPinned(AppData.readBool(reader));
+        group.setRequireApproval(AppData.readBool(reader));
 
         int length = AppData.readInt(reader);
         ArrayList<User> users = new ArrayList<>();
@@ -277,9 +297,11 @@ public class GroupStorage {
         group.setModerators(moderators);
         user = UserStorage.getUser(AppData.readInt(reader));
         if (user == null) {
-            throw new InvalidFileFormatException("Null user stored");
+            group.setOwner(null);
         }
-        group.setOwner(user.getID());
+        else {
+            group.setOwner(user.getID());
+        }
 
         reader.close();
 

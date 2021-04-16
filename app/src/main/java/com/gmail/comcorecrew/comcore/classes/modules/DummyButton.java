@@ -25,7 +25,7 @@ import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
  */
 public class DummyButton extends CustomChat {
 
-    private Button dummyButton;
+    private transient Button dummyButton;
 
     public DummyButton(String name, CustomModuleID id, Group group) {
         super(name, id, group);
