@@ -422,6 +422,26 @@ public final class ServerConnector {
     }
 
     /**
+     * Set whether approval is required for user's calendar events in a group.
+     *
+     * @param group   the group to update the settings for
+     * @param requireApproval whether approval is required
+     * @param handler the handler for the response of the server
+     */
+    public static void setRequireApproval(GroupID group, boolean requireApproval,
+                                          ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("requireApproval", requireApproval);
+        getConnection().send(new ServerMsg("setRequireApproval", data), handler,
+                response -> null);
+    }
+
+    /**
      * Set whether a module is enabled or disabled.
      *
      * @param module  the module to enable/disable

@@ -174,7 +174,7 @@ public class MainFragment extends Fragment {
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
             Group group = AppData.getFromPos(position);
-            viewHolder.getTextView().setText(group.getName());
+            viewHolder.getTextView().setText(group.getDisplayName());
             viewHolder.setGroup(group);
 
             /* Changes or removes the image on each group list item based on whether

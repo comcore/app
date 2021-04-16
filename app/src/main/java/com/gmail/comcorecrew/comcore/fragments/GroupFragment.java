@@ -82,7 +82,7 @@ public class GroupFragment extends Fragment {
         refresh();
 
         TextView groupNameText = (TextView) view.findViewById(R.id.label_group_fragment);
-        groupNameText.setText(currentGroup.getName());
+        groupNameText.setText(currentGroup.getDisplayName());
 
         /**
          * If the "back" button is clicked, return to the main page

@@ -111,6 +111,7 @@ public class GroupStorage {
                         group.setName(info.name);
                         group.setGroupRole(info.role);
                         group.setMuted(info.muted);
+                        group.setRequireApproval(info.requireApproval);
 
                         // Refresh the group's users, then refresh the modules
                         group.refreshUsers(alreadyRefreshed, () ->

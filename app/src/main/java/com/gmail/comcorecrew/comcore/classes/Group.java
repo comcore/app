@@ -2,6 +2,8 @@ package com.gmail.comcorecrew.comcore.classes;
 
 import android.os.Parcel;
 
+import androidx.annotation.NonNull;
+
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
@@ -233,6 +235,20 @@ public class Group implements NotificationListener, Comparable<Group> {
                 callback.run();
             }
         });
+    }
+
+    @NonNull
+    public String getDisplayName() {
+        // If the group is a direct message group, return the name of the other user instead
+        if (isDirect() && users != null) {
+            for (User user : users) {
+                if (!user.getID().equals(AppData.self.getID())) {
+                    return user.getName();
+                }
+            }
+        }
+
+        return groupName == null ? "" : groupName;
     }
 
     public String getName() {
@@ -489,9 +505,9 @@ public class Group implements NotificationListener, Comparable<Group> {
             return compare;
         }
 
-        // Sort by alphabetically next
-        String a = groupName == null ? "" : groupName;
-        String b = o.groupName == null ? "" : o.groupName;
+        // Sort by alphabetically based on group name next
+        String a = getDisplayName();
+        String b = o.getDisplayName();
         if ((compare = a.compareToIgnoreCase(b)) != 0) {
             return compare;
         }
@@ -500,5 +516,11 @@ public class Group implements NotificationListener, Comparable<Group> {
         a = groupID == null ? "" : groupID.id;
         b = o.groupID == null ? "" : o.groupID.id;
         return a.compareTo(b);
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return getDisplayName();
     }
 }

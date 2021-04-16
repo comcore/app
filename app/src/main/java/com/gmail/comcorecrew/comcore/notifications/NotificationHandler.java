@@ -211,7 +211,7 @@ public class NotificationHandler implements NotificationListener {
 
         notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle(info.getName())
+                .setContentTitle(info.getDisplayName())
                 .setContentText("You have become a " + role)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build());
@@ -226,7 +226,7 @@ public class NotificationHandler implements NotificationListener {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle(info.getName())
+                .setContentTitle(info.getDisplayName())
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
         if (muted) {
