@@ -329,7 +329,7 @@ public final class ServerConnector {
             if (user == null) {
                 throw new IllegalArgumentException("UserID cannot be null");
             }
-            array.add(user.id);
+            array.add(user.toJson());
         }
 
         JsonObject data = new JsonObject();
