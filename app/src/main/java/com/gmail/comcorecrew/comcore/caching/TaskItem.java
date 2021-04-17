@@ -39,6 +39,10 @@ public class TaskItem implements Cacheable {
         return completerId != -1;
     }
 
+    public boolean isAssigned() {
+        return assignedId != -1;
+    }
+
     public String getData() {
         return data;
     }

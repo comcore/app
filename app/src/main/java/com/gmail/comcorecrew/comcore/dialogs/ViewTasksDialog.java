@@ -121,14 +121,11 @@ public class ViewTasksDialog extends DialogFragment {
                     currentTaskList.toggleCompleted(currentTask.id);
                 } else if (flag == 2) {
                     switch (currentTask.getStatus()) {
-                        case UNASSIGNED:
-                            // TODO set the task to be IN_PROGRESS
-                            break;
-                        case IN_PROGRESS:
-                            ErrorDialog.show(R.string.error_already_in_progress);
-                            break;
                         case COMPLETED:
                             ErrorDialog.show(R.string.error_already_complete);
+                            break;
+                        default:
+                            currentTaskList.toggleAssigned(currentTask.id);
                             break;
                     }
                 }
