@@ -191,7 +191,11 @@ public class MainFragment extends Fragment {
                     break;
                 case MODERATOR:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
-                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    if (group.isDirect()) {
+                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.primary_d1));
+                    } else {
+                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    }
                     break;
                 case USER:
                     viewHolder.viewTag.setVisibility(View.INVISIBLE);

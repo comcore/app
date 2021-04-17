@@ -498,6 +498,11 @@ public class Group implements NotificationListener, Comparable<Group> {
             return compare;
         }
 
+        // Put direct messages first
+        if ((compare = Boolean.compare(o.isDirect(), isDirect())) != 0) {
+            return compare;
+        }
+
         // Put moderated groups first
         GroupRole roleA = groupRole == null ? GroupRole.USER : groupRole;
         GroupRole roleB = o.groupRole == null ? GroupRole.USER : o.groupRole;
