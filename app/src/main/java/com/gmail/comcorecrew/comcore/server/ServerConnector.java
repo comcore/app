@@ -28,9 +28,10 @@ import java.util.List;
  * Utility class representing a connection with the server.
  */
 public final class ServerConnector {
-    private static final List<NotificationListener> notificationListeners =
-            Collections.synchronizedList(new ArrayList<>());
     private static Connection serverConnection;
+    private static NotificationListener notificationListener;
+
+    private ServerConnector() {}
 
     /**
      * Set the connection which will be used for all server requests.
@@ -66,13 +67,13 @@ public final class ServerConnector {
     }
 
     /**
-     * Add a NotificationListener to the ServerConnector.
+     * Set a base NotificationListener for the ServerConnector.
      *
-     * @param listener the NotificationListener to add
+     * @param listener the NotificationListener to set
      * @see NotificationListener
      */
-    public static void addNotificationListener(NotificationListener listener) {
-        notificationListeners.add(listener);
+    public static void setNotificationListener(NotificationListener listener) {
+        notificationListener = listener;
     }
 
     /**
@@ -96,11 +97,9 @@ public final class ServerConnector {
     public static void sendNotification(Notification notification) {
         // Run on the main thread
         new Handler(Looper.getMainLooper()).post(() -> {
-            // Create a queue from the notification listeners list
-            ArrayDeque<NotificationListener> listeners;
-            synchronized (notificationListeners) {
-                listeners = new ArrayDeque<>(notificationListeners);
-            }
+            // Create a queue from the base notification listener
+            ArrayDeque<NotificationListener> listeners = new ArrayDeque<>();
+            listeners.add(notificationListener);
 
             // Loop over the notification listeners, giving each the notification
             while (!listeners.isEmpty()) {

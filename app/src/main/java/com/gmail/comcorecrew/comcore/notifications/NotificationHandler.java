@@ -35,11 +35,11 @@ import java.util.List;
  */
 public class NotificationHandler implements NotificationListener {
     // Android notification channel identifiers
-    private static final String CHANNEL_MESSAGE = "message";
-    private static final String CHANNEL_TASK = "task";
-    private static final String CHANNEL_EVENT = "event";
-    private static final String CHANNEL_INVITE = "invite";
-    private static final String CHANNEL_STATUS = "status";
+    public static final String CHANNEL_MESSAGE = "message";
+    public static final String CHANNEL_TASK = "task";
+    public static final String CHANNEL_EVENT = "event";
+    public static final String CHANNEL_INVITE = "invite";
+    public static final String CHANNEL_STATUS = "status";
 
     // A unique ID to give a notification
     private static int uniqueId = (int) System.currentTimeMillis();

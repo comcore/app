@@ -13,12 +13,14 @@ import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.EventID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
+import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
@@ -68,33 +70,25 @@ public class Calendar extends Module {
     }
 
     public void approve(EventID eventID) {
-        int index = getEventIndex(eventID);
-        if (index != -1) {
-            ServerConnector.approveEvent(eventID, true, result -> {
-                if (result.isFailure()) {
-                    ErrorDialog.show(result.errorMessage);
-                    return;
-                }
+        ServerConnector.approveEvent(eventID, true, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
+                return;
+            }
 
-                events.get(index).setApproved(true);
-                toCache();
-            });
-        }
+            onEventApproved(eventID);
+        });
     }
 
     public void disapprove(EventID eventID) {
-        int index = getEventIndex(eventID);
-        if (index != -1) {
-            ServerConnector.approveEvent(eventID, false, result -> {
-                if (result.isFailure()) {
-                    ErrorDialog.show(result.errorMessage);
-                    return;
-                }
+        ServerConnector.approveEvent(eventID, false, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
+                return;
+            }
 
-                events.remove(index);
-                toCache();
-            });
-        }
+            onEventDeleted(eventID);
+        });
     }
 
     public void sendEvent(String description, long start, long end) {
@@ -105,18 +99,19 @@ public class Calendar extends Module {
             }
 
             addEvent(result.data);
-
         });
     }
 
     public void addEvent(EventEntry event) {
         events.add(new EventItem(event));
+        NotificationScheduler.add(event);
         toCache();
     }
 
     public void addEvents(ArrayList<EventEntry> events) {
         for (EventEntry event : events) {
             this.events.add(new EventItem(event));
+            NotificationScheduler.add(event);
         }
         toCache();
     }
@@ -129,6 +124,7 @@ public class Calendar extends Module {
             }
 
             events.remove(getEventIndex(eventID));
+            NotificationScheduler.remove(eventID);
             toCache();
         });
     }
@@ -147,7 +143,6 @@ public class Calendar extends Module {
         }
         deleteEvent(eventID);
         sendEvent(description, start, end);
-
     }
 
     public ArrayList<EventEntry> getEntries() {
@@ -190,7 +185,9 @@ public class Calendar extends Module {
             return;
         }
 
-        events.get(index).setApproved(true);
+        EventItem item = events.get(index);
+        item.setApproved(true);
+        NotificationScheduler.add(item.toEntry((CalendarID) getId()));
         toCache();
     }
 
@@ -206,6 +203,7 @@ public class Calendar extends Module {
         }
 
         events.remove(index);
+        NotificationScheduler.remove(event);
         toCache();
     }
 
@@ -229,6 +227,7 @@ public class Calendar extends Module {
         for (char[] line : data) {
             events.add(new EventItem(line));
         }
+        registerNotifications();
     }
 
     @Override
@@ -242,7 +241,14 @@ public class Calendar extends Module {
             for (EventEntry eventEntry : result.data) {
                 events.add(new EventItem(eventEntry));
             }
+            registerNotifications();
             toCache();
         });
+    }
+
+    private void registerNotifications() {
+        for (EventItem event : events) {
+            NotificationScheduler.add(event.toEntry((CalendarID) getId()));
+        }
     }
 }

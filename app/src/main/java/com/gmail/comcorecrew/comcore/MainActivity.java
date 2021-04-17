@@ -12,6 +12,7 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 import com.gmail.comcorecrew.comcore.server.entry.InviteLinkEntry;
@@ -29,18 +30,15 @@ public class MainActivity extends AppCompatActivity {
         // Set the ErrorDialog's fragment manager
         ErrorDialog.fragmentManager = getSupportFragmentManager();
 
-        try {
-            AppData.preInit(context);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         // Initialize the notification manager using the application context
         NotificationHandler notificationHandler = new NotificationHandler(context);
 
+        // Initialize the notification scheduler using the application context
+        NotificationScheduler.init(context);
+
         // Initialize the connection to the server
         ServerConnector.setConnection(new ServerConnection());
-        ServerConnector.addNotificationListener(notificationHandler);
+        ServerConnector.setNotificationListener(notificationHandler);
 
         // Get the URL if the user clicked a link
         Intent appLinkIntent = getIntent();
@@ -67,10 +65,17 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Create the main view
+        // Create the main view for the application
         setContentView(R.layout.activity_main);
         Toolbar mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+
+        // Start initializing the cache using the application context
+        try {
+            AppData.preInit(context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
