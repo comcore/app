@@ -35,8 +35,7 @@ public class InviteLinkDialog extends DialogFragment {
 
         if (pendingLink.hasExpired()) {
             InviteLinkDialog.pendingLink = null;
-            new ErrorDialog(R.string.error_link_expired)
-                    .show(fragmentManager, null);
+            ErrorDialog.show(R.string.error_link_expired);
         }
     }
 
@@ -64,8 +63,7 @@ public class InviteLinkDialog extends DialogFragment {
                 .setPositiveButton(R.string.join, (dialog, id) -> {
                     ServerConnector.useInviteLink(link.inviteLink, result -> {
                         if (result.isFailure()) {
-                            new ErrorDialog(R.string.error_cannot_connect)
-                                    .show(mainFragment.getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_cannot_connect);
                             return;
                         }
 

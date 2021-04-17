@@ -114,8 +114,7 @@ public class CreateGroupFragment extends Fragment {
             String groupName = groupNameView.getText().toString();
 
             if (groupName.isEmpty()) {
-                new ErrorDialog(R.string.error_missing_data)
-                        .show(getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_missing_data);
                 return;
             }
 
@@ -124,8 +123,7 @@ public class CreateGroupFragment extends Fragment {
 
                 ServerConnector.createGroup(groupName, result -> {
                     if (result.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
 
@@ -133,10 +131,7 @@ public class CreateGroupFragment extends Fragment {
                     //text.setText(result.data.toString());
                     ServerConnector.createChat(result.data, groupName, result1 -> {
                         if (result1.isFailure()) {
-                            new ErrorDialog(R.string.error_cannot_connect)
-                                    .show(getParentFragmentManager(), null);
-                        } else {
-                            System.out.println("Chat created!");
+                            ErrorDialog.show(R.string.error_cannot_connect);
                         }
                     });
                     NavHostFragment.findNavController(this)

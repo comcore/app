@@ -825,13 +825,16 @@ public final class ServerConnector {
      * Add a task with a given description to a task list.
      *
      * @param taskList    the task list to add the task to
+     * @param deadline    the deadline to set for the task (or 0 for no deadline)
      * @param description the description of the task
      * @param handler     the handler for the response of the server
      */
-    public static void addTask(TaskListID taskList, String description,
+    public static void addTask(TaskListID taskList, long deadline, String description,
                                ResultHandler<TaskEntry> handler) {
         if (taskList == null) {
             throw new IllegalArgumentException("TaskListID cannot be null");
+        } else if (deadline < 0) {
+            throw new IllegalArgumentException("task deadline cannot be negative");
         } else if (description == null) {
             throw new IllegalArgumentException("task description cannot be null");
         }
@@ -839,6 +842,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", taskList.group.id);
         data.addProperty("taskList", taskList.id);
+        data.addProperty("deadline", deadline);
         data.addProperty("description", description);
         getConnection().send(new ServerMsg("addTask", data), handler,
                 response -> TaskEntry.fromJson(taskList, response));
@@ -864,17 +868,19 @@ public final class ServerConnector {
     }
 
     /**
-     * Update a task's completed status.
+     * Update a task's status.
      *
      * @param task    the task to update
      * @param status  the status to set for the task
      * @param handler the handler for the response of the server
      * @see TaskStatus
      */
-    public static void updateTask(TaskID task, TaskStatus status,
-                                  ResultHandler<TaskEntry> handler) {
+    public static void updateTaskStatus(TaskID task, TaskStatus status,
+                                        ResultHandler<TaskEntry> handler) {
         if (task == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
+        } else if (status == null) {
+            throw new IllegalArgumentException("TaskStatus cannot be null");
         }
 
         JsonObject data = new JsonObject();
@@ -883,7 +889,32 @@ public final class ServerConnector {
         data.addProperty("id", task.id);
         data.addProperty("completed", status == TaskStatus.COMPLETED);
         data.addProperty("inProgress", status == TaskStatus.IN_PROGRESS);
-        getConnection().send(new ServerMsg("updateTask", data), handler,
+        getConnection().send(new ServerMsg("updateTaskStatus", data), handler,
+                response -> TaskEntry.fromJson(task.module, response));
+    }
+
+    /**
+     * Update a task's deadline.
+     *
+     * @param task     the task to update
+     * @param deadline the deadline to set for the task (or 0 for no deadline)
+     * @param handler  the handler for the response of the server
+     * @see TaskStatus
+     */
+    public static void updateTaskDeadline(TaskID task, long deadline,
+                                          ResultHandler<TaskEntry> handler) {
+        if (task == null) {
+            throw new IllegalArgumentException("TaskID cannot be null");
+        } else if (deadline < 0) {
+            throw new IllegalArgumentException("task deadline cannot be negative");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", task.module.group.id);
+        data.addProperty("taskList", task.module.id);
+        data.addProperty("id", task.id);
+        data.addProperty("deadline", deadline);
+        getConnection().send(new ServerMsg("updateTaskDeadline", data), handler,
                 response -> TaskEntry.fromJson(task.module, response));
     }
 

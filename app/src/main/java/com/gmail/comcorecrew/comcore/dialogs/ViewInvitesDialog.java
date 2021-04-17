@@ -95,8 +95,7 @@ public class ViewInvitesDialog extends DialogFragment {
                 view.findViewById(R.id.accept_invite_button).setOnClickListener(clickedView -> {
                     ServerConnector.replyToInvite(currentInviteEntry.id, true, result -> {
                         if (result.isFailure()) {
-                            new ErrorDialog(R.string.error_cannot_connect)
-                                    .show(getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_cannot_connect);
                             return;
                         }
 
@@ -109,8 +108,7 @@ public class ViewInvitesDialog extends DialogFragment {
                 view.findViewById(R.id.reject_invite_button).setOnClickListener(clickedView -> {
                     ServerConnector.replyToInvite(currentInviteEntry.id, false, result -> {
                         if (result.isFailure()) {
-                            new ErrorDialog(R.string.error_cannot_connect)
-                                    .show(getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_cannot_connect);
                             return;
                         }
 

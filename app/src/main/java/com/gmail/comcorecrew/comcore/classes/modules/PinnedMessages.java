@@ -181,7 +181,7 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public void afterCreate() {
-        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), chatId, result -> {
+        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), 0, chatId, result -> {
             if (result.isFailure()) {
                 throw new RuntimeException("Critical PinnedMessages initialization error!");
             }

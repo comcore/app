@@ -141,73 +141,66 @@ public class ViewMembersDialog extends DialogFragment {
 
                 if (flag == 1) {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.OWNER, result -> {
-                        if (result.isSuccess()) {
-
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.owner_color);
-
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
-                        else {
-                            new ErrorDialog(R.string.error_set_role)
-                                    .show(getParentFragmentManager(), null);
-                        }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.owner_color);
                     });
 
                 }
                 else if (flag == 2) {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.MODERATOR, result -> {
-                        if (result.isSuccess()) {
-
-
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
-                        else {
-                            new ErrorDialog(R.string.error_set_role)
-                                    .show(getParentFragmentManager(), null);
-                        }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.view_member_tag).setBackgroundColor(R.color.moderator_color);
                     });
                 }
                 else if (flag == 3) {
                     ServerConnector.setRole(currentGroup, currentUser.getID(), GroupRole.USER, result -> {
-                        if (result.isSuccess()) {
-
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                        } else {
-                            new ErrorDialog(R.string.error_set_role)
-                                    .show(getParentFragmentManager(), null);
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
                     });
                 }
                 else if (flag == 4) {
                     ServerConnector.kick(currentGroup, currentUser.getID(), result -> {
-                        if (result.isSuccess()) {
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
-                        } else {
-                            new ErrorDialog(R.string.error_cannot_kick)
-                                    .show(getParentFragmentManager(), null);
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
                     });
                 } else if (flag == 5) {
                     ServerConnector.setMuted(currentGroup, currentUser.getID(), true, result -> {
-                        if (result.isSuccess()) {
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
-                        } else {
-                            new ErrorDialog(R.string.error_cannot_mute)
-                                    .show(getParentFragmentManager(), null);
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
                     });
                 } else if (flag == 6) {
                     ServerConnector.setMuted(currentGroup, currentUser.getID(), false, result -> {
-                        if (result.isSuccess()) {
-                            view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
-                        } else {
-                            new ErrorDialog(R.string.error_cannot_unmute)
-                                    .show(getParentFragmentManager(), null);
+                        if (result.isFailure()) {
+                            ErrorDialog.show(result.errorMessage);
+                            return;
                         }
+
+                        view.findViewById(R.id.view_member_tag).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.view_member_tag).setBackgroundColor(Color.RED);
                     });
                 }
             }

@@ -10,6 +10,7 @@ import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -71,8 +72,10 @@ public class Calendar extends Module {
         if (index != -1) {
             ServerConnector.approveEvent(eventID, true, result -> {
                 if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
                     return;
                 }
+
                 events.get(index).setApproved(true);
                 toCache();
             });
@@ -84,8 +87,10 @@ public class Calendar extends Module {
         if (index != -1) {
             ServerConnector.approveEvent(eventID, false, result -> {
                 if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
                     return;
                 }
+
                 events.remove(index);
                 toCache();
             });
@@ -95,6 +100,7 @@ public class Calendar extends Module {
     public void sendEvent(String description, long start, long end) {
         ServerConnector.addEvent((CalendarID) getId(), description, start, end, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
 
@@ -118,6 +124,7 @@ public class Calendar extends Module {
     public void deleteEvent(EventID eventID) {
         ServerConnector.deleteEvent(eventID, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
 

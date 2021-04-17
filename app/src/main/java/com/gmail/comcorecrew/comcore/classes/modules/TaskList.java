@@ -5,6 +5,7 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -86,8 +87,9 @@ public class TaskList extends Module {
         int index = getTaskIndex(taskID);
         if (index != -1) {
             boolean completed = !tasks.get(index).isCompleted();
-            ServerConnector.updateTask(taskID, completed ? TaskStatus.COMPLETED : TaskStatus.UNASSIGNED, result -> {
+            ServerConnector.updateTaskStatus(taskID, completed ? TaskStatus.COMPLETED : TaskStatus.UNASSIGNED, result -> {
                 if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
                     return;
                 }
 
@@ -101,11 +103,13 @@ public class TaskList extends Module {
      * Creates a new task with a given description and sends it to the server,
      * object, and cache.
      *
+     * @param deadline    the deadline to set for the task (or 0 for no deadline)
      * @param description description of the task
      */
-    public void sendTask(String description) {
-        ServerConnector.addTask((TaskListID) getId(), description, result -> {
+    public void sendTask(long deadline, String description) {
+        ServerConnector.addTask((TaskListID) getId(), deadline, description, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
 
@@ -122,6 +126,11 @@ public class TaskList extends Module {
         int index = getTaskIndex(taskID);
         if (index != -1) {
             ServerConnector.deleteTask(taskID, result -> {
+                if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
+                    return;
+                }
+
                 tasks.remove(index);
                 toCache();
             });

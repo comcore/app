@@ -58,8 +58,7 @@ public class LoginFragment extends Fragment {
             String pass = passwordView.getText().toString();
 
             if (email.isEmpty()) {
-                new ErrorDialog(R.string.error_missing_data)
-                        .show(getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_missing_data);
                 return;
             }
 
@@ -67,8 +66,7 @@ public class LoginFragment extends Fragment {
             passwordView.setText("");
             ServerConnector.login(email, pass, result -> {
                 if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_cannot_connect);
                     return;
                 }
 
@@ -86,8 +84,7 @@ public class LoginFragment extends Fragment {
                         ).show(getParentFragmentManager(), null);
                         break;
                     case DOES_NOT_EXIST:
-                        new ErrorDialog(R.string.error_does_not_exist)
-                                .show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_does_not_exist);
                         break;
                     case INVALID_PASSWORD:
                         // Show a dialog with an option to reset the password

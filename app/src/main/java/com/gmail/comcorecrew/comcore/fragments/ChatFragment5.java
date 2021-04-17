@@ -23,10 +23,10 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
-import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -189,8 +189,7 @@ public class ChatFragment5 extends Fragment {
         ChatID chatID = (ChatID) messaging.getId();
         ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
-                new StringErrorDialog(result.errorMessage)
-                        .show(getParentFragmentManager(), null);
+                ErrorDialog.show(result.errorMessage);
             }
             messaging.onReceiveMessage(result.data);
             refresh();
@@ -208,8 +207,7 @@ public class ChatFragment5 extends Fragment {
             }
             ServerConnector.updateMessage(messageEntry1.id, messageToBeSent.getText().toString(), result -> {
                 if (result.isFailure()) {
-                    new StringErrorDialog(result.errorMessage)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(result.errorMessage);
                 } else {
                     messaging.onMessageUpdated(result.data);
                     refresh();
@@ -221,8 +219,7 @@ public class ChatFragment5 extends Fragment {
         } else {
             ServerConnector.updateMessage(messageEntry1.id, null, result -> {
                 if (result.isFailure()) {
-                    new StringErrorDialog(result.errorMessage)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(result.errorMessage);
                 } else {
                     messaging.onMessageUpdated(result.data);
                     refresh();

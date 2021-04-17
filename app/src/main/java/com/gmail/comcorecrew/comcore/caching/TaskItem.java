@@ -78,7 +78,10 @@ public class TaskItem implements Cacheable {
     public TaskEntry toEntry(TaskListID listID) {
         TaskID taskID = new TaskID(listID, taskid);
 
-        return new TaskEntry(taskID, UserStorage.getUser(userId).getID(), timestamp, data,
+        // TODO cache the deadline (and in CustomItem)
+        long deadline = 0;
+
+        return new TaskEntry(taskID, UserStorage.getUser(userId).getID(), timestamp, deadline, data,
                 isCompleted() ? UserStorage.getUser(completerId).getID() : null,
                 assignedId >= 0 ? UserStorage.getUser(assignedId).getID() : null);
     }

@@ -121,7 +121,7 @@ public class ViewTasksDialog extends DialogFragment {
                      * allowing them to un-complete a task **/
                     if (currentTask.isCompleted()) {
                         if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
-                            new ErrorDialog(R.string.error_cannot_uncomplete).show(getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_cannot_uncomplete);
                         }
                         else {
                             currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
@@ -133,11 +133,11 @@ public class ViewTasksDialog extends DialogFragment {
                 }
                 else if (flag == 2) {
                     if (currentTask.isCompleted()) {
-                        new ErrorDialog(R.string.error_already_complete).show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_already_complete);
                     }
                     /** TODO display an error message if the task is already in progress. **/
                     else if (false) {
-                        new ErrorDialog(R.string.error_already_in_progress).show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_already_in_progress);
                     }
                     else {
                         /** TODO the clicked task should be marked as "in progress" **/

@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
         // Get the application context
         Context context = getBaseContext();
 
+        // Set the ErrorDialog's fragment manager
+        ErrorDialog.fragmentManager = getSupportFragmentManager();
+
         try {
             AppData.preInit(context);
         } catch (IOException e) {
@@ -47,17 +50,14 @@ public class MainActivity extends AppCompatActivity {
         if (appLinkData != null) {
             ServerConnector.checkInviteLink(appLinkData, result -> {
                 if (result.isFailure()) {
-                    System.out.println(result.errorMessage);
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getSupportFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_cannot_connect);
                     return;
                 }
 
                 // Check if the link is invalid
                 InviteLinkEntry inviteLink = result.data;
                 if (inviteLink == null) {
-                    new ErrorDialog(R.string.error_link_invalid)
-                            .show(getSupportFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_link_invalid);
                     return;
                 }
 

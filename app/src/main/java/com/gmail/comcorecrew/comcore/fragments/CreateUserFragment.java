@@ -60,16 +60,14 @@ public class CreateUserFragment extends Fragment {
             String pass = passwordView.getText().toString();
 
             if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-                new ErrorDialog(R.string.error_missing_data)
-                        .show(getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_missing_data);
                 return;
             }
 
             // Start creating an account with the server
             ServerConnector.createAccount(name, email, pass, result -> {
                 if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_cannot_connect);
                     return;
                 }
 
@@ -80,8 +78,7 @@ public class CreateUserFragment extends Fragment {
                             R.id.action_createUserFragment_to_mainFragment
                     ).show(getParentFragmentManager(), null);
                 } else {
-                    new ErrorDialog(R.string.error_already_exists)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_already_exists);
                 }
             });
         });

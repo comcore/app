@@ -34,8 +34,7 @@ public class CreateLinkDialog extends DialogFragment {
     private void finishLink(long expireTimestamp) {
         ServerConnector.createInviteLink(group, expireTimestamp, result -> {
             if (result.isFailure()) {
-                new ErrorDialog(R.string.error_cannot_connect)
-                        .show(fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_cannot_connect);
                 return;
             }
 
@@ -49,8 +48,7 @@ public class CreateLinkDialog extends DialogFragment {
             clipboard.setPrimaryClip(ClipData.newPlainText(null, link));
 
             // Show the link in a dialog
-            new StringErrorDialog("Link copied to clipboard:\n" + link)
-                    .show(fragment.getParentFragmentManager(), null);
+            ErrorDialog.show("Link copied to clipboard:\n" + link);
         });
     }
 
@@ -94,8 +92,7 @@ public class CreateLinkDialog extends DialogFragment {
             // Make sure the date is not in the past
             long expireTimestamp = calendar.getTimeInMillis();
             if (expireTimestamp + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
-                new ErrorDialog(R.string.error_expire_past)
-                        .show(parent.fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_expire_past);
                 return;
             }
 
@@ -133,8 +130,7 @@ public class CreateLinkDialog extends DialogFragment {
             // Make sure the timestamp is not in the past
             long expireTimestamp = calendar.getTimeInMillis();
             if (expireTimestamp < System.currentTimeMillis()) {
-                new ErrorDialog(R.string.error_expire_past)
-                        .show(parent.fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_expire_past);
                 return;
             }
 

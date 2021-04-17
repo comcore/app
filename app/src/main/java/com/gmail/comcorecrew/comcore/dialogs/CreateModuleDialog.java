@@ -65,8 +65,7 @@ public class CreateModuleDialog extends DialogFragment {
 
                 ServerConnector.createChat(groupID, moduleName.getText().toString(), result -> {
                     if (result.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
 
@@ -78,8 +77,7 @@ public class CreateModuleDialog extends DialogFragment {
                 /** Try to create a tasklist module **/
                 ServerConnector.createTaskList(groupID, moduleName.getText().toString(), result -> {
                     if (result.isFailure()) {
-                        new ErrorDialog(R.string.error_cannot_connect)
-                                .show(getParentFragmentManager(), null);
+                        ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
 
@@ -113,8 +111,7 @@ public class CreateModuleDialog extends DialogFragment {
             }
             else {
                 /** Throw an error if for some reason no radio button is checked **/
-                new ErrorDialog(R.string.error_module_not_selected)
-                        .show(getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_module_not_selected);
             }
 
         });

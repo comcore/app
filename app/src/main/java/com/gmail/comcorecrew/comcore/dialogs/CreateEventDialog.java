@@ -48,8 +48,7 @@ public class CreateEventDialog extends DialogFragment {
         long endTimestamp = startTimestamp;
         ServerConnector.addEvent(calendarID, description, startTimestamp, endTimestamp, result -> {
             if (result.isFailure()) {
-                new ErrorDialog(R.string.error_cannot_connect)
-                        .show(fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_cannot_connect);
                 return;
             }
 
@@ -109,8 +108,7 @@ public class CreateEventDialog extends DialogFragment {
 
             long expireTimestamp = calendar.getTimeInMillis();
             if (expireTimestamp + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
-                new ErrorDialog(R.string.error_expire_past)
-                        .show(parent.fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_event_past);
                 return;
             }
 
@@ -146,8 +144,7 @@ public class CreateEventDialog extends DialogFragment {
 
             long eventTimestamp = calendar.getTimeInMillis();
             if (eventTimestamp < System.currentTimeMillis()) {
-                new ErrorDialog(R.string.error_expire_past)
-                        .show(parent.fragment.getParentFragmentManager(), null);
+                ErrorDialog.show(R.string.error_event_past);
                 return;
             }
 
