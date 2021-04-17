@@ -92,6 +92,9 @@ public class GroupStorage {
                     group = new Group(id);
                     newGroups.add(group);
                     ids.put(id, group);
+
+                    // Reset the last refresh time so that the new group's info is always retrieved
+                    lastRefresh = 0;
                 }
             } else {
                 ids = existingIds;
