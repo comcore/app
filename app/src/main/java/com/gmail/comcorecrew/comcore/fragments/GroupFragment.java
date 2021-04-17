@@ -108,18 +108,11 @@ public class GroupFragment extends Fragment {
         if (currentGroup == null) {
             return;
         }
-        if (currentGroup.getGroupRole() == GroupRole.OWNER) {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, true);
-        }
-        else if (currentGroup.getGroupRole() == GroupRole.MODERATOR) {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
-        }
-        else {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, false);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
-        }
+
+        GroupRole role = currentGroup.getGroupRole();
+        menu.setGroupVisible(R.id.menu_group_owner_actions, role == GroupRole.OWNER);
+        menu.setGroupVisible(R.id.menu_group_moderator_actions, role != GroupRole.USER);
+        menu.setGroupVisible(R.id.menu_not_direct, !currentGroup.isDirect());
     }
 
     /**

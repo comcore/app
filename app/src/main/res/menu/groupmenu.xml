@@ -3,31 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- This menu item is only showed to group moderators and the owner -->
     <group android:id="@+id/menu_group_moderator_actions">
-        <item
-            android:id="@+id/invite_member"
-            android:title="@string/invite_member"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/create_invite_link"
-            android:title="@string/create_invite_link" />
-        <item
-            android:id="@+id/kick_member"
-            android:title="@string/kick_member"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/add_moderator"
-            android:title="@string/add_moderator"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/remove_moderator"
-            android:title="@string/remove_moderator"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/mute_member"
-            android:title="@string/mute_member" />
-        <item
-            android:id="@+id/unmute_member"
-            android:title="@string/unmute_member" />
+        <group android:id="@+id/menu_not_direct" >
+            <item
+                android:id="@+id/invite_member"
+                android:title="@string/invite_member"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/create_invite_link"
+                android:title="@string/create_invite_link" />
+            <item
+                android:id="@+id/kick_member"
+                android:title="@string/kick_member"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/add_moderator"
+                android:title="@string/add_moderator"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/remove_moderator"
+                android:title="@string/remove_moderator"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/mute_member"
+                android:title="@string/mute_member" />
+            <item
+                android:id="@+id/unmute_member"
+                android:title="@string/unmute_member" />
+        </group>
         <item
             android:id="@+id/create_module"
             android:title="@string/create_module"
