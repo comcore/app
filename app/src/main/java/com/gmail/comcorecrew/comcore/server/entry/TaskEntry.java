@@ -1,5 +1,8 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
+import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
@@ -131,6 +134,28 @@ public final class TaskEntry {
             return TaskStatus.IN_PROGRESS;
         } else {
             return TaskStatus.UNASSIGNED;
+        }
+    }
+
+    /**
+     * Get a description string for the status of the task which can be displayed with the task.
+     *
+     * @return the description of the status of the task
+     */
+    public String getStatusDescription() {
+        switch (getStatus()) {
+            case IN_PROGRESS: {
+                User user = UserStorage.getUser(assigned);
+                String name = user == null ? "???" : user.getName();
+                return "Assigned to " + name;
+            }
+            case COMPLETED: {
+                User user = UserStorage.getUser(completer);
+                String name = user == null ? "???" : user.getName();
+                return "Completed by " + name;
+            }
+            default:
+                return "Not completed";
         }
     }
 
