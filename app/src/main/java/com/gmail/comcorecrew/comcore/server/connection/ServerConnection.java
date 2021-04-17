@@ -250,6 +250,12 @@ public final class ServerConnection implements Connection {
             return;
         }
 
+        // If the message is a ping and there isn't anything queued, then just call it directly
+        if (task.message.isPing() && readerThread.isEmpty()) {
+            task.handleResult(ServerResult.success(new JsonObject()));
+            return;
+        }
+
         if (!start()) {
             task.handleResult(ServerResult.failure("cannot connect to server"));
             return;

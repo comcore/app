@@ -121,6 +121,15 @@ public final class ServerConnector {
     }
 
     /**
+     * Do something after every other action has finished.
+     *
+     * @param callback what to do next
+     */
+    public static void then(Runnable callback) {
+        getConnection().send(new ServerMsg("PING"), result -> callback.run(), response -> null);
+    }
+
+    /**
      * Log out if logged in. It will be necessary to call login() again.
      */
     public static void logout() {
@@ -1105,10 +1114,11 @@ public final class ServerConnector {
             throw new IllegalArgumentException(field + " cannot be null");
         }
 
-//        if (ids.isEmpty()) {
-//            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
-//            return;
-//        }
+        if (ids.isEmpty()) {
+            then(() -> handler.handleResult(
+                    ServerResult.success((T[]) Array.newInstance(clazz, 0))));
+            return;
+        }
 
         JsonArray array = new JsonArray();
         for (ItemID id : ids) {

@@ -1,7 +1,5 @@
 package com.gmail.comcorecrew.comcore.caching;
 
-import android.util.Log;
-
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
@@ -34,6 +32,7 @@ import java.util.HashSet;
  */
 public class GroupStorage {
     private static boolean isRefreshing = false;
+    private static long lastRefresh = 0;
 
     private GroupStorage() {}
 
@@ -50,6 +49,9 @@ public class GroupStorage {
 
         // Record that a refresh is in progress
         isRefreshing = true;
+
+        // Remember when the refresh started
+        long refreshStart = System.currentTimeMillis();
 
         // Get the group associated with each ID
         HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.getGroupSize());
@@ -80,7 +82,7 @@ public class GroupStorage {
                     // Check for an existing group object to reuse
                     Group group = existingIds.get(id);
                     if (group != null) {
-                        //If group is still active, removes from old group.
+                        // If group is still active, removes from old group.
                         oldGroups.set(AppData.getPosition(id), null);
                         ids.put(id, group);
                         continue;
@@ -97,12 +99,15 @@ public class GroupStorage {
             }
 
             // Update the group info of any existing groups
-            ServerConnector.getGroupInfo(ids.keySet(), 0, resultGroups -> {
+            ServerConnector.getGroupInfo(ids.keySet(), lastRefresh, resultGroups -> {
                 if (resultGroups.isSuccess()) {
-                    // Iterate over every group and refresh their user information as well
+                    // Update the refresh time for the next refresh
+                    lastRefresh = refreshStart;
+
+                    // Iterate over every updated group and refresh their user information as well
                     HashSet<UserID> alreadyRefreshed = new HashSet<>();
                     for (GroupInfo info : resultGroups.data) {
-                        Group group = ids.get(info.id);
+                        Group group = ids.remove(info.id);
                         if (group == null) {
                             continue;
                         }
@@ -113,9 +118,13 @@ public class GroupStorage {
                         group.setMuted(info.muted);
                         group.setRequireApproval(info.requireApproval);
 
-                        // Refresh the group's users, then refresh the modules
                         group.refreshUsers(alreadyRefreshed, () ->
-                            group.refreshModules(null));
+                                group.refreshModules(null));
+                    }
+
+                    // Refresh only the modules of every remaining group
+                    for (Group group : ids.values()) {
+                        group.refreshModules(null);
                     }
                 }
 
@@ -130,9 +139,18 @@ public class GroupStorage {
                     }
                 }
 
-                // Run the callback after setting all of the info
                 if (callback != null) {
-                    callback.run();
+                    // Wait for the threads to finish getting the users for each group
+                    ServerConnector.then(() -> {
+                        // Then wait for the threads to finish getting the user info for each user
+                        ServerConnector.then(() -> {
+                            // Re-sort the group list in case the order changed
+                            AppData.normalizeGroupList();
+
+                            // Call the callback now that everything is refreshed
+                            callback.run();
+                        });
+                    });
                 }
 
                 // Mark the refresh as completed
