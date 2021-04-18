@@ -101,6 +101,27 @@ public class TaskList extends Module {
     }
 
     /**
+     * Toggles the assigned state of the task with the given id.
+     *
+     * @param taskID id of the task to toggle
+     */
+    public void toggleAssigned(TaskID taskID) {
+        int index = getTaskIndex(taskID);
+        if (index != -1) {
+            boolean assigned = !tasks.get(index).isAssigned();
+            ServerConnector.updateTaskStatus(taskID, assigned ? TaskStatus.IN_PROGRESS : TaskStatus.UNASSIGNED, result -> {
+                if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
+                    return;
+                }
+
+                tasks.set(index, new TaskItem(result.data));
+                toCache();
+            });
+        }
+    }
+
+    /**
      * Creates a new task with a given description and sends it to the server,
      * object, and cache.
      *

@@ -126,9 +126,7 @@ public class CreateGroupFragment extends Fragment {
                         ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
-
-                    //TextView text = (TextView) view.findViewById(R.id.label_create_group);
-                    //text.setText(result.data.toString());
+                    /** Automatically creates a chat module **/
                     ServerConnector.createChat(result.data, groupName, result1 -> {
                         if (result1.isFailure()) {
                             ErrorDialog.show(R.string.error_cannot_connect);
@@ -140,9 +138,19 @@ public class CreateGroupFragment extends Fragment {
             }
             /** If the new group is a sub group **/
             else {
-                /** TODO Create sub group using list of memberIDs
-                 * Note that the members ArrayList does not include the current user. The person
-                 * creating the group should always be added to the new group **/
+                ServerConnector.createSubGroup(parentGroupID, groupName, members, result -> {
+                    if (result.isFailure()) {
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                        return;
+                    }
+                    /** Automatically creates a chat module **/
+                    ServerConnector.createChat(result.data, groupName, result1 -> {
+                        if (result1.isFailure()) {
+                            ErrorDialog.show(R.string.error_cannot_connect);
+                        }
+                    });
+                    NavHostFragment.findNavController(this).popBackStack();
+                });
             }
 
         });

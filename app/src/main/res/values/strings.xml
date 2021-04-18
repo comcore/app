@@ -89,8 +89,9 @@
     <string name="error_module_not_selected">No module type selected.</string>
     <string name="error_unknown_module_type">An unknown type of module was received.</string>
     <string name="error_already_complete">The task has already been completed.</string>
-    <string name="error_already_in_progress">The task is already in progress.</string>
+    <string name="error_already_in_progress">The task is already assigned.</string>
     <string name="error_cannot_uncomplete">You do not have the permission to remove the completion status.</string>
+    <string name="error_incorrect_format">The input format is incorrect.</string>
 
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
@@ -134,9 +135,12 @@
     <string name="completed">Completed!</string>
     <string name="delete_task">Delete A Task</string>
     <string name="complete_task">Set (or Unset) A Task As Completed</string>
-    <string name="in_progress_task">Set (or Unset) A Task As In Progress</string>
+    <string name="in_progress_task">Set (or Unset) A Task As Assigned</string>
     <string name="complete_task_short">Complete A Task</string>
-    <string name="in_progress_task_short">Work On A Task</string>
+    <string name="in_progress_task_short">Claim A Task</string>
+    <string name="no_deadline">No Deadline</string>
+    <string name="task_deadline_date_label">Deadline Date (MM/DD/YYYY)</string>
+    <string name="task_deadline_time_label">Deadline  (HH:MM)</string>
 
     <!-- Create Module Dialog -->
     <string name="create_module">Create Module</string>
@@ -172,6 +176,16 @@
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
+
+    <!-- Calendar -->
+    <string name="view_pending_events">View Pending Events</string>
+    <string name="view_all_events">View All Events</string>
+    <string name="create_event_start_date">Start Date (MM/DD/YYYY)</string>
+    <string name="create_event_end_date">End Date (MM/DD/YYYY)</string>
+    <string name="create_event_start_time">Start Time (HH:MM)</string>
+    <string name="create_event_end_time">End Time (HH:MM)</string>
+    <string name="delete_events">Remove Event</string>
+
 
 
 

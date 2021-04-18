@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -161,9 +162,19 @@ public class TaskListFragment extends Fragment {
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
             TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
+            TextView deadlineText = viewHolder.itemView.findViewById(R.id.task_deadline);
+
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
             completedText.setText(task.getStatusDescription());
+
+            if (task.hasDeadline()) {
+                String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();
+                deadlineText.setText(parsedDate);
+            }
+            else {
+                deadlineText.setText(R.string.no_deadline);
+            }
         }
 
         @Override

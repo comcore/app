@@ -23,37 +23,23 @@ import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.id.CalendarID;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
-import java.util.Calendar;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class CreateEventDialog extends DialogFragment {
     private final Fragment fragment;
-    private final CalendarID calendarID;
+    private final Calendar calendar;
 
-    public CreateEventDialog(Fragment fragment, CalendarID calendarID) {
+    public CreateEventDialog(Fragment fragment, Calendar calendar) {
         this.fragment = fragment;
-        this.calendarID = calendarID;
-    }
-
-    private void createEvent(long startTimestamp) {
-
-        EditText createEventDesc = getView().findViewById(R.id.create_event_desc);
-        String description = createEventDesc.getText().toString();
-
-        // TODO: also let the user pick an end time for the event
-        long endTimestamp = startTimestamp;
-        ServerConnector.addEvent(calendarID, description, startTimestamp, endTimestamp, result -> {
-            if (result.isFailure()) {
-                ErrorDialog.show(R.string.error_cannot_connect);
-                return;
-            }
-
-            this.dismiss();
-        });
+        this.calendar = calendar;
     }
 
     @Override
@@ -67,6 +53,13 @@ public class CreateEventDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        EditText desc = view.findViewById(R.id.create_event_desc);
+        EditText startDate = view.findViewById(R.id.editStartDate);
+        EditText endDate = view.findViewById(R.id.editEndDate);
+        EditText startTime = view.findViewById(R.id.editStartTime);
+        EditText endTime = view.findViewById(R.id.editEndTime);
+
+
         /**
          * If the "cancel" button is clicked, close the dialog box
          */
@@ -74,82 +67,29 @@ public class CreateEventDialog extends DialogFragment {
             this.dismiss();
         });
 
-        /**
-         * If the "pick a date" button is clicked, show the PickDateDialog
-         */
-        view.findViewById(R.id.pick_date_button).setOnClickListener(clickedView -> {
-            new PickDateDialog(this).show(fragment.getParentFragmentManager(), null);
+        view.findViewById(R.id.create_event_submit).setOnClickListener(clickedView -> {
+
+            String startFull = startDate.getText().toString() + "-" + startTime.getText().toString();
+            String endFull = endDate.getText().toString() + "-" + endTime.getText().toString();
+
+
+            java.util.Calendar calStart = java.util.Calendar.getInstance();
+            java.util.Calendar calEnd = java.util.Calendar.getInstance();
+
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy-HH:mm");
+
+            try {
+                calStart.setTime(df.parse(startFull, new ParsePosition(0)));
+                calEnd.setTime(df.parse(endFull, new ParsePosition(0)));
+            }
+            catch (NullPointerException e) {
+                ErrorDialog.show(R.string.error_incorrect_format);
+                this.dismiss();
+            }
+
+            calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
+            this.dismiss();
         });
-    }
 
-    public static class PickDateDialog extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        private final CreateEventDialog parent;
-
-        public PickDateDialog(CreateEventDialog parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.clear();
-            calendar.set(year, month, day);
-
-            long expireTimestamp = calendar.getTimeInMillis();
-            if (expireTimestamp + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
-                ErrorDialog.show(R.string.error_event_past);
-                return;
-            }
-
-            new PickTimeDialog(parent, calendar)
-                    .show(parent.fragment.getParentFragmentManager(), null);
-        }
-    }
-
-    public static class PickTimeDialog extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
-
-        private final CreateEventDialog parent;
-        private final Calendar calendar;
-
-        public PickTimeDialog(CreateEventDialog parent, Calendar calendar) {
-            this.parent = parent;
-            this.calendar = calendar;
-        }
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            calendar.set(Calendar.MINUTE, minute);
-
-            long eventTimestamp = calendar.getTimeInMillis();
-            if (eventTimestamp < System.currentTimeMillis()) {
-                ErrorDialog.show(R.string.error_event_past);
-                return;
-            }
-
-            /** Create the event **/
-            parent.createEvent(calendar.getTimeInMillis());
-        }
     }
 }
