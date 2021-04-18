@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -153,9 +154,18 @@ public class ViewTasksDialog extends DialogFragment {
 
             TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
+            TextView deadlineText = viewHolder.itemView.findViewById(R.id.task_deadline);
+
             TaskEntry task = currentTaskList.getEntry(position);
             dataText.setText(task.description);
             completedText.setText(task.getStatusDescription());
+            if (task.hasDeadline()) {
+                String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();
+                deadlineText.setText(parsedDate);
+            }
+            else {
+                deadlineText.setText(R.string.no_deadline);
+            }
             viewHolder.setCurrentTask(task);
         }
 
