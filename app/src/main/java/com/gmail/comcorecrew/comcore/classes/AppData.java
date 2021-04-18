@@ -412,7 +412,7 @@ public class AppData {
             if (group != null) {
                 for (Module module : group.getModules()) {
                     if (module instanceof Calendar) {
-                        for (EventEntry entry : ((Calendar) module).getEntries()) {
+                        for (EventEntry entry : ((Calendar) module).getApproved()) {
                             if (entry.start >= now && entry.end <= then) {
                                 upcoming.add(entry);
                             }

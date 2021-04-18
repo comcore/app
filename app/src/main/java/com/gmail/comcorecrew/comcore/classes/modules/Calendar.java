@@ -1,34 +1,21 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.app.usage.UsageEvents;
-import android.icu.text.DateFormat;
-
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.EventItem;
-import com.gmail.comcorecrew.comcore.caching.TaskItem;
-import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
-import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
+import com.gmail.comcorecrew.comcore.notifications.ScheduledList;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.EventID;
-import com.gmail.comcorecrew.comcore.server.id.TaskID;
-import com.gmail.comcorecrew.comcore.server.id.TaskListID;
-import com.gmail.comcorecrew.comcore.server.id.UserID;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 /*
  * UNDER CONSTRUCTION
@@ -37,41 +24,19 @@ import java.util.Date;
  */
 public class Calendar extends Module {
 
-    private transient ArrayList<EventItem> events;
+    private transient ScheduledList<EventID, EventEntry> approved;
+    private transient ArrayList<EventEntry> unapproved;
 
     public Calendar(String name, CalendarID calendarID, Group group) {
         super(name, calendarID, group, Mdid.CCLD);
-        events = new ArrayList<>();
+        approved = new ScheduledList<>();
+        unapproved = new ArrayList<>();
     }
 
     public Calendar(String name, Group group) {
         super(name, group, Mdid.CCLD);
-        events = new ArrayList<>();
-    }
-
-    public ArrayList<EventItem> getEvents() {
-        return events;
-    }
-
-    public void setEvents(ArrayList<EventItem> events) {
-        this.events = events;
-    }
-
-    public int getEventIndex(EventID eventID) {
-        for (int i = 0; i < events.size(); i++) {
-            if (eventID.id == events.get(i).getEventId()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public EventEntry getEventEntry(EventID eventID) {
-        int index = getEventIndex(eventID);
-        if (index == -1) {
-            return null;
-        }
-        return events.get(index).toEntry((CalendarID) getId());
+        approved = new ScheduledList<>();
+        unapproved = new ArrayList<>();
     }
 
     public void approve(EventID eventID) {
@@ -103,22 +68,8 @@ public class Calendar extends Module {
                 return;
             }
 
-            addEvent(result.data);
+            onEventAdded(result.data);
         });
-    }
-
-    public void addEvent(EventEntry event) {
-        events.add(new EventItem(event));
-        NotificationScheduler.add(event);
-        toCache();
-    }
-
-    public void addEvents(ArrayList<EventEntry> events) {
-        for (EventEntry event : events) {
-            this.events.add(new EventItem(event));
-            NotificationScheduler.add(event);
-        }
-        toCache();
     }
 
     public void deleteEvent(EventID eventID) {
@@ -128,45 +79,21 @@ public class Calendar extends Module {
                 return;
             }
 
-            events.remove(getEventIndex(eventID));
-            NotificationScheduler.remove(eventID);
-            toCache();
+            onEventDeleted(eventID);
         });
     }
 
-    public void modifyEvent(EventID eventID, long start, long end, String description) {
-        int index = getEventIndex(eventID);
-        EventItem event = events.get(index);
-        if (start < 0) {
-            start = event.getStart();
+    public List<EventEntry> getEntriesByDay(java.util.Calendar currentDay) {
+        if (currentDay == null) {
+            return getApproved();
         }
-        if (end < 0) {
-            end = event.getEnd();
-        }
-        if (description == null) {
-            description = event.getData();
-        }
-        deleteEvent(eventID);
-        sendEvent(description, start, end);
-    }
 
-    public ArrayList<EventEntry> getEntries() {
-        ArrayList<EventEntry> entries = new ArrayList<>();
-        for (EventItem event : events) {
-            if (event.isApproved()) {
-                entries.add(event.toEntry((CalendarID) getId()));
-            }
-        }
-        return entries;
-    }
-
-    public ArrayList<EventEntry> getEntriesByDay(java.util.Calendar currentDay) {
         ArrayList<EventEntry> eventList = new ArrayList<>();
 
         java.util.Calendar startDay = java.util.Calendar.getInstance();
 
-        for (int i = 0; i < getEntries().size(); i++) {
-            startDay.setTimeInMillis(getEntries().get(i).start);
+        for (int i = 0; i < getApproved().size(); i++) {
+            startDay.setTimeInMillis(approved.get(i).start);
 
             /** Currently gets entries based on their starting day
              * TODO match entries as long as the currentDay overlaps with its time range **/
@@ -174,20 +101,36 @@ public class Calendar extends Module {
                 currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
                 currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
 
-                eventList.add(getEntries().get(i));
+                eventList.add(approved.get(i));
             }
         }
         return eventList;
     }
 
-    public ArrayList<EventEntry> getRequests() {
-        ArrayList<EventEntry> entries = new ArrayList<>();
-        for (EventItem event : events) {
-            if (!event.isApproved()) {
-                entries.add(event.toEntry((CalendarID) getId()));
+    public List<EventEntry> getApproved() {
+        return approved.getEntries();
+    }
+
+    public List<EventEntry> getUnapproved() {
+        return unapproved;
+    }
+
+    private EventEntry removeUnapproved(EventID event) {
+        for (int i = 0, s = unapproved.size(); i < s; i++) {
+            EventEntry entry = unapproved.get(i);
+            if (entry.id.equals(event)) {
+                unapproved.remove(i);
+                return entry;
             }
         }
-        return entries;
+
+        return null;
+    }
+
+    @Override
+    public void didUpdate() {
+        super.didUpdate();
+        NotificationScheduler.store();
     }
 
     @Override
@@ -196,7 +139,13 @@ public class Calendar extends Module {
             return;
         }
 
-        addEvent(event);
+        if (event.approved) {
+            approved.add(event);
+        } else {
+            unapproved.add(event);
+        }
+
+        toCache();
     }
 
     @Override
@@ -205,15 +154,17 @@ public class Calendar extends Module {
             return;
         }
 
-        int index = getEventIndex(event);
-        if (index == -1) {
-            return;
+        EventEntry entry = removeUnapproved(event);
+        if (entry != null) {
+            approved.add(new EventEntry(
+                    entry.id,
+                    entry.creator,
+                    entry.description,
+                    entry.start,
+                    entry.end,
+                    true));
+            toCache();
         }
-
-        EventItem item = events.get(index);
-        item.setApproved(true);
-        NotificationScheduler.add(item.toEntry((CalendarID) getId()));
-        toCache();
     }
 
     @Override
@@ -222,37 +173,57 @@ public class Calendar extends Module {
             return;
         }
 
-        int index = getEventIndex(event);
-        if (index == -1) {
-            return;
+        if (!approved.remove(event)) {
+            if (removeUnapproved(event) == null) {
+                return;
+            }
         }
 
-        events.remove(index);
-        NotificationScheduler.remove(event);
         toCache();
     }
 
     @Override
     protected void readToCache() {
-        if (events.size() == 0) {
+        if (approved.isEmpty() && unapproved.isEmpty()) {
             return;
         }
 
-        Cacher.cacheData(new ArrayList<>(events), this);
+        ArrayList<Cacheable> items = new ArrayList<>();
+        for (EventEntry event : approved.getEntries()) {
+            items.add(new EventItem(event));
+        }
+        for (EventEntry event : unapproved) {
+            items.add(new EventItem(event));
+        }
+        Cacher.cacheData(items, this);
     }
 
     @Override
     protected void readFromCache() {
-        events = new ArrayList<>();
+        if (approved == null) {
+            approved = new ScheduledList<>();
+        }
+        if (unapproved == null) {
+            unapproved = new ArrayList<>();
+        }
+
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
         }
 
+        unapproved.clear();
+        ArrayList<EventEntry> entries = new ArrayList<>();
+        CalendarID calendar = (CalendarID) getId();
         for (char[] line : data) {
-            events.add(new EventItem(line));
+            EventEntry entry = new EventItem(line).toEntry(calendar);
+            if (entry.approved) {
+                entries.add(entry);
+            } else {
+                unapproved.add(entry);
+            }
         }
-        registerNotifications();
+        approved.setEntries(entries);
     }
 
     @Override
@@ -262,18 +233,17 @@ public class Calendar extends Module {
                 return;
             }
 
-            events.clear();
-            for (EventEntry eventEntry : result.data) {
-                events.add(new EventItem(eventEntry));
+            unapproved.clear();
+            ArrayList<EventEntry> approved = new ArrayList<>();
+            for (EventEntry entry : result.data) {
+                if (entry.approved) {
+                    approved.add(entry);
+                } else {
+                    unapproved.add(entry);
+                }
             }
-            registerNotifications();
+            this.approved.setEntries(approved);
             toCache();
         });
-    }
-
-    private void registerNotifications() {
-        for (EventItem event : events) {
-            NotificationScheduler.add(event.toEntry((CalendarID) getId()));
-        }
     }
 }

@@ -9,32 +9,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.caching.EventItem;
-import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
-import com.gmail.comcorecrew.comcore.fragments.MainFragment;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
-import com.gmail.comcorecrew.comcore.server.id.CalendarID;
-import com.gmail.comcorecrew.comcore.server.id.EventID;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 public class ViewEventsDialog extends DialogFragment {
 
     private CustomAdapter adapter;
-    private ArrayList<EventEntry> eventList = new ArrayList<>();
+    private List<EventEntry> eventList = new ArrayList<>();
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
 
@@ -55,12 +44,7 @@ public class ViewEventsDialog extends DialogFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
 
-        if (currentDate == null) {
-            eventList = currentCalendar.getEntries();
-        }
-        else {
-            eventList = currentCalendar.getEntriesByDay(currentDate);
-        }
+        eventList = currentCalendar.getEntriesByDay(currentDate);
 
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
