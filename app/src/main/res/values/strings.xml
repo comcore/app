@@ -171,6 +171,9 @@
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
 
+    <!-- Calendar -->
+    <string name="view_pending_events">View Pending Events</string>
+
 
 
 </resources>
