@@ -3,15 +3,8 @@ package com.gmail.comcorecrew.comcore.notifications;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 
-import androidx.core.app.NotificationCompat;
-
-import com.gmail.comcorecrew.comcore.abstracts.Module;
-import com.gmail.comcorecrew.comcore.caching.GroupStorage;
-import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
+import com.gmail.comcorecrew.comcore.server.entry.ModuleEntry;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleItemID;
 import com.google.gson.JsonObject;
@@ -64,59 +57,17 @@ public final class NotificationScheduler {
     }
 
     /**
-     * Schedule a notification for a task.
+     * Schedule a notification for an entry.
      *
-     * @param task the task to schedule a notification for
+     * @param entry the entry to schedule a notification for
      */
-    public static void add(TaskEntry task) {
-        if (!task.hasDeadline()) {
+    public static void add(ModuleEntry<?, ?> entry) {
+        ScheduledNotification notification = entry.getScheduledNotification();
+        if (notification == null) {
             return;
         }
 
-        long displayTime = task.deadline - REMINDER_TIME;
-        if (displayTime < System.currentTimeMillis()) {
-            return;
-        }
-
-        Module module = GroupStorage.getModule(task.id.module);
-        if (module == null || module.isMuted()) {
-            return;
-        }
-
-        addByKey(keyFor(task.id), new ScheduledNotification(
-                NotificationHandler.CHANNEL_TASK,
-                NotificationCompat.PRIORITY_HIGH,
-                displayTime,
-                module.getName(),
-                "Upcoming deadline: " + task.description));
-    }
-
-    /**
-     * Schedule a notification for an event.
-     *
-     * @param event the event to schedule a notification for
-     */
-    public static void add(EventEntry event) {
-        if (!event.approved) {
-            return;
-        }
-
-        long displayTime = event.start - REMINDER_TIME;
-        if (displayTime < System.currentTimeMillis()) {
-            return;
-        }
-
-        Module module = GroupStorage.getModule(event.id.module);
-        if (module == null || module.isMuted()) {
-            return;
-        }
-
-        addByKey(keyFor(event.id), new ScheduledNotification(
-                NotificationHandler.CHANNEL_EVENT,
-                NotificationCompat.PRIORITY_HIGH,
-                displayTime,
-                module.getName(),
-                "Upcoming event: " + event.description));
+        addByKey(keyFor(entry.id), notification);
     }
 
     /**
@@ -237,6 +188,8 @@ public final class NotificationScheduler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        write();
     }
 
     /**

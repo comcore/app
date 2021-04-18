@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.notifications.ScheduledNotification;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -12,12 +13,7 @@ import java.util.Objects;
 /**
  * Represents an entry of message data returned by the server.
  */
-public final class MessageEntry {
-    /**
-     * The message's identifier.
-     */
-    public final MessageID id;
-
+public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
     /**
      * The user that sent the message.
      */
@@ -43,9 +39,9 @@ public final class MessageEntry {
      * @param contents  the contents of the message (or empty)
      */
     public MessageEntry(MessageID id, UserID sender, long timestamp, String contents) {
-        if (id == null) {
-            throw new IllegalArgumentException("MessageID cannot be null");
-        } else if (sender == null) {
+        super(id);
+
+        if (sender == null) {
             throw new IllegalArgumentException("message sender cannot be null");
         } else if (timestamp < 1) {
             throw new IllegalArgumentException("message timestamp cannot be less than 1");
@@ -53,7 +49,6 @@ public final class MessageEntry {
             throw new IllegalArgumentException("message contents cannot be null");
         }
 
-        this.id = id;
         this.sender = sender;
         this.timestamp = timestamp;
         this.contents = contents;
@@ -73,6 +68,11 @@ public final class MessageEntry {
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
         return new MessageEntry(id, sender, timestamp, contents);
+    }
+
+    @Override
+    public ScheduledNotification getScheduledNotification() {
+        return null;
     }
 
     @Override
