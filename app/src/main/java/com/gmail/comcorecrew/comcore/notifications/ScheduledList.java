@@ -11,7 +11,7 @@ import java.util.List;
 public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I>> {
     private final ArrayList<T> items = new ArrayList<>();
 
-    public synchronized T get(int index) {
+    public T get(int index) {
         return items.get(index);
     }
 
@@ -25,7 +25,7 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         return -1;
     }
 
-    public synchronized T get(I id) {
+    public T get(I id) {
         int index = indexOf(id);
         if (index == -1) {
             return null;
@@ -34,16 +34,20 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         return items.get(index);
     }
 
-    public synchronized int size() {
+    public int size() {
         return items.size();
     }
 
-    public synchronized void add(T item) {
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    public void add(T item) {
         NotificationScheduler.add(item);
         items.add(item);
     }
 
-    public synchronized void set(int index, T item) {
+    public void set(int index, T item) {
         T old = items.set(index, item);
         if (!old.equals(item)) {
             NotificationScheduler.remove(old.id);
@@ -51,7 +55,7 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         }
     }
 
-    public synchronized void update(T item) {
+    public void update(T item) {
         int index = indexOf(item.id);
         if (index == -1) {
             add(item);
@@ -61,11 +65,11 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         set(index, item);
     }
 
-    public synchronized void remove(int index) {
+    public void remove(int index) {
         NotificationScheduler.remove(items.remove(index).id);
     }
 
-    public synchronized boolean remove(I id) {
+    public boolean remove(I id) {
         int index = indexOf(id);
         if (index == -1) {
             return false;
@@ -75,15 +79,7 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         return true;
     }
 
-    public synchronized void clear() {
-        for (T item : items) {
-            NotificationScheduler.remove(item.id);
-        }
-
-        items.clear();
-    }
-
-    public synchronized void setEntries(List<T> items) {
+    public void setEntries(List<T> items) {
         HashSet<ModuleItemID<?>> toDelete = new HashSet<>();
         for (T item : this.items) {
             toDelete.add(item.id);
@@ -102,7 +98,7 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
         this.items.addAll(items);
     }
 
-    public synchronized List<T> getEntries() {
+    public List<T> getEntries() {
         return Collections.unmodifiableList(items);
     }
 }

@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.notifications.ScheduledList;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
@@ -15,6 +16,7 @@ import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TaskList extends Module {
 
@@ -91,6 +93,12 @@ public class TaskList extends Module {
     }
 
     @Override
+    public void didUpdate() {
+        super.didUpdate();
+        NotificationScheduler.store();
+    }
+
+    @Override
     public void onTaskAdded(TaskEntry task) {
         if (!task.id.module.equals(getId())) {
             return;
@@ -123,7 +131,7 @@ public class TaskList extends Module {
 
     @Override
     protected void readToCache() {
-        if (tasks.size() == 0) {
+        if (tasks.isEmpty()) {
             return;
         }
 
@@ -136,16 +144,21 @@ public class TaskList extends Module {
 
     @Override
     protected void readFromCache() {
-        tasks = new ScheduledList<>();
+        if (tasks == null) {
+            tasks = new ScheduledList<>();
+        }
+
         char[][] data = Cacher.uncacheData(this);
         if (data == null) {
             return;
         }
 
+        ArrayList<TaskEntry> entries = new ArrayList<>();
         TaskListID taskList = (TaskListID) getId();
         for (char[] line : data) {
-            tasks.add(new TaskItem(line).toEntry(taskList));
+            entries.add(new TaskItem(line).toEntry(taskList));
         }
+        tasks.setEntries(entries);
     }
 
     /**
@@ -158,10 +171,7 @@ public class TaskList extends Module {
                 return;
             }
 
-            tasks.clear();
-            for (TaskEntry taskEntry : result.data) {
-                tasks.add(taskEntry);
-            }
+            tasks.setEntries(Arrays.asList(result.data));
             toCache();
         });
     }

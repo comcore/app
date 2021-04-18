@@ -32,6 +32,7 @@ public final class NotificationScheduler {
     private static WeakReference<Context> contextWeakReference;
     private static AlarmManager alarmManager;
     private static File scheduleFile;
+    private static boolean dirty = false;
 
     private NotificationScheduler() {}
 
@@ -41,9 +42,9 @@ public final class NotificationScheduler {
      * @param context the context
      */
     public static void init(Context context) {
+        contextWeakReference = new WeakReference<>(context);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
-        contextWeakReference = new WeakReference<>(context);
         read();
     }
 
@@ -112,7 +113,7 @@ public final class NotificationScheduler {
         }
 
         setAlarm(key, notification);
-        write();
+        dirty = true;
     }
 
     /**
@@ -124,7 +125,17 @@ public final class NotificationScheduler {
         ScheduledNotification notification = schedule.remove(key);
         if (notification != null) {
             cancelAlarm(key, notification);
+            dirty = true;
+        }
+    }
+
+    /**
+     * Store the loaded data if necessary.
+     */
+    public static void store() {
+        if (dirty) {
             write();
+            dirty = false;
         }
     }
 
@@ -166,7 +177,7 @@ public final class NotificationScheduler {
      * Load all previously scheduled events.
      */
     private static void read() {
-        if (!schedule.isEmpty()) {
+        if (dirty) {
             return;
         }
 
@@ -177,6 +188,7 @@ public final class NotificationScheduler {
                 JsonObject json = JsonParser.parseString(line).getAsJsonObject();
                 ScheduledNotification notification = ScheduledNotification.fromJson(json);
                 if (notification.timestamp < time) {
+                    dirty = true;
                     continue;
                 }
 
@@ -189,7 +201,7 @@ public final class NotificationScheduler {
             e.printStackTrace();
         }
 
-        write();
+        store();
     }
 
     /**
