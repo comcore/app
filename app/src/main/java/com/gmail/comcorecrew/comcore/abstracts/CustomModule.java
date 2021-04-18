@@ -186,8 +186,8 @@ public abstract class CustomModule extends Module {
         });
     }
 
-    protected void sendTask(String data) {
-        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), data, result -> {
+    protected void sendTask(long deadline, String data) {
+        ServerConnector.addTask(((CustomModuleID) getId()).asTaskList(), deadline, data, result -> {
             if (result.isFailure()) {
                 return;
             }
@@ -196,8 +196,8 @@ public abstract class CustomModule extends Module {
         });
     }
 
-    protected void modifyItem(ModuleItemID<ChatID> itemId, String data) {
-        ServerConnector.updateMessage((MessageID) itemId, data, result -> {
+    protected void modifyItem(MessageID itemId, String data) {
+        ServerConnector.updateMessage(itemId, data, result -> {
             if (result.isFailure()) {
                 return;
             }
@@ -206,9 +206,8 @@ public abstract class CustomModule extends Module {
         });
     }
 
-    protected void modifyItem(ModuleItemID<TaskListID> itemId, TaskStatus completed) {
-        TaskListID taskListID = ((CustomModuleID) getId()).asTaskList();
-        ServerConnector.updateTask((TaskID) itemId, completed, result -> {
+    protected void modifyItem(TaskID itemId, TaskStatus status) {
+        ServerConnector.updateTaskStatus(itemId, status, result -> {
             if (result.isFailure()) {
                 return;
             }

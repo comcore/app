@@ -174,7 +174,7 @@ public class MainFragment extends Fragment {
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
             Group group = AppData.getFromPos(position);
-            viewHolder.getTextView().setText(group.getName());
+            viewHolder.getTextView().setText(group.getDisplayName());
             viewHolder.setGroup(group);
 
             /* Changes or removes the image on each group list item based on whether
@@ -191,7 +191,11 @@ public class MainFragment extends Fragment {
                     break;
                 case MODERATOR:
                     viewHolder.viewTag.setVisibility(View.VISIBLE);
-                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    if (group.isDirect()) {
+                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.primary_d1));
+                    } else {
+                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
+                    }
                     break;
                 case USER:
                     viewHolder.viewTag.setVisibility(View.INVISIBLE);

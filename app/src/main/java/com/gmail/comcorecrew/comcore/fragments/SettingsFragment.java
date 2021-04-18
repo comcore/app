@@ -86,8 +86,7 @@ public class SettingsFragment extends Fragment {
             /** Set Two Factor Authentication */
             ServerConnector.setTwoFactor(twoFactorSwitch.isChecked(), result -> {
                 if (result.isFailure()) {
-                    new ErrorDialog(R.string.error_cannot_connect)
-                            .show(getParentFragmentManager(), null);
+                    ErrorDialog.show(R.string.error_cannot_connect);
                 }
             });
 

@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
-import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
@@ -30,7 +29,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
-import com.gmail.comcorecrew.comcore.dialogs.StringErrorDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -82,7 +81,7 @@ public class GroupFragment extends Fragment {
         refresh();
 
         TextView groupNameText = (TextView) view.findViewById(R.id.label_group_fragment);
-        groupNameText.setText(currentGroup.getName());
+        groupNameText.setText(currentGroup.getDisplayName());
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -108,18 +107,13 @@ public class GroupFragment extends Fragment {
         if (currentGroup == null) {
             return;
         }
-        if (currentGroup.getGroupRole() == GroupRole.OWNER) {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, true);
-        }
-        else if (currentGroup.getGroupRole() == GroupRole.MODERATOR) {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, true);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
-        }
-        else {
-            menu.setGroupVisible(R.id.menu_group_moderator_actions, false);
-            menu.setGroupVisible(R.id.menu_group_owner_actions, false);
-        }
+
+        GroupRole role = currentGroup.getGroupRole();
+        menu.setGroupVisible(R.id.menu_group_owner_actions, role == GroupRole.OWNER);
+
+        boolean moderator = role != GroupRole.USER;
+        menu.setGroupVisible(R.id.menu_group_moderator_actions, moderator);
+        menu.setGroupVisible(R.id.menu_moderator_not_direct, moderator && !currentGroup.isDirect());
     }
 
     /**
@@ -145,8 +139,7 @@ public class GroupFragment extends Fragment {
                                 .popBackStack();
                     }
                     else {
-                        new StringErrorDialog(result.errorMessage)
-                                .show(getParentFragmentManager(), null);
+                        ErrorDialog.show(result.errorMessage);
                     }
                 });
 

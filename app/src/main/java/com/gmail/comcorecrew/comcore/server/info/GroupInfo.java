@@ -34,6 +34,11 @@ public final class GroupInfo {
     public final boolean muted;
 
     /**
+     * Whether users need moderator approval to create calendar events.
+     */
+    public final boolean requireApproval;
+
+    /**
      * Timestamp for when the group's info was last updated.
      */
     public final long lastUpdate;
@@ -47,7 +52,8 @@ public final class GroupInfo {
      * @param muted      the user's muted status
      * @param lastUpdate when the group info was last updated
      */
-    public GroupInfo(GroupID id, String name, GroupRole role, boolean muted, long lastUpdate) {
+    public GroupInfo(GroupID id, String name, GroupRole role, boolean muted,
+                     boolean requireApproval, long lastUpdate) {
         if (id == null) {
             throw new IllegalArgumentException("GroupID cannot be null");
         } else if (name == null || name.isEmpty()) {
@@ -64,6 +70,7 @@ public final class GroupInfo {
         this.name = name;
         this.role = role;
         this.muted = muted;
+        this.requireApproval = requireApproval;
         this.lastUpdate = lastUpdate;
     }
 
@@ -78,9 +85,10 @@ public final class GroupInfo {
         String name = json.get("name").getAsString();
         GroupRole role = GroupRole.fromString(json.get("role").getAsString());
         boolean muted = json.get("muted").getAsBoolean();
+        boolean requireApproval = json.get("requireApproval").getAsBoolean();
         JsonElement lastUpdateJson = json.get("lastUpdate");
         long lastUpdate = lastUpdateJson == null ? 0 : lastUpdateJson.getAsLong();
-        return new GroupInfo(id, name, role, muted, lastUpdate);
+        return new GroupInfo(id, name, role, muted, requireApproval, lastUpdate);
     }
 
     @Override

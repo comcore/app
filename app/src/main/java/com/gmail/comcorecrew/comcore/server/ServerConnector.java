@@ -28,9 +28,10 @@ import java.util.List;
  * Utility class representing a connection with the server.
  */
 public final class ServerConnector {
-    private static final List<NotificationListener> notificationListeners =
-            Collections.synchronizedList(new ArrayList<>());
     private static Connection serverConnection;
+    private static NotificationListener notificationListener;
+
+    private ServerConnector() {}
 
     /**
      * Set the connection which will be used for all server requests.
@@ -66,13 +67,13 @@ public final class ServerConnector {
     }
 
     /**
-     * Add a NotificationListener to the ServerConnector.
+     * Set a base NotificationListener for the ServerConnector.
      *
-     * @param listener the NotificationListener to add
+     * @param listener the NotificationListener to set
      * @see NotificationListener
      */
-    public static void addNotificationListener(NotificationListener listener) {
-        notificationListeners.add(listener);
+    public static void setNotificationListener(NotificationListener listener) {
+        notificationListener = listener;
     }
 
     /**
@@ -96,11 +97,9 @@ public final class ServerConnector {
     public static void sendNotification(Notification notification) {
         // Run on the main thread
         new Handler(Looper.getMainLooper()).post(() -> {
-            // Create a queue from the notification listeners list
-            ArrayDeque<NotificationListener> listeners;
-            synchronized (notificationListeners) {
-                listeners = new ArrayDeque<>(notificationListeners);
-            }
+            // Create a queue from the base notification listener
+            ArrayDeque<NotificationListener> listeners = new ArrayDeque<>();
+            listeners.add(notificationListener);
 
             // Loop over the notification listeners, giving each the notification
             while (!listeners.isEmpty()) {
@@ -118,6 +117,15 @@ public final class ServerConnector {
                 }
             }
         });
+    }
+
+    /**
+     * Do something after every other action has finished.
+     *
+     * @param callback what to do next
+     */
+    public static void then(Runnable callback) {
+        getConnection().send(new ServerMsg("PING"), result -> callback.run(), response -> null);
     }
 
     /**
@@ -329,7 +337,7 @@ public final class ServerConnector {
             if (user == null) {
                 throw new IllegalArgumentException("UserID cannot be null");
             }
-            array.add(user.id);
+            array.add(user.toJson());
         }
 
         JsonObject data = new JsonObject();
@@ -419,6 +427,26 @@ public final class ServerConnector {
         }
 
         createModule(type, group, name, handler, id -> new CustomModuleID(group, id, type));
+    }
+
+    /**
+     * Set whether approval is required for user's calendar events in a group.
+     *
+     * @param group   the group to update the settings for
+     * @param requireApproval whether approval is required
+     * @param handler the handler for the response of the server
+     */
+    public static void setRequireApproval(GroupID group, boolean requireApproval,
+                                          ResultHandler<Void> handler) {
+        if (group == null) {
+            throw new IllegalArgumentException("GroupID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", group.id);
+        data.addProperty("requireApproval", requireApproval);
+        getConnection().send(new ServerMsg("setRequireApproval", data), handler,
+                response -> null);
     }
 
     /**
@@ -796,13 +824,16 @@ public final class ServerConnector {
      * Add a task with a given description to a task list.
      *
      * @param taskList    the task list to add the task to
+     * @param deadline    the deadline to set for the task (or 0 for no deadline)
      * @param description the description of the task
      * @param handler     the handler for the response of the server
      */
-    public static void addTask(TaskListID taskList, String description,
+    public static void addTask(TaskListID taskList, long deadline, String description,
                                ResultHandler<TaskEntry> handler) {
         if (taskList == null) {
             throw new IllegalArgumentException("TaskListID cannot be null");
+        } else if (deadline < 0) {
+            throw new IllegalArgumentException("task deadline cannot be negative");
         } else if (description == null) {
             throw new IllegalArgumentException("task description cannot be null");
         }
@@ -810,6 +841,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", taskList.group.id);
         data.addProperty("taskList", taskList.id);
+        data.addProperty("deadline", deadline);
         data.addProperty("description", description);
         getConnection().send(new ServerMsg("addTask", data), handler,
                 response -> TaskEntry.fromJson(taskList, response));
@@ -835,17 +867,19 @@ public final class ServerConnector {
     }
 
     /**
-     * Update a task's completed status.
+     * Update a task's status.
      *
      * @param task    the task to update
      * @param status  the status to set for the task
      * @param handler the handler for the response of the server
      * @see TaskStatus
      */
-    public static void updateTask(TaskID task, TaskStatus status,
-                                  ResultHandler<TaskEntry> handler) {
+    public static void updateTaskStatus(TaskID task, TaskStatus status,
+                                        ResultHandler<TaskEntry> handler) {
         if (task == null) {
             throw new IllegalArgumentException("TaskID cannot be null");
+        } else if (status == null) {
+            throw new IllegalArgumentException("TaskStatus cannot be null");
         }
 
         JsonObject data = new JsonObject();
@@ -854,7 +888,32 @@ public final class ServerConnector {
         data.addProperty("id", task.id);
         data.addProperty("completed", status == TaskStatus.COMPLETED);
         data.addProperty("inProgress", status == TaskStatus.IN_PROGRESS);
-        getConnection().send(new ServerMsg("updateTask", data), handler,
+        getConnection().send(new ServerMsg("updateTaskStatus", data), handler,
+                response -> TaskEntry.fromJson(task.module, response));
+    }
+
+    /**
+     * Update a task's deadline.
+     *
+     * @param task     the task to update
+     * @param deadline the deadline to set for the task (or 0 for no deadline)
+     * @param handler  the handler for the response of the server
+     * @see TaskStatus
+     */
+    public static void updateTaskDeadline(TaskID task, long deadline,
+                                          ResultHandler<TaskEntry> handler) {
+        if (task == null) {
+            throw new IllegalArgumentException("TaskID cannot be null");
+        } else if (deadline < 0) {
+            throw new IllegalArgumentException("task deadline cannot be negative");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", task.module.group.id);
+        data.addProperty("taskList", task.module.id);
+        data.addProperty("id", task.id);
+        data.addProperty("deadline", deadline);
+        getConnection().send(new ServerMsg("updateTaskDeadline", data), handler,
                 response -> TaskEntry.fromJson(task.module, response));
     }
 
@@ -1085,10 +1144,11 @@ public final class ServerConnector {
             throw new IllegalArgumentException(field + " cannot be null");
         }
 
-//        if (ids.isEmpty()) {
-//            handler.handleResult(ServerResult.success((T[]) Array.newInstance(clazz, 0)));
-//            return;
-//        }
+        if (ids.isEmpty()) {
+            then(() -> handler.handleResult(
+                    ServerResult.success((T[]) Array.newInstance(clazz, 0))));
+            return;
+        }
 
         JsonArray array = new JsonArray();
         for (ItemID id : ids) {

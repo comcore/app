@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
  * Represents a message to send or receive from the server.
  */
 public final class ServerMsg {
+    private static final String PING = "PING";
+
     /**
      * The kind of message which identifies the action to perform.
      */
@@ -15,6 +17,13 @@ public final class ServerMsg {
      * The data of the message containing additional information.
      */
     public final JsonObject data;
+
+    /**
+     * Create a message that will succeed immediately with no data.
+     */
+    public ServerMsg() {
+        this(PING);
+    }
 
     /**
      * Create a message from just the kind, with no additional data.
@@ -40,6 +49,15 @@ public final class ServerMsg {
 
         this.kind = kind;
         this.data = data;
+    }
+
+    /**
+     * Check if this message is a PING message.
+     *
+     * @return true if this is a PING message, false otherwise
+     */
+    public boolean isPing() {
+        return kind.equals(PING);
     }
 
     /**

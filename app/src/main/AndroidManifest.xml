@@ -62,6 +62,9 @@
                     android:pathPrefix="/join" />
             </intent-filter>
         </activity>
+        <receiver
+            android:process=":remote"
+            android:name=".notifications.NotificationBroadcastReceiver"/>
     </application>
 
 </manifest>

@@ -5,8 +5,10 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
@@ -44,6 +46,7 @@ public class TaskList extends Module {
      */
     public void setTasks(ArrayList<TaskItem> tasks) {
         this.tasks = tasks;
+        registerNotifications();
         toCache();
     }
 
@@ -86,13 +89,13 @@ public class TaskList extends Module {
         int index = getTaskIndex(taskID);
         if (index != -1) {
             boolean completed = !tasks.get(index).isCompleted();
-            ServerConnector.updateTask(taskID, completed ? TaskStatus.COMPLETED : TaskStatus.UNASSIGNED, result -> {
+            ServerConnector.updateTaskStatus(taskID, completed ? TaskStatus.COMPLETED : TaskStatus.UNASSIGNED, result -> {
                 if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
                     return;
                 }
 
-                tasks.set(index, new TaskItem(result.data));
-                toCache();
+                onTaskUpdated(result.data);
             });
         }
     }
@@ -101,11 +104,13 @@ public class TaskList extends Module {
      * Creates a new task with a given description and sends it to the server,
      * object, and cache.
      *
+     * @param deadline    the deadline to set for the task (or 0 for no deadline)
      * @param description description of the task
      */
-    public void sendTask(String description) {
-        ServerConnector.addTask((TaskListID) getId(), description, result -> {
+    public void sendTask(long deadline, String description) {
+        ServerConnector.addTask((TaskListID) getId(), deadline, description, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
 
@@ -119,13 +124,14 @@ public class TaskList extends Module {
      * @param taskID id of the task to delete
      */
     public void deleteTask(TaskID taskID) {
-        int index = getTaskIndex(taskID);
-        if (index != -1) {
-            ServerConnector.deleteTask(taskID, result -> {
-                tasks.remove(index);
-                toCache();
-            });
-        }
+        ServerConnector.deleteTask(taskID, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
+                return;
+            }
+
+            onTaskDeleted(taskID);
+        });
     }
 
     /**
@@ -135,6 +141,7 @@ public class TaskList extends Module {
      */
     public void addTask(TaskEntry entry) {
         tasks.add(new TaskItem(entry));
+        NotificationScheduler.add(entry);
         toCache();
     }
 
@@ -146,6 +153,7 @@ public class TaskList extends Module {
     public void addTasks(ArrayList<TaskEntry> entries) {
         for (TaskEntry entry : entries) {
             tasks.add(new TaskItem(entry));
+            NotificationScheduler.add(entry);
         }
         toCache();
     }
@@ -193,6 +201,7 @@ public class TaskList extends Module {
                 item.setData(task.description);
                 item.setCompleterId(UserStorage.getInternalId(task.completer));
                 item.setAssignedId(UserStorage.getInternalId(task.assigned));
+                NotificationScheduler.add(task);
                 this.toCache();
                 return;
             }
@@ -209,6 +218,7 @@ public class TaskList extends Module {
         for (int i = 0; i < tasks.size(); i++) {
             if (tasks.get(i).getTaskid() == id) {
                 tasks.remove(i);
+                NotificationScheduler.remove(task);
                 toCache();
                 return;
             }
@@ -235,6 +245,7 @@ public class TaskList extends Module {
         for (char[] line : data) {
             tasks.add(new TaskItem(line));
         }
+        registerNotifications();
     }
 
     /**
@@ -251,7 +262,14 @@ public class TaskList extends Module {
             for (TaskEntry taskEntry : result.data) {
                 tasks.add(new TaskItem(taskEntry));
             }
+            registerNotifications();
             toCache();
         });
+    }
+
+    private void registerNotifications() {
+        for (TaskItem task : tasks) {
+            NotificationScheduler.add(task.toEntry((TaskListID) getId()));
+        }
     }
 }

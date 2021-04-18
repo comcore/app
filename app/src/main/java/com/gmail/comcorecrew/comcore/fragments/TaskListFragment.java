@@ -163,22 +163,7 @@ public class TaskListFragment extends Fragment {
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
-
-            switch (task.getStatus()) {
-                case UNASSIGNED:
-                    completedText.setText(R.string.not_completed);
-                    break;
-                case IN_PROGRESS:
-                    UserStorage.lookup(task.assigned, user -> {
-                        completedText.setText("Assigned to " + user.getName());
-                    });
-                    break;
-                case COMPLETED:
-                    UserStorage.lookup(task.completer, user -> {
-                        completedText.setText("Completed by " + user.getName());
-                    });
-                    break;
-            }
+            completedText.setText(task.getStatusDescription());
         }
 
         @Override

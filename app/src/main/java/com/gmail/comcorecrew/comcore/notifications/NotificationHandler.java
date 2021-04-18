@@ -35,14 +35,14 @@ import java.util.List;
  */
 public class NotificationHandler implements NotificationListener {
     // Android notification channel identifiers
-    private static final String CHANNEL_MESSAGE = "message";
-    private static final String CHANNEL_TASK = "task";
-    private static final String CHANNEL_EVENT = "event";
-    private static final String CHANNEL_INVITE = "invite";
-    private static final String CHANNEL_STATUS = "status";
+    public static final String CHANNEL_MESSAGE = "message";
+    public static final String CHANNEL_TASK = "task";
+    public static final String CHANNEL_EVENT = "event";
+    public static final String CHANNEL_INVITE = "invite";
+    public static final String CHANNEL_STATUS = "status";
 
     // A unique ID to give a notification
-    private static int uniqueId = (int) System.currentTimeMillis();
+    private static int uniqueId = (int) (System.currentTimeMillis() >> 3);
 
     // The context and notification manager for displaying notifications
     private final Context context;
@@ -107,12 +107,21 @@ public class NotificationHandler implements NotificationListener {
     }
 
     /**
+     * Get a unique identifier for a notification.
+     *
+     * @return a unique identifier
+     */
+    public static int getUniqueId() {
+        return uniqueId++;
+    }
+
+    /**
      * Send a notification, giving it a unique identifier.
      *
      * @param notification the notification to send
      */
     private void notify(Notification notification) {
-        manager.notify(uniqueId++, notification);
+        manager.notify(getUniqueId(), notification);
     }
 
     @Override
@@ -211,7 +220,7 @@ public class NotificationHandler implements NotificationListener {
 
         notify(new NotificationCompat.Builder(context, CHANNEL_STATUS)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle(info.getName())
+                .setContentTitle(info.getDisplayName())
                 .setContentText("You have become a " + role)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build());
@@ -226,7 +235,7 @@ public class NotificationHandler implements NotificationListener {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_STATUS)
                 .setSmallIcon(R.drawable.receivedmsg)
-                .setContentTitle(info.getName())
+                .setContentTitle(info.getDisplayName())
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
         if (muted) {

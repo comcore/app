@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- This menu item is only showed to group moderators and the owner -->
-    <group android:id="@+id/menu_group_moderator_actions">
+    <group android:id="@+id/menu_moderator_not_direct">
         <item
             android:id="@+id/invite_member"
             android:title="@string/invite_member"
@@ -28,6 +28,8 @@
         <item
             android:id="@+id/unmute_member"
             android:title="@string/unmute_member" />
+    </group>
+    <group android:id="@+id/menu_group_moderator_actions">
         <item
             android:id="@+id/create_module"
             android:title="@string/create_module"

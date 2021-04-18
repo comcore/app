@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
@@ -151,8 +152,10 @@ public class AppData {
         }
         ServerConnector.createSubGroup(parent.getGroupId(), name, ids, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
+
             Group group = new Group(name, result.data, GroupRole.OWNER, false);
             addGroup(group);
             try {

@@ -30,15 +30,13 @@ public class InvalidPasswordDialog extends DialogFragment {
                     // Start resetting the password
                     ServerConnector.requestReset(email, result -> {
                         if (result.isFailure()) {
-                            new ErrorDialog(R.string.error_cannot_connect)
-                                    .show(fragment.getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_cannot_connect);
                             return;
                         }
 
                         boolean sent = result.data;
                         if (!sent) {
-                            new ErrorDialog(R.string.error_does_not_exist)
-                                    .show(fragment.getParentFragmentManager(), null);
+                            ErrorDialog.show(R.string.error_does_not_exist);
                             return;
                         }
 

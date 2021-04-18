@@ -27,6 +27,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.fragments.TaskListFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
@@ -95,7 +96,7 @@ public class ViewTasksDialog extends DialogFragment {
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
-            private TaskItem currentTask;
+            private TaskEntry currentTask;
 
             public ViewHolder(View view) {
                 super(view);
@@ -108,39 +109,27 @@ public class ViewTasksDialog extends DialogFragment {
                 return textView;
             }
 
-            public void setCurrentTask(TaskItem currentTask) {
+            public void setCurrentTask(TaskEntry currentTask) {
                 this.currentTask = currentTask;
             }
 
             @Override
             public void onClick(View view) {
                 if (flag == 0) {
-                    currentTaskList.deleteTask(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
+                    currentTaskList.deleteTask(currentTask.id);
                 } else if (flag == 1) {
-                    /** TODO Check if the user is an owner, moderator, or the task completer before
-                     * allowing them to un-complete a task **/
-                    if (currentTask.isCompleted()) {
-                        if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
-                            new ErrorDialog(R.string.error_cannot_uncomplete).show(getParentFragmentManager(), null);
-                        }
-                        else {
-                            currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
-                        }
-                    }
-                    else {
-                        currentTaskList.toggleCompleted(new TaskID((TaskListID) currentTaskList.getId(), currentTask.getTaskid()));
-                    }
-                }
-                else if (flag == 2) {
-                    if (currentTask.isCompleted()) {
-                        new ErrorDialog(R.string.error_already_complete).show(getParentFragmentManager(), null);
-                    }
-                    /** TODO display an error message if the task is already in progress. **/
-                    else if (false) {
-                        new ErrorDialog(R.string.error_already_in_progress).show(getParentFragmentManager(), null);
-                    }
-                    else {
-                        /** TODO the clicked task should be marked as "in progress" **/
+                    currentTaskList.toggleCompleted(currentTask.id);
+                } else if (flag == 2) {
+                    switch (currentTask.getStatus()) {
+                        case UNASSIGNED:
+                            // TODO set the task to be IN_PROGRESS
+                            break;
+                        case IN_PROGRESS:
+                            ErrorDialog.show(R.string.error_already_in_progress);
+                            break;
+                        case COMPLETED:
+                            ErrorDialog.show(R.string.error_already_complete);
+                            break;
                     }
                 }
                 dismiss();
@@ -167,25 +156,10 @@ public class ViewTasksDialog extends DialogFragment {
 
             TextView dataText = viewHolder.itemView.findViewById(R.id.task_description);
             TextView completedText = viewHolder.itemView.findViewById(R.id.task_completed_status);
-            dataText.setText(currentTaskList.getTasks().get(position).getData());
-            if (currentTaskList.getTasks().get(position).isCompleted()) {
-                if (currentTaskList.getGroup().getGroupRole() == GroupRole.USER) {
-                    completedText.setText(R.string.completed);
-                }
-                /** TODO display the name of the user who completed the task **/
-                else {
-                    completedText.setText("Completed By: ");
-                }
-            }
-            /** TODO If the task is in progress, display the name of the user who is working on the task **/
-            else if (false){
-                completedText.setText("In Progress By: ");
-            }
-            else {
-                completedText.setText("Not Completed");
-            }
-            viewHolder.setCurrentTask(currentTaskList.getTasks().get(position));
-
+            TaskEntry task = currentTaskList.getEntry(position);
+            dataText.setText(task.description);
+            completedText.setText(task.getStatusDescription());
+            viewHolder.setCurrentTask(task);
         }
 
         @Override

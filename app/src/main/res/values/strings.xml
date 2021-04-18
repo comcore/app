@@ -68,6 +68,7 @@
     <string name="create_link_does_expire">Do you want the invite link to expire?</string>
     <string name="create_link_copied">The link was copied to your clipboard.</string>
     <string name="error_expire_past">The expire time cannot be in the past.</string>
+    <string name="error_event_past">The calendar event cannot be in the past.</string>
 
     <!-- Error Messages -->
     <string name="error_cannot_connect">Cannot connect to server.</string>

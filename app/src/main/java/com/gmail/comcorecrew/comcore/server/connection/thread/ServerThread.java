@@ -44,7 +44,7 @@ public abstract class ServerThread {
      *
      * @param task the task to add
      */
-    public final synchronized void addTask(ServerTask task) {
+    public synchronized final void addTask(ServerTask task) {
         if (running) {
             currentTasks.add(task);
             notifyAll();
@@ -59,7 +59,7 @@ public abstract class ServerThread {
      *
      * @return the next task from the queue
      */
-    protected final synchronized ServerTask getTask() {
+    protected synchronized final ServerTask getTask() {
         if (!running) {
             return null;
         }
@@ -83,9 +83,18 @@ public abstract class ServerThread {
     }
 
     /**
+     * Check if there are any tasks in the queue.
+     *
+     * @return true if the queue is empty, false otherwise
+     */
+    public synchronized final boolean isEmpty() {
+        return currentTasks.isEmpty();
+    }
+
+    /**
      * Clear all tasks from the queue, failing them.
      */
-    public final synchronized void clearTasks() {
+    public synchronized final void clearTasks() {
         for (ServerTask task : currentTasks) {
             task.handleResult(ServerResult.disconnected());
         }

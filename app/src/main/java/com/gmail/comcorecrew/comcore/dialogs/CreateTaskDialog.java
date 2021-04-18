@@ -59,7 +59,7 @@ public class CreateTaskDialog extends DialogFragment {
 
             EditText taskDesc = view.findViewById(R.id.create_task_name_edit);
 
-            currentTaskList.sendTask(taskDesc.getText().toString());
+            currentTaskList.sendTask(0, taskDesc.getText().toString());
             this.dismiss();
         });
 
