@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.EventItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
@@ -24,17 +25,29 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
+import com.gmail.comcorecrew.comcore.server.id.EventID;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class ViewPendingEventsDialog extends DialogFragment {
+public class ViewEventsDialog extends DialogFragment {
 
     private CustomAdapter adapter;
-    private ArrayList<EventEntry> unapprovedEventList = new ArrayList<>();
+    private ArrayList<EventEntry> eventList = new ArrayList<>();
     private Calendar currentCalendar;
+    private java.util.Calendar currentDate;
 
-    public ViewPendingEventsDialog (Calendar currentCalendar) {
+    /**
+     * 0 - View events
+     * 1 - Delete events
+     */
+    private int flag;
+
+    public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate, int flag) {
         this.currentCalendar = currentCalendar;
+        this.currentDate = currentDate;
+        this.flag = flag;
     }
 
     @Override
@@ -42,7 +55,13 @@ public class ViewPendingEventsDialog extends DialogFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
 
-        unapprovedEventList = currentCalendar.getRequests();
+        if (currentDate == null) {
+            eventList = currentCalendar.getEntries();
+        }
+        else {
+            eventList = currentCalendar.getEntriesByDay(currentDate);
+        }
+
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -68,29 +87,19 @@ public class ViewPendingEventsDialog extends DialogFragment {
 
 
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
-     * the list of pending calendar events in the GUI
+     * the list of calendar events in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private EventEntry currentEventEntry;
 
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
 
                 textView = (TextView) view.findViewById(R.id.label_invite);
-
-                view.findViewById(R.id.accept_invite_button).setOnClickListener(clickedView -> {
-
-                    currentCalendar.approve(currentEventEntry.id);
-                    notifyDataSetChanged();
-                });
-
-                view.findViewById(R.id.reject_invite_button).setOnClickListener(clickedView -> {
-                    currentCalendar.disapprove(currentEventEntry.id);
-                    notifyDataSetChanged();
-                });
             }
 
             public TextView getTextView() {
@@ -101,12 +110,21 @@ public class ViewPendingEventsDialog extends DialogFragment {
                 this.currentEventEntry = newEntry;
             }
 
+            @Override
+            public void onClick(View view) {
+                if (flag == 1) {
+                    /** Delete event **/
+                    currentCalendar.deleteEvent(currentEventEntry.id);
+                    dismiss();
+                }
+            }
+
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.pending_event_row_item, viewGroup, false);
+                    .inflate(R.layout.event_row_item, viewGroup, false);
 
             return new ViewHolder(view);
         }
@@ -114,21 +132,21 @@ public class ViewPendingEventsDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            TextView eventDesc = viewHolder.itemView.findViewById(R.id.pending_event_desc);
-            TextView eventDate = viewHolder.itemView.findViewById(R.id.pending_event_date);
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.event_description);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.event_date_range);
 
-            eventDesc.setText(unapprovedEventList.get(position).description);
-            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).start).toString() +
-                    " - " + DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).end).toString();
+            eventDesc.setText(eventList.get(position).description);
+            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventList.get(position).start).toString() +
+                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventList.get(position).end).toString();
             eventDate.setText(parsedDate);
 
-            viewHolder.setCurrentEventEntry(unapprovedEventList.get(position));
+            viewHolder.setCurrentEventEntry(eventList.get(position));
 
         }
 
         @Override
         public int getItemCount() {
-            return unapprovedEventList.size();
+            return eventList.size();
         }
     }
 
