@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment {
                 currentDate.set(java.util.Calendar.HOUR, 0);
 
                 if (calendar.getEntriesByDay(currentDate).size() > 0) {
-                    new ViewEventsDialog(calendar, currentDate).show(getParentFragmentManager(), null);
+                    new ViewEventsDialog(calendar, currentDate, 0).show(getParentFragmentManager(), null);
                 }
             }
 
@@ -117,7 +117,11 @@ public class CalendarFragment extends Fragment {
                 return true;
             case R.id.view_all_events:
                 /** Handle viewing all calendar events**/
-                new ViewEventsDialog(calendar, null).show(getParentFragmentManager(), null);
+                new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.delete_events:
+                /** Handle deleting calendar events**/
+                new ViewEventsDialog(calendar, null, 1).show(getParentFragmentManager(), null);
                 return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/

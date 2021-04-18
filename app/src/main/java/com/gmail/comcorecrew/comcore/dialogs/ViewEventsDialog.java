@@ -38,9 +38,16 @@ public class ViewEventsDialog extends DialogFragment {
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
 
-    public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate) {
+    /**
+     * 0 - View events
+     * 1 - Delete events
+     */
+    private int flag;
+
+    public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate, int flag) {
         this.currentCalendar = currentCalendar;
         this.currentDate = currentDate;
+        this.flag = flag;
     }
 
     @Override
@@ -80,16 +87,17 @@ public class ViewEventsDialog extends DialogFragment {
 
 
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
-     * the list of pending calendar events in the GUI
+     * the list of calendar events in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private final TextView textView;
             private EventEntry currentEventEntry;
 
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
 
                 textView = (TextView) view.findViewById(R.id.label_invite);
             }
@@ -100,6 +108,15 @@ public class ViewEventsDialog extends DialogFragment {
 
             public void setCurrentEventEntry(EventEntry newEntry) {
                 this.currentEventEntry = newEntry;
+            }
+
+            @Override
+            public void onClick(View view) {
+                if (flag == 1) {
+                    /** Delete event **/
+                    currentCalendar.deleteEvent(currentEventEntry.id);
+                    dismiss();
+                }
             }
 
         }
