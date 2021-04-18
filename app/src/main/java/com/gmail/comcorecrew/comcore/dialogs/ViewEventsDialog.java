@@ -40,6 +40,7 @@ public class ViewEventsDialog extends DialogFragment {
 
     public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate) {
         this.currentCalendar = currentCalendar;
+        this.currentDate = currentDate;
     }
 
     @Override
@@ -47,7 +48,12 @@ public class ViewEventsDialog extends DialogFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
 
-        eventList = currentCalendar.getEntriesByDay(currentDate);
+        if (currentDate == null) {
+            eventList = currentCalendar.getEntries();
+        }
+        else {
+            eventList = currentCalendar.getEntriesByDay(currentDate);
+        }
 
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
@@ -113,8 +119,8 @@ public class ViewEventsDialog extends DialogFragment {
             TextView eventDate = viewHolder.itemView.findViewById(R.id.event_date_range);
 
             eventDesc.setText(eventList.get(position).description);
-            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", eventList.get(position).start).toString() +
-                    " - " + DateFormat.format("dd-MM-yyyy HH:mm", eventList.get(position).end).toString();
+            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventList.get(position).start).toString() +
+                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventList.get(position).end).toString();
             eventDate.setText(parsedDate);
 
             viewHolder.setCurrentEventEntry(eventList.get(position));

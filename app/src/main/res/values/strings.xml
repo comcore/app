@@ -91,6 +91,7 @@
     <string name="error_already_complete">The task has already been completed.</string>
     <string name="error_already_in_progress">The task is already assigned.</string>
     <string name="error_cannot_uncomplete">You do not have the permission to remove the completion status.</string>
+    <string name="error_incorrect_format">The input format is incorrect.</string>
 
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
@@ -173,6 +174,12 @@
 
     <!-- Calendar -->
     <string name="view_pending_events">View Pending Events</string>
+    <string name="view_all_events">View All Events</string>
+    <string name="create_event_start_date">Start Date (MM/DD/YYYY)</string>
+    <string name="create_event_end_date">End Date (MM/DD/YYYY)</string>
+    <string name="create_event_start_time">Start Time (HH:MM)</string>
+    <string name="create_event_end_time">End Time (HH:MM)</string>
+
 
 
 

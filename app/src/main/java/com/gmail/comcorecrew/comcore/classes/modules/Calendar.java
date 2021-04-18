@@ -22,7 +22,9 @@ import com.gmail.comcorecrew.comcore.server.id.EventID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -167,11 +169,16 @@ public class Calendar extends Module {
         ArrayList<EventEntry> eventList = new ArrayList<>();
 
         java.util.Calendar startDay = java.util.Calendar.getInstance();
-        java.util.Calendar endDay = java.util.Calendar.getInstance();
+
         for (int i = 0; i < getEntries().size(); i++) {
-            startDay.setTime(new Date(getEntries().get(i).start));
-            endDay.setTime(new Date(getEntries().get(i).end));
-            if (!startDay.after(currentDay) && !endDay.before(currentDay)) {
+            startDay.setTimeInMillis(getEntries().get(i).start);
+
+            /** Currently gets entries based on their starting day
+             * TODO match entries as long as the currentDay overlaps with its time range **/
+            if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
+                currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
+                currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
+
                 eventList.add(getEntries().get(i));
             }
         }

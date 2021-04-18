@@ -20,8 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
+import com.gmail.comcorecrew.comcore.dialogs.CreateEventDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
+
+import java.util.Date;
 
 
 public class CalendarFragment extends Fragment {
@@ -72,8 +77,13 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int day) {
+
                 java.util.Calendar currentDate = java.util.Calendar.getInstance();
-                currentDate.set(year, month, day);
+                currentDate.set(java.util.Calendar.YEAR, year);
+                currentDate.set(java.util.Calendar.MONTH, month);
+                currentDate.set(java.util.Calendar.DATE, day);
+                currentDate.set(java.util.Calendar.HOUR, 0);
+
                 if (calendar.getEntriesByDay(currentDate).size() > 0) {
                     new ViewEventsDialog(calendar, currentDate).show(getParentFragmentManager(), null);
                 }
@@ -97,6 +107,14 @@ public class CalendarFragment extends Fragment {
         // Handle item selection
         switch (item.getItemId()) {
 
+            case R.id.create_event:
+                /** Handle creating an event **/
+                new CreateEventDialog(this, calendar).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.view_all_events:
+                /** Handle viewing all calendar events**/
+                new ViewEventsDialog(calendar, null).show(getParentFragmentManager(), null);
+                return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
                 new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
