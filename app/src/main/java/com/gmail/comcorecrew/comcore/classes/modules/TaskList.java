@@ -4,6 +4,7 @@ import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
@@ -56,19 +57,16 @@ public class TaskList extends Module {
      * @param taskID id of the task to toggle
      */
     public void toggleAssigned(TaskID taskID) {
-        int index = getTaskIndex(taskID);
-        if (index != -1) {
-            boolean assigned = !tasks.get(index).isAssigned();
-            ServerConnector.updateTaskStatus(taskID, assigned ? TaskStatus.IN_PROGRESS : TaskStatus.UNASSIGNED, result -> {
-                if (result.isFailure()) {
-                    ErrorDialog.show(result.errorMessage);
-                    return;
-                }
+        boolean assigned = tasks.get(taskID).assigned.equals(AppData.self.getID());
+        TaskStatus newStatus = assigned ? TaskStatus.UNASSIGNED : TaskStatus.IN_PROGRESS;
+        ServerConnector.updateTaskStatus(taskID, newStatus, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
+                return;
+            }
 
-                tasks.set(index, new TaskItem(result.data));
-                toCache();
-            });
-        }
+            onTaskUpdated(result.data);
+        });
     }
 
     /**
