@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
 import android.app.usage.UsageEvents;
+import android.icu.text.DateFormat;
 
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
@@ -21,7 +22,9 @@ import com.gmail.comcorecrew.comcore.server.id.EventID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 /*
  * UNDER CONSTRUCTION
@@ -158,6 +161,21 @@ public class Calendar extends Module {
             }
         }
         return entries;
+    }
+
+    public ArrayList<EventEntry> getEntriesByDay(java.util.Calendar currentDay) {
+        ArrayList<EventEntry> eventList = new ArrayList<>();
+
+        java.util.Calendar startDay = java.util.Calendar.getInstance();
+        java.util.Calendar endDay = java.util.Calendar.getInstance();
+        for (int i = 0; i < getEntries().size(); i++) {
+            startDay.setTime(new Date(getEntries().get(i).start));
+            endDay.setTime(new Date(getEntries().get(i).end));
+            if (!startDay.after(currentDay) && !endDay.before(currentDay)) {
+                eventList.add(getEntries().get(i));
+            }
+        }
+        return eventList;
     }
 
     public ArrayList<EventEntry> getRequests() {

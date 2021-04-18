@@ -7,6 +7,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
+import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
 
 
@@ -37,6 +39,7 @@ public class CalendarFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -63,6 +66,19 @@ public class CalendarFragment extends Fragment {
         view.findViewById(R.id.calendar_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
                     .popBackStack();
+        });
+
+        CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int day) {
+                java.util.Calendar currentDate = java.util.Calendar.getInstance();
+                currentDate.set(year, month, day);
+                if (calendar.getEntriesByDay(currentDate).size() > 0) {
+                    new ViewEventsDialog(calendar, currentDate).show(getParentFragmentManager(), null);
+                }
+            }
+
         });
     }
 
