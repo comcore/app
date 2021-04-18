@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.CreateEventDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 
@@ -95,6 +96,9 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.calendarmenu, menu);
+
+        GroupRole role = calendar.getGroup().getGroupRole();
+        menu.setGroupVisible(R.id.menu_group_moderator_actions, role != GroupRole.USER);
     }
 
     /**
