@@ -38,7 +38,7 @@ public class Calendar extends Module {
     }
 
     public Calendar(String name, Group group) {
-        super(name, null, group, Mdid.CCLD);
+        super(name, group, Mdid.CCLD);
         events = new ArrayList<>();
     }
 

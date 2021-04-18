@@ -78,6 +78,9 @@
         <action
             android:id="@+id/action_groupFragment_to_createGroupFragment"
             app:destination="@id/createGroupFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
@@ -96,4 +99,8 @@
         android:id="@+id/customFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CustomFragment"
         android:label="CustomFragment" />
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.CalendarFragment"
+        android:label="CalendarFragment" />
 </navigation>
