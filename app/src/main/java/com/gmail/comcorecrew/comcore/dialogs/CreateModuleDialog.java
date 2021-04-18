@@ -12,8 +12,11 @@ import androidx.fragment.app.DialogFragment;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -62,28 +65,17 @@ public class CreateModuleDialog extends DialogFragment {
 
             if (chatRadio.isChecked()) {
                 /** Try to create a chat module **/
+                new Messaging(moduleName.getText().toString(), AppData.getGroup(groupID));
+                this.dismiss();
+                fragment.refresh();
 
-                ServerConnector.createChat(groupID, moduleName.getText().toString(), result -> {
-                    if (result.isFailure()) {
-                        ErrorDialog.show(R.string.error_cannot_connect);
-                        return;
-                    }
-
-                    this.dismiss();
-                    fragment.refresh();
-                });
             }
             else if (tasklistRadio.isChecked()) {
-                /** Try to create a tasklist module **/
-                ServerConnector.createTaskList(groupID, moduleName.getText().toString(), result -> {
-                    if (result.isFailure()) {
-                        ErrorDialog.show(R.string.error_cannot_connect);
-                        return;
-                    }
 
-                    this.dismiss();
-                    fragment.refresh();
-                });
+                new TaskList(moduleName.getText().toString(), AppData.getGroup(groupID));
+
+                this.dismiss();
+                fragment.refresh();
             }
             else if (false) { //TODO use pinnedRadio.isChecked() once following line is fixed
                 ChatID selectedChat = null; //TODO Prompt user for chat to create module for
@@ -98,7 +90,7 @@ public class CreateModuleDialog extends DialogFragment {
             }
             else if (calendarRadio.isChecked()) {
 
-                /** TODO Create CalendarModule **/
+                new Calendar(moduleName.getText().toString(), AppData.getGroup(groupID));
 
                 this.dismiss();
                 fragment.refresh();

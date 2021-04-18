@@ -22,6 +22,8 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class CreateTaskDialog extends DialogFragment {
@@ -58,8 +60,22 @@ public class CreateTaskDialog extends DialogFragment {
         view.findViewById(R.id.create_task_submit_button).setOnClickListener(clickedView -> {
 
             EditText taskDesc = view.findViewById(R.id.create_task_name_edit);
+            EditText dateDeadline = view.findViewById(R.id.editTaskDate);
+            EditText timeDeadline = view.findViewById(R.id.editTaskTime);
 
-            currentTaskList.sendTask(0, taskDesc.getText().toString());
+            String startFull = dateDeadline.getText().toString() + "-" + timeDeadline.getText().toString();
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy-HH:mm");
+            java.util.Calendar deadline = java.util.Calendar.getInstance();
+
+
+            try {
+                deadline.setTime(df.parse(startFull, new ParsePosition(0)));
+                currentTaskList.sendTask(deadline.getTimeInMillis(), taskDesc.getText().toString());
+            }
+            catch (NullPointerException e) {
+                /** If an error occurs parsing the deadline, create the task without a deadline **/
+                currentTaskList.sendTask(0, taskDesc.getText().toString());
+            }
             this.dismiss();
         });
 
