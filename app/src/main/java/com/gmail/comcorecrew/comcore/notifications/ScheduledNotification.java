@@ -1,13 +1,20 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+
 import com.google.gson.JsonObject;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Represents a notification that can be scheduled to occur at a specific time.
  */
-public final class ScheduledNotification {
+public final class ScheduledNotification implements Serializable {
     /**
      * The notification channel ID (from NotificationHandler). Not considered during comparison.
      */
@@ -89,6 +96,21 @@ public final class ScheduledNotification {
         json.addProperty("title", title);
         json.addProperty("text", text);
         return json;
+    }
+
+    /**
+     * Create a PendingIntent to send this notification.
+     *
+     * @param context the context to create the intent with
+     * @param key     the key associated with this notification
+     * @return the PendingIntent
+     */
+    public PendingIntent getPendingIntent(Context context, String key) {
+        Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
+        intent.setData(Uri.fromParts("notify", key, null));
+        intent.putExtra("json", toJson().toString());
+        intent.putExtra("id", NotificationHandler.getUniqueId());
+        return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
     @Override

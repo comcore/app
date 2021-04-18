@@ -1,6 +1,10 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
 
@@ -18,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +36,8 @@ public final class NotificationScheduler {
     public static final long REMINDER_TIME = 24 * 60 * 60 * 1000;
 
     private static final HashMap<String, ScheduledNotification> schedule = new HashMap<>();
+    private static WeakReference<Context> contextWeakReference;
+    private static AlarmManager alarmManager;
     private static File scheduleFile;
 
     private NotificationScheduler() {}
@@ -41,7 +48,9 @@ public final class NotificationScheduler {
      * @param context the context
      */
     public static void init(Context context) {
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
+        contextWeakReference = new WeakReference<>(context);
         read();
     }
 
@@ -74,7 +83,7 @@ public final class NotificationScheduler {
             return;
         }
 
-        add(keyFor(task.id), new ScheduledNotification(
+        addByKey(keyFor(task.id), new ScheduledNotification(
                 NotificationHandler.CHANNEL_TASK,
                 NotificationCompat.PRIORITY_HIGH,
                 displayTime,
@@ -102,7 +111,7 @@ public final class NotificationScheduler {
             return;
         }
 
-        add(keyFor(event.id), new ScheduledNotification(
+        addByKey(keyFor(event.id), new ScheduledNotification(
                 NotificationHandler.CHANNEL_EVENT,
                 NotificationCompat.PRIORITY_HIGH,
                 displayTime,
@@ -116,7 +125,7 @@ public final class NotificationScheduler {
      * @param item the item to cancel the notification for
      */
     public static void remove(ModuleItemID<?> item) {
-        remove(keyFor(item));
+        removeByKey(keyFor(item));
     }
 
     /**
@@ -125,7 +134,7 @@ public final class NotificationScheduler {
      * @param item the item to create a key for
      * @return the unique key for the item
      */
-    private static String keyFor(ModuleItemID<?> item) {
+    public static String keyFor(ModuleItemID<?> item) {
         ModuleID module = item.module;
         return module.group.id + "-" + module.getType() + "-" + module.id + "-" + item.id;
     }
@@ -136,9 +145,9 @@ public final class NotificationScheduler {
      * @param key          the key for the notification
      * @param notification the notification to schedule
      */
-    private static synchronized void add(String key, ScheduledNotification notification) {
+    public static synchronized void addByKey(String key, ScheduledNotification notification) {
         if (notification == null) {
-            remove(key);
+            removeByKey(key);
             return;
         }
 
@@ -160,7 +169,7 @@ public final class NotificationScheduler {
      *
      * @param key the key to cancel the notification for
      */
-    private static synchronized void remove(String key) {
+    public static synchronized void removeByKey(String key) {
         ScheduledNotification notification = schedule.remove(key);
         if (notification != null) {
             cancelAlarm(key, notification);
@@ -175,7 +184,14 @@ public final class NotificationScheduler {
      * @param notification the notification to schedule
      */
     private static void setAlarm(String key, ScheduledNotification notification) {
-        System.out.printf("setAlarm(%s, %d)\n", key, notification.timestamp);
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        System.err.printf("setAlarm(%s)\n", key);
+        PendingIntent intent = notification.getPendingIntent(context, key);
+        alarmManager.setExact(AlarmManager.RTC, notification.timestamp, intent);
     }
 
     /**
@@ -185,7 +201,14 @@ public final class NotificationScheduler {
      * @param notification the notification to cancel
      */
     private static void cancelAlarm(String key, ScheduledNotification notification) {
-        System.out.printf("cancelAlarm(%s, %d)\n", key, notification.timestamp);
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        System.err.printf("cancelAlarm(%s)\n", key);
+        PendingIntent intent = notification.getPendingIntent(context, key);
+        alarmManager.cancel(intent);
     }
 
     /**

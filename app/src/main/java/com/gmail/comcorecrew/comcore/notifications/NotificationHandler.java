@@ -42,7 +42,7 @@ public class NotificationHandler implements NotificationListener {
     public static final String CHANNEL_STATUS = "status";
 
     // A unique ID to give a notification
-    private static int uniqueId = (int) System.currentTimeMillis();
+    private static int uniqueId = (int) (System.currentTimeMillis() >> 3);
 
     // The context and notification manager for displaying notifications
     private final Context context;
@@ -107,12 +107,21 @@ public class NotificationHandler implements NotificationListener {
     }
 
     /**
+     * Get a unique identifier for a notification.
+     *
+     * @return a unique identifier
+     */
+    public static int getUniqueId() {
+        return uniqueId++;
+    }
+
+    /**
      * Send a notification, giving it a unique identifier.
      *
      * @param notification the notification to send
      */
     private void notify(Notification notification) {
-        manager.notify(uniqueId++, notification);
+        manager.notify(getUniqueId(), notification);
     }
 
     @Override
