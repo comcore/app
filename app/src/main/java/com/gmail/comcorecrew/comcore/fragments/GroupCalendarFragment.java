@@ -89,8 +89,7 @@ public class GroupCalendarFragment extends Fragment {
     }
 
     private void addEvent() {
-        CalendarID calendarID = (CalendarID) calendar.getId();
-        CreateEventDialog createEventDialog = new CreateEventDialog(this, calendarID);
+        CreateEventDialog createEventDialog = new CreateEventDialog(this, calendar);
         createEventDialog.show(getParentFragmentManager(), null);
         calendar.refresh();
     }

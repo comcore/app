@@ -100,6 +100,10 @@
         android:name="com.gmail.comcorecrew.comcore.fragments.CustomFragment"
         android:label="CustomFragment" />
     <fragment
+        android:id="@+id/sharedCalendarFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.GroupCalendarFragment"
+        android:label="SharedCalendarFragment" />
+    <fragment
         android:id="@+id/calendarFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CalendarFragment"
         android:label="CalendarFragment" />
