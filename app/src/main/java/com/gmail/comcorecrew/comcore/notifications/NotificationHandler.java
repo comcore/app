@@ -271,7 +271,7 @@ public final class NotificationHandler implements NotificationListener {
     public void onLoggedOut() {
         LoginFragment.onLoggedOut();
         try {
-            AppData.clearLoginToken();
+            AppData.clearToken();
         } catch (IOException e) {
             e.printStackTrace();
         }

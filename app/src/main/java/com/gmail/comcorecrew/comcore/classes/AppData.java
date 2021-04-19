@@ -137,21 +137,6 @@ public class AppData {
     }
 
     /**
-     * Clear the stored login token and user data when the user's token expires.
-     */
-    public static void clearLoginToken() throws IOException {
-        int version;
-        try (FileReader reader = new FileReader(appStorage)) {
-            version = readInt(reader);
-        }
-
-        try (PrintWriter writer = new PrintWriter(appStorage)) {
-            writeInt(version, writer);
-            writeInt(-1, writer);
-        }
-    }
-
-    /**
      * Fetches the list of groups in an ArrayList.
      *
      * @return list of groups
@@ -549,17 +534,17 @@ public class AppData {
         file.close();
     }
 
-    public static void clearToken(Context context) throws IOException {
-        File appStorage = new File(context.getFilesDir(), "main");
-        if (!appStorage.exists()) {
-            throw new IOException("Illegal clearToken() call");
+    /**
+     * Clear the stored login token and user data when the user's token expires.
+     */
+    public static void clearToken() throws IOException {
+        int version;
+        try (FileReader reader = new FileReader(appStorage)) {
+            version = readInt(reader);
         }
-        token = null;
-        FileReader reader = new FileReader(appStorage);
-        int version = readInt(reader);
-        reader.close();
-        PrintWriter writer = new PrintWriter(appStorage);
-        writeInt(version, writer);
-        writer.close();
+
+        try (PrintWriter writer = new PrintWriter(appStorage)) {
+            writeInt(version, writer);
+        }
     }
 }
