@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.notifications;
 
 import com.gmail.comcorecrew.comcore.server.entry.ModuleEntry;
+import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.ModuleItemID;
 
 import java.util.ArrayList;
@@ -139,6 +140,17 @@ public class ScheduledList<I extends ModuleItemID<?>, T extends ModuleEntry<?, I
 
         remove(index);
         return true;
+    }
+
+    /**
+     * Delete all of the entries in the list. This is a potentially expensive operation, so it
+     * should only be run when absolutely necessary.
+     */
+    public void expensiveDeleteAll() {
+        for (T item : items) {
+            NotificationScheduler.remove(item.id);
+        }
+        items.clear();
     }
 
     /**

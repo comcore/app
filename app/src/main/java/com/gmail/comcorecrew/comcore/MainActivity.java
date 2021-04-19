@@ -84,4 +84,12 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.activitymenu, menu);
         return true;
     }
+
+    @Override
+    protected void onDestroy() {
+        // Make sure the notification scheduler stores any changes
+        NotificationScheduler.store();
+
+        super.onDestroy();
+    }
 }

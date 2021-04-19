@@ -383,6 +383,7 @@ public class AppData {
     public static void deleteFromPos(int position) {
         if ((position >= 0) && (position < groupsList.size())) {
             Group group = groupsList.get(position);
+            group.onDeleted();
             deleteDirectory(new File(groupsDir, group.getGroupId().id));
             deleteDirectory(new File(cacheDir, group.getGroupId().id));
             groups[group.getIndex()] = null;

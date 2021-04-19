@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Handles displaying notifications by forwarding them to Android.
  */
-public class NotificationHandler implements NotificationListener {
+public final class NotificationHandler implements NotificationListener {
     // Android notification channel identifiers
     public static final String CHANNEL_MESSAGE = "message";
     public static final String CHANNEL_TASK = "task";

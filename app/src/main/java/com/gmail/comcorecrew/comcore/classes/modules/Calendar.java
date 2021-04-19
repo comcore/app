@@ -246,4 +246,10 @@ public class Calendar extends Module {
             toCache();
         });
     }
+
+    @Override
+    public void onDeleted() {
+        approved.expensiveDeleteAll();
+        unapproved.clear();
+    }
 }
