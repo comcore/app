@@ -115,6 +115,7 @@ public class AppData {
         }
 
         self = new User(user);
+        self.setInternalId(0);
         cacheDir = new File(context.getCacheDir(), self.getID().id);
         filesDir = new File(context.getFilesDir(), self.getID().id);
         boolean madeDir = filesDir.mkdir();

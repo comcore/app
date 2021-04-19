@@ -1,6 +1,9 @@
 package com.gmail.comcorecrew.comcore.classes;
 
 import com.gmail.comcorecrew.comcore.enums.Reaction;
+import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
+
+import java.util.ArrayList;
 
 public class ReactionHolder {
 
@@ -86,5 +89,13 @@ public class ReactionHolder {
 
     public int getCharLength() {
         return 2 + 2 * reactions.length;
+    }
+
+    public ArrayList<ReactionEntry> toReactionEntries() {
+        ArrayList<ReactionEntry> entries = new ArrayList<>();
+        for (int i = 0; i < reactions.length; i++) {
+            entries.add(new ReactionEntry(Reaction.fromInt(i + 1).name().toLowerCase()));
+        }
+        return entries;
     }
 }

@@ -2,7 +2,6 @@ package com.gmail.comcorecrew.comcore.server.entry;
 
 import androidx.core.app.NotificationCompat;
 
-import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;

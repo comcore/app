@@ -16,6 +16,7 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.fragments.LoginFragment;
@@ -275,6 +276,7 @@ public final class NotificationHandler implements NotificationListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ErrorDialog.show(R.string.error_logged_out);
     }
 
     @Override

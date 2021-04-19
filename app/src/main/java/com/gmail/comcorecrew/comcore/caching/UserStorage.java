@@ -391,6 +391,8 @@ public class UserStorage {
             return true;
         }
         else {
+            // Update the user's internal ID to match the existing internal ID
+            user.setInternalId(root.internalId);
             return false;
         }
     }

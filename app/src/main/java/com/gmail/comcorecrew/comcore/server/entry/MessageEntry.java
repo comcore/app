@@ -1,13 +1,15 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.notifications.ScheduledNotification;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
-import com.gmail.comcorecrew.comcore.server.info.UserInfo;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -30,6 +32,12 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
     public final String contents;
 
     /**
+     * The reactions of users to the message. This set is immutable, so any attempts to modify it
+     * will result in an exception.
+     */
+    public final Collection<ReactionEntry> reactions;
+
+    /**
      * Create a MessageEntry with information about who sent it and when. An empty contents
      * represents a deleted message.
      *
@@ -37,8 +45,10 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
      * @param sender    the user that sent the message
      * @param timestamp the timestamp from when the message was sent
      * @param contents  the contents of the message (or empty)
+     * @param reactions the reactions to the message
      */
-    public MessageEntry(MessageID id, UserID sender, long timestamp, String contents) {
+    public MessageEntry(MessageID id, UserID sender, long timestamp, String contents,
+                        Collection<ReactionEntry> reactions) {
         super(id);
 
         if (sender == null) {
@@ -47,11 +57,14 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
             throw new IllegalArgumentException("message timestamp cannot be less than 1");
         } else if (contents == null) {
             throw new IllegalArgumentException("message contents cannot be null");
+        } else if (reactions == null) {
+            throw new IllegalArgumentException("reactions cannot be null");
         }
 
         this.sender = sender;
         this.timestamp = timestamp;
         this.contents = contents;
+        this.reactions = Collections.unmodifiableCollection(reactions);
     }
 
     /**
@@ -67,7 +80,11 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
         UserID sender = new UserID(json.get("sender").getAsString());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
-        return new MessageEntry(id, sender, timestamp, contents);
+        ArrayList<ReactionEntry> reactions = new ArrayList<>();
+        for (JsonElement reaction : json.getAsJsonArray("reactions")) {
+            reactions.add(ReactionEntry.fromJson(reaction.getAsJsonObject()));
+        }
+        return new MessageEntry(id, sender, timestamp, contents, reactions);
     }
 
     @Override

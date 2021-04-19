@@ -92,7 +92,7 @@
     <string name="error_already_in_progress">The task is already assigned.</string>
     <string name="error_cannot_uncomplete">You do not have the permission to remove the completion status.</string>
     <string name="error_incorrect_format">The input format is incorrect.</string>
-
+    <string name="error_logged_out">Your login information has expired.\nPlease log back in.</string>
 
     <string name="cc_leave_group">Are you sure you want to leave the group?</string>
 
