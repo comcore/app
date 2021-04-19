@@ -82,9 +82,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void whenExistingLogin(UserInfo info, LoginToken token) throws IOException {
-        ServerConnector.connect(token);
+        // Call AppData.init() first in case there is an error
         Context context = getBaseContext();
         AppData.init(info, token, context);
+
+        // Connect to the server with the token
+        ServerConnector.connect(token);
+
+        // Set alreadyLoggedIn to true so that the LoginFragment knows to skip login
         LoginFragment.alreadyLoggedIn = true;
     }
 

@@ -49,7 +49,6 @@ public final class NotificationScheduler {
         if (scheduleFile == null) {
             scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
             load();
-            store();
         }
     }
 
@@ -60,6 +59,17 @@ public final class NotificationScheduler {
         for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
             setAlarm(entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * Clear all scheduled alarms (e.g. if the cache is cleared).
+     */
+    public static synchronized void clearAllAlarms() {
+        for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
+            cancelAlarm(entry.getKey(), entry.getValue());
+        }
+
+        schedule.clear();
     }
 
     /**
@@ -136,7 +146,7 @@ public final class NotificationScheduler {
      * Store all scheduled notifications so they can be restored when the app is next loaded.
      */
     public static void store() {
-        if (dirty) {
+        if (!dirty) {
             return;
         }
 
@@ -198,6 +208,11 @@ public final class NotificationScheduler {
      * @param notification the notification to schedule
      */
     private static void setAlarm(String key, ScheduledNotification notification) {
+        // Don't set the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
+        }
+
         Context context = contextWeakReference.get();
         if (context == null) {
             return;
@@ -218,6 +233,11 @@ public final class NotificationScheduler {
      * @param notification the notification to cancel
      */
     private static void cancelAlarm(String key, ScheduledNotification notification) {
+        // Don't cancel the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
+        }
+
         Context context = contextWeakReference.get();
         if (context == null) {
             return;

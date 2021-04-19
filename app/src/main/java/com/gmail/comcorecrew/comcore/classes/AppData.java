@@ -10,6 +10,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.exceptions.StorageFileDisjunctionException;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
@@ -122,8 +123,12 @@ public class AppData {
         if ((madeDir) && (!UserStorage.addUser(self))) {
             throw new StorageFileDisjunctionException("Impossible use storage state.");
         }
-        if ((!cacheDir.exists()) && (!cacheDir.mkdir())) {
-            throw new IOException("Cannot create cache directory");
+        boolean cacheExists = cacheDir.exists();
+        if (!cacheExists) {
+            NotificationScheduler.clearAllAlarms();
+            if (!cacheDir.mkdir()) {
+                throw new IOException("Cannot create cache directory");
+            }
         }
         groupsDir = new File(filesDir, "groups");
         if (!groupsDir.mkdir()) {
