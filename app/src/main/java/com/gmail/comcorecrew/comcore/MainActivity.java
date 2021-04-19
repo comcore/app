@@ -11,11 +11,14 @@ import android.view.Menu;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
+import com.gmail.comcorecrew.comcore.fragments.LoginFragment;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
 import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 import com.gmail.comcorecrew.comcore.server.entry.InviteLinkEntry;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.IOException;
 
@@ -72,10 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Start initializing the cache using the application context
         try {
-            AppData.preInit(context);
-        } catch (IOException e) {
+            AppData.preInit(context, this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void whenExistingLogin(UserInfo info, LoginToken token) throws IOException {
+        ServerConnector.connect(token);
+        Context context = getBaseContext();
+        AppData.init(info, token, context);
+        LoginFragment.alreadyLoggedIn = true;
     }
 
     @Override

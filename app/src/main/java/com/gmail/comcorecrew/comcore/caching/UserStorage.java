@@ -33,9 +33,7 @@ public class UserStorage {
      * @throws IOException if an IO error occurs
      */
     public static void init() throws IOException {
-        if ((!refreshLists())) {
-            // TODO: Prompt user information to add to storage.
-        }
+        refreshLists();
     }
 
     /**

@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.classes;
 
 import android.content.Context;
 
+import com.gmail.comcorecrew.comcore.MainActivity;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
@@ -42,6 +43,7 @@ public class AppData {
     public static File cacheDir;
     public static File filesDir;
     public static File groupsDir;
+    private static File appStorage;
     private static LoginToken token;
     private static Group[] groups; //Array containing the groups
     private static ArrayList<Group> groupsList; //Arraylist containing the groups
@@ -58,9 +60,9 @@ public class AppData {
      * @param context       App context
      * @throws IOException  if an IO error occurs
      */
-    public static void preInit(Context context) throws IOException {
-        File appStorage = new File(context.getFilesDir(), "main");
-        token = null;
+    public static void preInit(Context context, MainActivity activity) throws IOException {
+        clearGroups();
+        appStorage = new File(context.getFilesDir(), "main");
         if (appStorage.createNewFile()) {
             updateCache(context);
         }
@@ -68,12 +70,19 @@ public class AppData {
             FileReader reader = new FileReader(appStorage);
             int curVersion = readInt(reader);
             String userId = readString(reader);
+            UserInfo info = null;
+            LoginToken token = null;
             if (userId != null) {
-                token = new LoginToken(new UserID(userId), readString(reader));
+                UserID id = new UserID(userId);
+                token = new LoginToken(id, readString(reader));
+                info = new UserInfo(id, readString(reader));
             }
             reader.close();
             if (curVersion < cacheVersion) {
                 updateCache(context);
+            }
+            if (info != null && token != null)  {
+                activity.whenExistingLogin(info, token);
             }
         }
     }
@@ -86,10 +95,29 @@ public class AppData {
      * @param context App context
      */
     public static void init(UserInfo user, LoginToken loginToken, Context context) throws IOException {
+        // Store the user's information first in case there are any errors during initialization
+        token = loginToken;
+        if (!appStorage.exists()) {
+            throw new IOException("Illegal init() call!");
+        }
+
+        int version;
+        try (FileReader reader = new FileReader(appStorage)) {
+            version = readInt(reader);
+        }
+
+        try (PrintWriter writer = new PrintWriter(appStorage)) {
+            writeInt(version, writer);
+            writeString(token.user.id, writer);
+            writeString(token.token, writer);
+            writeString(user.name, writer);
+        }
+
         self = new User(user);
         cacheDir = new File(context.getCacheDir(), self.getID().id);
         filesDir = new File(context.getFilesDir(), self.getID().id);
         boolean madeDir = filesDir.mkdir();
+
         UserStorage.init();
         if ((madeDir) && (!UserStorage.addUser(self))) {
             throw new StorageFileDisjunctionException("Impossible use storage state.");
@@ -100,23 +128,21 @@ public class AppData {
         groupsDir = new File(filesDir, "groups");
         if (!groupsDir.mkdir()) {
             GroupStorage.readAllGroups();
-        } else {
-            clearGroups();
         }
-        token = loginToken;
-        if (token != null) {
-            File appStorage = new File(context.getFilesDir(), "main");
-            if (!appStorage.exists()) {
-                throw new IOException("Illegal init() call!");
-            }
-            FileReader reader = new FileReader(appStorage);
-            int version = readInt(reader);
-            reader.close();
-            PrintWriter writer = new PrintWriter(appStorage);
+    }
+
+    /**
+     * Clear the stored login token and user data when the user's token expires.
+     */
+    public static void clearLoginToken() throws IOException {
+        int version;
+        try (FileReader reader = new FileReader(appStorage)) {
+            version = readInt(reader);
+        }
+
+        try (PrintWriter writer = new PrintWriter(appStorage)) {
             writeInt(version, writer);
-            writeString(token.user.id, writer);
-            writeString(token.token, writer);
-            writer.close();
+            writeInt(-1, writer);
         }
     }
 

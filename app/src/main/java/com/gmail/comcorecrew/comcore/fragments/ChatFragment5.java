@@ -190,6 +190,7 @@ public class ChatFragment5 extends Fragment {
         ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
                 ErrorDialog.show(result.errorMessage);
+                return;
             }
             messaging.onReceiveMessage(result.data);
             refresh();
