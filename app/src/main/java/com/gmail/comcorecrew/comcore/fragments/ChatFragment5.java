@@ -1,5 +1,10 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -7,11 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.OpenableColumns;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +39,13 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ChatFragment5#newInstance} factory method to
@@ -44,7 +58,13 @@ public class ChatFragment5 extends Fragment {
     public static final int ID_PIN_BUTTON = 123;
     public static final int ID_REACT_BUTTON = 124;
 
+
+    private static final int MY_REQUEST_CODE_PERMISSION = 1000;
+    private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
+    private Uri filePath;
+
     public static Messaging messaging;
+    public static String fileUpload = "";
 
     private MessageEntry messageEntry;
 
@@ -256,6 +276,102 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void uploadFile() {
+        askPermissionAndBrowseFile();
+    }
 
+    private void askPermissionAndBrowseFile()  {
+        // With Android Level >= 23, you have to ask the user
+        // for permission to access External Storage.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // Level 23
+
+            // Check if we have Call permission
+            int permisson = ActivityCompat.checkSelfPermission(this.getContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE);
+
+            if (permisson != PackageManager.PERMISSION_GRANTED) {
+                // If don't have permission so prompt the user.
+                this.requestPermissions(
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_REQUEST_CODE_PERMISSION
+                );
+                return;
+            }
+        }
+        this.doBrowseFile();
+    }
+
+    private void doBrowseFile()  {
+        Intent chooseFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFileIntent.setType("*/*");
+        // Only return URIs that can be opened with ContentResolver
+        chooseFileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        chooseFileIntent = Intent.createChooser(chooseFileIntent, "Choose a file");
+        startActivityForResult(chooseFileIntent, MY_RESULT_CODE_FILECHOOSER);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MY_RESULT_CODE_FILECHOOSER && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            filePath = data.getData();
+
+            InputStream iStream = null;
+            try {
+                iStream = getContext().getContentResolver().openInputStream(filePath);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                byte[] inputData = getBytes(iStream);
+                String x = getFileName(filePath);
+                System.out.println(x);
+                ServerConnector.uploadFile(x, inputData, result -> {
+                    if (result.isFailure()) {
+                        ErrorDialog.show(result.errorMessage);
+                    }
+                    messageToBeSent.setText(result.data);
+                    sendMessage();
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 }
