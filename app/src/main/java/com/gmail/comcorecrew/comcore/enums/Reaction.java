@@ -33,14 +33,12 @@ public enum Reaction {
         }
     }
 
-    public static Reaction[] getReactions() {
-        return new Reaction[] {
-                Reaction.LIKE,
-                Reaction.DISLIKE
-        };
-    }
+    public static Reaction[] reactions = {
+            Reaction.LIKE,
+            Reaction.DISLIKE,
+    };
 
     public static int[] getEmptyReactionArray() {
-        return new int[getReactions().length];
+        return new int[reactions.length];
     }
 }

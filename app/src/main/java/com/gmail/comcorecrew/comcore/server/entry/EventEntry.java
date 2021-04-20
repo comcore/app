@@ -1,5 +1,12 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
+import androidx.core.app.NotificationCompat;
+
+import com.gmail.comcorecrew.comcore.abstracts.Module;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
+import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
+import com.gmail.comcorecrew.comcore.notifications.ScheduledNotification;
 import com.gmail.comcorecrew.comcore.server.id.EventID;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -10,12 +17,7 @@ import java.util.Objects;
 /**
  * Represents an entry of event data returned by the server.
  */
-public final class EventEntry {
-    /**
-     * The event's identifier.
-     */
-    public final EventID id;
-
+public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
     /**
      * The user that created the event.
      */
@@ -53,9 +55,9 @@ public final class EventEntry {
      */
     public EventEntry(EventID id, UserID creator, String description, long start, long end,
                       boolean approved) {
-        if (id == null) {
-            throw new IllegalArgumentException("EventID cannot be null");
-        } else if (creator == null) {
+        super(id);
+
+        if (creator == null) {
             throw new IllegalArgumentException("event creator cannot be null");
         } else if (description == null || description.isEmpty()) {
             throw new IllegalArgumentException("event description cannot be null or empty");
@@ -65,7 +67,6 @@ public final class EventEntry {
             throw new IllegalArgumentException("event end cannot come before start");
         }
 
-        this.id = id;
         this.creator = creator;
         this.description = description;
         this.start = start;
@@ -89,6 +90,30 @@ public final class EventEntry {
         long end = json.get("end").getAsLong();
         boolean approved = json.get("approved").getAsBoolean();
         return new EventEntry(id, creator, description, start, end, approved);
+    }
+
+    @Override
+    public ScheduledNotification getScheduledNotification() {
+        if (!approved) {
+            return null;
+        }
+
+        long displayTime = start - NotificationScheduler.REMINDER_TIME;
+        if (displayTime < System.currentTimeMillis()) {
+            return null;
+        }
+
+        Module module = GroupStorage.getModule(id.module);
+        if (module == null || module.isMuted()) {
+            return null;
+        }
+
+        return new ScheduledNotification(
+                NotificationHandler.CHANNEL_EVENT,
+                NotificationCompat.PRIORITY_HIGH,
+                displayTime,
+                module.getName(),
+                "Upcoming event: " + description);
     }
 
     @Override

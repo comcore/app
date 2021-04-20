@@ -268,9 +268,13 @@ public class GroupStorage {
             throw new InvalidFileFormatException("Cannot read groups directory!");
         }
         for (File file : files) {
-            Group group = new Group(new GroupID(file.getName()));
-            AppData.quickAddGroup(group);
-            readGroup(group);
+            try {
+                Group group = new Group(new GroupID(file.getName()));
+                AppData.quickAddGroup(group);
+                readGroup(group);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         AppData.normalizeGroupList();
     }

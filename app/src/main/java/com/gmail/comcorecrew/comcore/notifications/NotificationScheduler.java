@@ -3,15 +3,8 @@ package com.gmail.comcorecrew.comcore.notifications;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 
-import androidx.core.app.NotificationCompat;
-
-import com.gmail.comcorecrew.comcore.abstracts.Module;
-import com.gmail.comcorecrew.comcore.caching.GroupStorage;
-import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
+import com.gmail.comcorecrew.comcore.server.entry.ModuleEntry;
 import com.gmail.comcorecrew.comcore.server.id.ModuleID;
 import com.gmail.comcorecrew.comcore.server.id.ModuleItemID;
 import com.google.gson.JsonObject;
@@ -39,6 +32,7 @@ public final class NotificationScheduler {
     private static WeakReference<Context> contextWeakReference;
     private static AlarmManager alarmManager;
     private static File scheduleFile;
+    private static boolean dirty = false;
 
     private NotificationScheduler() {}
 
@@ -48,10 +42,14 @@ public final class NotificationScheduler {
      * @param context the context
      */
     public static void init(Context context) {
-        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
         contextWeakReference = new WeakReference<>(context);
-        read();
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Only read from storage once (when the app first starts)
+        if (scheduleFile == null) {
+            scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
+            load();
+        }
     }
 
     /**
@@ -64,59 +62,28 @@ public final class NotificationScheduler {
     }
 
     /**
-     * Schedule a notification for a task.
-     *
-     * @param task the task to schedule a notification for
+     * Clear all scheduled alarms (e.g. if the cache is cleared).
      */
-    public static void add(TaskEntry task) {
-        if (!task.hasDeadline()) {
-            return;
+    public static synchronized void clearAllAlarms() {
+        for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
+            cancelAlarm(entry.getKey(), entry.getValue());
         }
 
-        long displayTime = task.deadline - REMINDER_TIME;
-        if (displayTime < System.currentTimeMillis()) {
-            return;
-        }
-
-        Module module = GroupStorage.getModule(task.id.module);
-        if (module == null || module.isMuted()) {
-            return;
-        }
-
-        addByKey(keyFor(task.id), new ScheduledNotification(
-                NotificationHandler.CHANNEL_TASK,
-                NotificationCompat.PRIORITY_HIGH,
-                displayTime,
-                module.getName(),
-                "Upcoming deadline: " + task.description));
+        schedule.clear();
     }
 
     /**
-     * Schedule a notification for an event.
+     * Schedule a notification for an entry.
      *
-     * @param event the event to schedule a notification for
+     * @param entry the entry to schedule a notification for
      */
-    public static void add(EventEntry event) {
-        if (!event.approved) {
+    public static void add(ModuleEntry<?, ?> entry) {
+        ScheduledNotification notification = entry.getScheduledNotification();
+        if (notification == null) {
             return;
         }
 
-        long displayTime = event.start - REMINDER_TIME;
-        if (displayTime < System.currentTimeMillis()) {
-            return;
-        }
-
-        Module module = GroupStorage.getModule(event.id.module);
-        if (module == null || module.isMuted()) {
-            return;
-        }
-
-        addByKey(keyFor(event.id), new ScheduledNotification(
-                NotificationHandler.CHANNEL_EVENT,
-                NotificationCompat.PRIORITY_HIGH,
-                displayTime,
-                module.getName(),
-                "Upcoming event: " + event.description));
+        addByKey(keyFor(entry.id), notification);
     }
 
     /**
@@ -161,7 +128,6 @@ public final class NotificationScheduler {
         }
 
         setAlarm(key, notification);
-        write();
     }
 
     /**
@@ -173,76 +139,21 @@ public final class NotificationScheduler {
         ScheduledNotification notification = schedule.remove(key);
         if (notification != null) {
             cancelAlarm(key, notification);
-            write();
         }
     }
 
     /**
-     * Register an alarm with the operating system.
-     *
-     * @param key          the key for the notification
-     * @param notification the notification to schedule
+     * Store all scheduled notifications so they can be restored when the app is next loaded.
      */
-    private static void setAlarm(String key, ScheduledNotification notification) {
-        Context context = contextWeakReference.get();
-        if (context == null) {
+    public static void store() {
+        if (!dirty) {
             return;
         }
 
-        System.err.printf("setAlarm(%s)\n", key);
-        PendingIntent intent = notification.getPendingIntent(context, key);
-        alarmManager.setExact(AlarmManager.RTC, notification.timestamp, intent);
-    }
+        // Clear the dirty flag
+        dirty = false;
 
-    /**
-     * Cancel an alarm with the operating system.
-     *
-     * @param key          the key for the notification
-     * @param notification the notification to cancel
-     */
-    private static void cancelAlarm(String key, ScheduledNotification notification) {
-        Context context = contextWeakReference.get();
-        if (context == null) {
-            return;
-        }
-
-        System.err.printf("cancelAlarm(%s)\n", key);
-        PendingIntent intent = notification.getPendingIntent(context, key);
-        alarmManager.cancel(intent);
-    }
-
-    /**
-     * Load all previously scheduled events.
-     */
-    private static void read() {
-        if (!schedule.isEmpty()) {
-            return;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(scheduleFile))) {
-            String line;
-            long time = System.currentTimeMillis();
-            while ((line = reader.readLine()) != null) {
-                JsonObject json = JsonParser.parseString(line).getAsJsonObject();
-                ScheduledNotification notification = ScheduledNotification.fromJson(json);
-                if (notification.timestamp < time) {
-                    continue;
-                }
-
-                String key = json.get("key").getAsString();
-                schedule.put(key, notification);
-            }
-        } catch (FileNotFoundException ignored) {
-            // There is no existing schedule
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Store all scheduled events.
-     */
-    private static void write() {
+        // Store each event into the schedule file
         try (PrintWriter writer = new PrintWriter(scheduleFile, "UTF-8")) {
             long time = System.currentTimeMillis();
             for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
@@ -258,5 +169,84 @@ public final class NotificationScheduler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Load all previously scheduled events.
+     */
+    private static void load() {
+        if (dirty) {
+            return;
+        }
+
+        // Load each event from the schedule file
+        try (BufferedReader reader = new BufferedReader(new FileReader(scheduleFile))) {
+            String line;
+            long time = System.currentTimeMillis();
+            while ((line = reader.readLine()) != null) {
+                JsonObject json = JsonParser.parseString(line).getAsJsonObject();
+                ScheduledNotification notification = ScheduledNotification.fromJson(json);
+                if (notification.timestamp < time) {
+                    dirty = true;
+                    continue;
+                }
+
+                String key = json.get("key").getAsString();
+                schedule.put(key, notification);
+            }
+        } catch (FileNotFoundException ignored) {
+            // There is no existing schedule
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Register an alarm with the operating system.
+     *
+     * @param key          the key for the notification
+     * @param notification the notification to schedule
+     */
+    private static void setAlarm(String key, ScheduledNotification notification) {
+        // Don't set the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
+        }
+
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        // Add the alarm for creating the notification
+        PendingIntent intent = notification.getPendingIntent(context, key);
+        alarmManager.setExact(AlarmManager.RTC, notification.timestamp, intent);
+
+        // Set the dirty flag
+        dirty = true;
+    }
+
+    /**
+     * Cancel an alarm with the operating system.
+     *
+     * @param key          the key for the notification
+     * @param notification the notification to cancel
+     */
+    private static void cancelAlarm(String key, ScheduledNotification notification) {
+        // Don't cancel the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
+        }
+
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        // Cancel the alarm for creating the notification
+        alarmManager.cancel(notification.getPendingIntent(context, key));
+
+        // Set the dirty flag
+        dirty = true;
     }
 }

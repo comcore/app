@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -12,17 +13,33 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.dialogs.EnterCodeDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InvalidPasswordDialog;
 import com.gmail.comcorecrew.comcore.server.LoginStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
-import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 public class LoginFragment extends Fragment {
+    public static boolean alreadyLoggedIn = false;
+
+    private static WeakReference<NavController> navControllerWeakReference;
+    private static boolean cancelLogin;
+
+    public static void onLoggedOut() {
+        if (navControllerWeakReference == null) {
+            cancelLogin = true;
+            return;
+        }
+
+        NavController navController = navControllerWeakReference.get();
+        if (navController == null) {
+            return;
+        }
+
+        navController.popBackStack(R.id.loginFragment, false);
+    }
 
     public LoginFragment() {
         // Required empty public constructor
@@ -49,6 +66,18 @@ public class LoginFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        NavController controller = NavHostFragment.findNavController(this);
+        navControllerWeakReference = new WeakReference<>(controller);
+
+        // If already logged in, navigate directly to the main view of the app
+        if (alreadyLoggedIn) {
+            alreadyLoggedIn = false;
+            if (!cancelLogin) {
+                controller.navigate(R.id.action_loginFragment_to_mainFragment);
+            }
+            return;
+        }
 
         view.findViewById(R.id.loginButton).setOnClickListener(clickedView -> {
             EditText usernameView = view.findViewById(R.id.editUsername);
@@ -99,7 +128,6 @@ public class LoginFragment extends Fragment {
             NavHostFragment.findNavController(LoginFragment.this)
                     .navigate(R.id.action_loginFragment_to_createUserFragment);
         });
-
     }
 
 }

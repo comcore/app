@@ -171,7 +171,7 @@ public class ViewTasksDialog extends DialogFragment {
 
         @Override
         public int getItemCount() {
-            return currentTaskList.getTasks().size();
+            return currentTaskList.numEntries();
         }
     }
 

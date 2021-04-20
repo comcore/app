@@ -215,6 +215,7 @@ public class ChatFragment5 extends Fragment {
         ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
             if (result.isFailure()) {
                 ErrorDialog.show(result.errorMessage);
+                return;
             }
             messaging.onReceiveMessage(result.data);
             refresh();
@@ -262,7 +263,7 @@ public class ChatFragment5 extends Fragment {
 
     private void editMessage(MenuItem item) {
         messageEntry = messaging.getEntry(item.getGroupId());
-        messageToBeSent.setText(messaging.getEntries().get(item.getGroupId()).contents);
+        messageToBeSent.setText(messaging.get(item.getGroupId()).getData());
         isEditMode = true;
     }
 

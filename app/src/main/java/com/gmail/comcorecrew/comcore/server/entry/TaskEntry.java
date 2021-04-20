@@ -1,9 +1,15 @@
 package com.gmail.comcorecrew.comcore.server.entry;
 
-import com.gmail.comcorecrew.comcore.R;
+import androidx.core.app.NotificationCompat;
+
+import com.gmail.comcorecrew.comcore.abstracts.Module;
+import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
+import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
+import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
+import com.gmail.comcorecrew.comcore.notifications.ScheduledNotification;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
@@ -15,12 +21,7 @@ import java.util.Objects;
 /**
  * Represents an entry of task data returned by the server.
  */
-public final class TaskEntry {
-    /**
-     * The task's identifier.
-     */
-    public final TaskID id;
-
+public final class TaskEntry extends ModuleEntry<TaskListID, TaskID> {
     /**
      * The user that created the task.
      */
@@ -66,9 +67,9 @@ public final class TaskEntry {
      */
     public TaskEntry(TaskID id, UserID creator, long timestamp, long deadline, String description,
                      UserID completer, UserID assigned) {
-        if (id == null) {
-            throw new IllegalArgumentException("TaskID cannot be null");
-        } else if (creator == null) {
+        super(id);
+
+        if (creator == null) {
             throw new IllegalArgumentException("task creator cannot be null");
         } else if (timestamp < 1) {
             throw new IllegalArgumentException("task timestamp cannot be less than 1");
@@ -84,7 +85,6 @@ public final class TaskEntry {
             assigned = null;
         }
 
-        this.id = id;
         this.creator = creator;
         this.timestamp = timestamp;
         this.deadline = deadline;
@@ -176,6 +176,30 @@ public final class TaskEntry {
      */
     public boolean isOverdue() {
         return deadline != 0 && deadline < System.currentTimeMillis();
+    }
+
+    @Override
+    public ScheduledNotification getScheduledNotification() {
+        if (!hasDeadline()) {
+            return null;
+        }
+
+        long displayTime = deadline - NotificationScheduler.REMINDER_TIME;
+        if (displayTime < System.currentTimeMillis()) {
+            return null;
+        }
+
+        Module module = GroupStorage.getModule(id.module);
+        if (module == null || module.isMuted()) {
+            return null;
+        }
+
+        return new ScheduledNotification(
+                NotificationHandler.CHANNEL_TASK,
+                NotificationCompat.PRIORITY_HIGH,
+                displayTime,
+                module.getName(),
+                "Upcoming deadline: " + description);
     }
 
     @Override

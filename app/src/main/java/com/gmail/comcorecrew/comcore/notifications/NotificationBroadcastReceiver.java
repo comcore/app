@@ -12,15 +12,21 @@ import com.gmail.comcorecrew.comcore.R;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * BroadcastReceiver to send a notification at a specific time.
+ */
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        // Get the notification JSON and ID from the Intent
         String jsonString = intent.getStringExtra("json");
         int id = intent.getIntExtra("id", 0);
 
+        // Parse the JSON to create a ScheduledNotification object
         JsonObject json = JsonParser.parseString(jsonString).getAsJsonObject();
         ScheduledNotification scheduled = ScheduledNotification.fromJson(json);
 
+        // Create a notification with the required information
         Notification notification = new NotificationCompat.Builder(context, scheduled.channel)
                 .setSmallIcon(R.drawable.receivedmsg)
                 .setContentTitle(scheduled.title)
@@ -29,6 +35,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                 .setPriority(scheduled.priority)
                 .build();
 
+        // Send the notification
         NotificationManagerCompat.from(context).notify(id, notification);
     }
 }

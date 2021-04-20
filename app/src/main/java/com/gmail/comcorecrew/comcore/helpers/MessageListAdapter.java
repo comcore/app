@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.MessageItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
@@ -47,9 +48,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     public int getItemViewType(int position) {
-        MessageEntry message = messaging.getEntry(position);
+        MessageItem message = messaging.get(position);
 
-        if (message.sender.equals(AppData.self.getID())) {
+        if (message.getId() == AppData.self.getInternalId()) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;
         } else {
@@ -78,7 +79,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        MessageEntry message = messaging.getEntry(position);
+        MessageItem message = messaging.get(position);
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_SENT:
@@ -102,13 +103,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
         }
 
-        void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents, messaging.getGroup(), null));
-            timeText.setText(format(message.timestamp));
-            dateText.setText(format2(message.timestamp));
-            UserStorage.lookup(message.sender, user -> {
-                nameText.setText(user.getName());
-            });
+        void bind(MessageItem message) {
+            messageText.setText(ChatMention.formatMentions(message.getData(), messaging.getGroup(), null));
+            timeText.setText(format(message.getTimestamp()));
+            dateText.setText(format2(message.getTimestamp()));
+            nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
         }
 
@@ -153,13 +152,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
         }
 
-        void bind(MessageEntry message) {
-            messageText.setText(ChatMention.formatMentions(message.contents, messaging.getGroup(), null));
-            timeText.setText(format(message.timestamp));
-            dateText.setText(format2(message.timestamp));
-            UserStorage.lookup(message.sender, user -> {
-                nameText.setText(user.getName());
-            });
+        void bind(MessageItem message) {
+            messageText.setText(ChatMention.formatMentions(message.getData(), messaging.getGroup(), null));
+            timeText.setText(format(message.getTimestamp()));
+            dateText.setText(format2(message.getTimestamp()));
+            nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
         }
 

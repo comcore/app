@@ -9,6 +9,8 @@ import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 
+import java.util.Collections;
+
 public class CustomItem implements Cacheable {
 
     private int id;
@@ -90,7 +92,8 @@ public class CustomItem implements Cacheable {
 
     public MessageEntry toEntry(ChatID chatID) {
         MessageID messageID = new MessageID(chatID, itemId);
-        return new MessageEntry(messageID, UserStorage.getUser(id).getID(), timestamp, data);
+        return new MessageEntry(messageID, UserStorage.getUser(id).getID(), timestamp, data,
+                Collections.emptyList());
     }
 
     public TaskEntry toEntry(TaskListID listID) {

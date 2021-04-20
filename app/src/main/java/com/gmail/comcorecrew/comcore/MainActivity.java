@@ -11,11 +11,14 @@ import android.view.Menu;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
+import com.gmail.comcorecrew.comcore.fragments.LoginFragment;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
 import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
+import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.connection.ServerConnection;
 import com.gmail.comcorecrew.comcore.server.entry.InviteLinkEntry;
+import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.io.IOException;
 
@@ -72,10 +75,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Start initializing the cache using the application context
         try {
-            AppData.preInit(context);
-        } catch (IOException e) {
+            AppData.preInit(context, this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void whenExistingLogin(UserInfo info, LoginToken token) throws IOException {
+        // Call AppData.init() first in case there is an error
+        Context context = getBaseContext();
+        AppData.init(info, token, context);
+
+        // Connect to the server with the token
+        ServerConnector.connect(token);
+
+        // Set alreadyLoggedIn to true so that the LoginFragment knows to skip login
+        LoginFragment.alreadyLoggedIn = true;
     }
 
     @Override
@@ -83,5 +98,13 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activitymenu, menu);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Make sure the notification scheduler stores any changes
+        NotificationScheduler.store();
+
+        super.onDestroy();
     }
 }

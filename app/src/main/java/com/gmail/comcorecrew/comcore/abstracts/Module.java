@@ -325,6 +325,11 @@ public abstract class Module implements Serializable, NotificationListener {
     public void clearCache() {}
 
     /**
+     * Run when a group is deleted to cancel any scheduled reminders.
+     */
+    public void onDeleted() {}
+
+    /**
      * Run after the module is initialized to the server to avoid
      * race conditions
      */

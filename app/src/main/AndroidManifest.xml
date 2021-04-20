@@ -3,6 +3,7 @@
     package="com.gmail.comcorecrew.comcore">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -65,6 +66,11 @@
         <receiver
             android:process=":remote"
             android:name=".notifications.NotificationBroadcastReceiver"/>
+        <receiver android:name=".notifications.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
