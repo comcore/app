@@ -134,12 +134,12 @@ public class ChatFragment5 extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.go_back:
-                /** Handle back button **/
+                /* Handle back button */
                 NavHostFragment.findNavController(this).popBackStack();
                 return true;
 
             case R.id.pinned_messages:
-                /**Handle pinned messages button **/
+                /*Handle pinned messages button */
                 return true;
 
             default:

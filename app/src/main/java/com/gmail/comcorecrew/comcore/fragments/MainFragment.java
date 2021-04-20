@@ -96,7 +96,7 @@ public class MainFragment extends Fragment {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.invitesFragment:
-                /** Handle viewing list of members **/
+                /* Handle viewing list of members */
 
                 new ViewInvitesDialog(this)
                         .show(getParentFragmentManager(), null);
@@ -113,7 +113,7 @@ public class MainFragment extends Fragment {
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
                 return true;
             case R.id.settingsFragment:
-                /** Handle moving to the settings page */
+                /* Handle moving to the settings page */
                 SettingsFragment.currentGroup = null;
                 NavHostFragment.findNavController(this)
                         .navigate(R.id.action_mainFragment_to_settingsFragment);
@@ -152,8 +152,8 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                /** When a group box is clicked, pass its GroupId to the new group fragment instead
-                 * of passing the entire group.
+                /* When a group box is clicked, pass its GroupId to the new group fragment instead
+                  of passing the entire group.
                  */
                 MainFragmentDirections.ActionMainFragmentToGroupFragment action = MainFragmentDirections.actionMainFragmentToGroupFragment(currentGroup.getGroupId());
                 action.setGroupID(currentGroup.getGroupId());
@@ -216,4 +216,3 @@ public class MainFragment extends Fragment {
         }
     }
 }
-

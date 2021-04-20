@@ -38,7 +38,7 @@ public class CreateGroupFragment extends Fragment {
     private boolean list = false;
     private boolean calendar = false;
     private GroupID parentGroupID = null;
-    private ArrayList<UserID> members = new ArrayList<UserID>();
+    private ArrayList<UserID> members = new ArrayList<>();
 
     public CreateGroupFragment() {
         // Required empty public constructor
@@ -64,8 +64,8 @@ public class CreateGroupFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_create_group, container, false);
 
-        /** If no parentGroupID was passed to this fragment, then elements specific to creating
-         * sub groups should not be shown.
+        /* If no parentGroupID was passed to this fragment, then elements specific to creating
+          sub groups should not be shown.
          */
         if (parentGroupID == null) {
             rootView.findViewById(R.id.total_members).setVisibility(View.INVISIBLE);
@@ -85,7 +85,7 @@ public class CreateGroupFragment extends Fragment {
 
     private void updateMemberListDisplay() {
         TextView totalMembers = getView().findViewById(R.id.total_members);
-        String totalMembersString = "Total Members: " + String.valueOf(members.size());
+        String totalMembersString = "Total Members: " + members.size();
         totalMembers.setText(totalMembersString);
     }
 
@@ -94,8 +94,8 @@ public class CreateGroupFragment extends Fragment {
 
         updateMemberListDisplay();
 
-        /**
-         * If the "back" button is clicked, return to the main page
+        /*
+          If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.create_group_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
@@ -106,8 +106,8 @@ public class CreateGroupFragment extends Fragment {
             chat = !chat;
         });
 
-        /**
-         * If the "submit" button is clicked, try to create a group using the given information
+        /*
+          If the "submit" button is clicked, try to create a group using the given information
          */
         view.findViewById(R.id.create_group_submit_button).setOnClickListener(clickedView -> {
             EditText groupNameView = view.findViewById(R.id.editGroupName);
@@ -118,7 +118,7 @@ public class CreateGroupFragment extends Fragment {
                 return;
             }
 
-            /** If the new group is not a sub group **/
+            /* If the new group is not a sub group */
             if (parentGroupID == null) {
 
                 ServerConnector.createGroup(groupName, result -> {
@@ -126,7 +126,7 @@ public class CreateGroupFragment extends Fragment {
                         ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
-                    /** Automatically creates a chat module **/
+                    /* Automatically creates a chat module */
                     ServerConnector.createChat(result.data, groupName, result1 -> {
                         if (result1.isFailure()) {
                             ErrorDialog.show(R.string.error_cannot_connect);
@@ -136,14 +136,14 @@ public class CreateGroupFragment extends Fragment {
                             .popBackStack();
                 });
             }
-            /** If the new group is a sub group **/
+            /* If the new group is a sub group */
             else {
                 ServerConnector.createSubGroup(parentGroupID, groupName, members, result -> {
                     if (result.isFailure()) {
                         ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
-                    /** Automatically creates a chat module **/
+                    /* Automatically creates a chat module */
                     ServerConnector.createChat(result.data, groupName, result1 -> {
                         if (result1.isFailure()) {
                             ErrorDialog.show(R.string.error_cannot_connect);
@@ -221,7 +221,7 @@ public class CreateGroupFragment extends Fragment {
             viewHolder.getTextView().setText(currentUser.getName());
             viewHolder.setUser(currentUser);
 
-            /** The group role tag is not necessary when creating a sub group **/
+            /* The group role tag is not necessary when creating a sub group */
             viewHolder.viewTag.setVisibility(View.INVISIBLE);
 
         }

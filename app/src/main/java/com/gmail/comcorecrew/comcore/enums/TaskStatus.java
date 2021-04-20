@@ -17,5 +17,5 @@ public enum TaskStatus {
     /**
      * A task which has been completed.
      */
-    COMPLETED;
+    COMPLETED,
 }

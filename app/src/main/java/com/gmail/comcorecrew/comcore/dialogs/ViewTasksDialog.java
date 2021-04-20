@@ -80,8 +80,8 @@ public class ViewTasksDialog extends DialogFragment {
             labelViewTasks.setText(R.string.in_progress_task);
         }
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.view_tasks_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
@@ -176,4 +176,3 @@ public class ViewTasksDialog extends DialogFragment {
     }
 
 }
-

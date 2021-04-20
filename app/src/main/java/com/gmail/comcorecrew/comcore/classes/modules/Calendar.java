@@ -95,8 +95,8 @@ public class Calendar extends Module {
         for (int i = 0; i < getApproved().size(); i++) {
             startDay.setTimeInMillis(approved.get(i).start);
 
-            /** Currently gets entries based on their starting day
-             * TODO match entries as long as the currentDay overlaps with its time range **/
+            /* Currently gets entries based on their starting day
+              TODO match entries as long as the currentDay overlaps with its time range */
             if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
                 currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
                 currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {

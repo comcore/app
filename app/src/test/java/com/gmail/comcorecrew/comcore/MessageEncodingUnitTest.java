@@ -1,9 +1,11 @@
 package com.gmail.comcorecrew.comcore;
 
+import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.MockConnection;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
@@ -13,6 +15,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -26,22 +30,28 @@ public class MessageEncodingUnitTest {
         ChatID chatID = new ChatID(new GroupID("gid"), "cid");
 
         // Create a message with unicode contents
+        ReactionEntry reaction = new ReactionEntry(new UserID("other"), "like");
         MessageEntry entry = new MessageEntry(
                 new MessageID(chatID, 1),
-                new UserInfo(new UserID("uid"), "Sender"),
+                new UserID("uid"),
                 System.currentTimeMillis(),
-                "Test message வணக்கம் \uD83D\uDC4D \uD83C\uDDFA\uD83C\uDDF8");
+                "Test message வணக்கம் \uD83D\uDC4D \uD83C\uDDFA\uD83C\uDDF8",
+                Collections.singletonList(reaction));
 
         // Encode it in JSON as if receiving from the server
-        JsonObject sender = new JsonObject();
-        sender.addProperty("id", entry.sender.id.id);
-        sender.addProperty("name", entry.sender.name);
+        JsonObject reactionJson = new JsonObject();
+        reactionJson.addProperty("user", reaction.user.id);
+        reactionJson.addProperty("reaction", reaction.reaction);
+
+        JsonArray reactions = new JsonArray();
+        reactions.add(reactionJson);
 
         JsonObject message = new JsonObject();
         message.addProperty("id", entry.id.id);
-        message.add("sender", sender);
+        message.addProperty("sender", entry.sender.id);
         message.addProperty("timestamp", entry.timestamp);
         message.addProperty("contents", entry.contents);
+        message.add("reactions", reactions);
 
         JsonArray messages = new JsonArray();
         messages.add(message);

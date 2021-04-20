@@ -65,8 +65,8 @@ public class ViewInvitesDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.view_invites_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
@@ -158,4 +158,3 @@ public class ViewInvitesDialog extends DialogFragment {
     }
 
 }
-

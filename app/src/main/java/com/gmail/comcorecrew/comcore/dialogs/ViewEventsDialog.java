@@ -60,8 +60,8 @@ public class ViewEventsDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.view_invites_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
@@ -97,7 +97,7 @@ public class ViewEventsDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    /** Delete event **/
+                    /* Delete event */
                     currentCalendar.deleteEvent(currentEventEntry.id);
                     dismiss();
                 }
@@ -135,4 +135,3 @@ public class ViewEventsDialog extends DialogFragment {
     }
 
 }
-

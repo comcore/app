@@ -27,7 +27,7 @@ public class ViewGroupsDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        /** ViewGroupsDialog uses the same layout as ViewMembersDialog **/
+        /* ViewGroupsDialog uses the same layout as ViewMembersDialog */
         View rootView = inflater.inflate(R.layout.view_group_members, container, false);
 
         // Create the RecyclerView
@@ -46,9 +46,9 @@ public class ViewGroupsDialog extends DialogFragment {
         TextView labelViewGroups = view.findViewById(R.id.label_view_members);
         labelViewGroups.setText(R.string.pin_group_desc);
 
-        /**
-         * If the "back" button is clicked, close the dialog box.
-         * ViewGroupsDialog uses the same layout and buttons as ViewMembersDialog.
+        /*
+          If the "back" button is clicked, close the dialog box.
+          ViewGroupsDialog uses the same layout and buttons as ViewMembersDialog.
          */
         view.findViewById(R.id.view_members_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
@@ -120,4 +120,3 @@ public class ViewGroupsDialog extends DialogFragment {
     }
 
 }
-

@@ -47,15 +47,15 @@ public class CreateTaskDialog extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.create_task_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
-        /**
-         * If the "submit" button is clicked, try to create the task
+        /*
+          If the "submit" button is clicked, try to create the task
          */
         view.findViewById(R.id.create_task_submit_button).setOnClickListener(clickedView -> {
 
@@ -73,7 +73,7 @@ public class CreateTaskDialog extends DialogFragment {
                 currentTaskList.sendTask(deadline.getTimeInMillis(), taskDesc.getText().toString());
             }
             catch (NullPointerException e) {
-                /** If an error occurs parsing the deadline, create the task without a deadline **/
+                /* If an error occurs parsing the deadline, create the task without a deadline */
                 currentTaskList.sendTask(0, taskDesc.getText().toString());
             }
             this.dismiss();

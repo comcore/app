@@ -49,9 +49,10 @@ public class CacheDriver extends Module {
     }
 
     @Override
-    public void setMuted(boolean muted) {
+    public void refresh() { }
 
-    }
+    @Override
+    public void setMuted(boolean muted) { }
 
     @Override
     public boolean isMuted() {

@@ -38,8 +38,8 @@ public class SettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        /** The twoFactorSwitch should be toggled depending on whether the user has previously
-         * enabled two factor authentication.
+        /* The twoFactorSwitch should be toggled depending on whether the user has previously
+          enabled two factor authentication.
          */
         Switch twoFactorSwitch = rootView.findViewById(R.id.settings_two_factor_switch);
         Switch muteCurrentSwitch = rootView.findViewById(R.id.mute_current_switch);
@@ -70,20 +70,20 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Handle the back button **/
+        /* Handle the back button */
         view.findViewById(R.id.settings_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
 
-        /** If the user presses submit, update their settings preferences **/
+        /* If the user presses submit, update their settings preferences */
         view.findViewById(R.id.settings_submit_button).setOnClickListener(clickedView -> {
 
             Switch twoFactorSwitch = view.findViewById(R.id.settings_two_factor_switch);
             Switch muteCurrentSwitch = view.findViewById(R.id.mute_current_switch);
             Switch mentionCurrentSwitch = view.findViewById(R.id.mention_current_switch);
 
-            /** Set Two Factor Authentication */
+            /* Set Two Factor Authentication */
             ServerConnector.setTwoFactor(twoFactorSwitch.isChecked(), result -> {
                 if (result.isFailure()) {
                     ErrorDialog.show(R.string.error_cannot_connect);
@@ -97,7 +97,7 @@ public class SettingsFragment extends Fragment {
                 }
             }
 
-            /** Close the settings fragment **/
+            /* Close the settings fragment */
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
