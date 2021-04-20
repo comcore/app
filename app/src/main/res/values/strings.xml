@@ -183,10 +183,15 @@
     <string name="create_event_start_time">Start Time (HH:MM)</string>
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
+    <string name="view_events">Events</string>
 
     <!-- Polling -->
     <string name="create_poll">Create Poll</string>
     <string name="delete_poll">Delete Poll</string>
+
+    <!-- Bulletin Board -->
+    <string name="bulletin_board">Bulletin Board</string>
+    <string name="bulletin_board_label">Upcoming events within the next week</string>
 
 
 </resources>

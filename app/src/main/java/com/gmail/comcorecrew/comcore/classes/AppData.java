@@ -407,7 +407,7 @@ public class AppData {
     public static ArrayList<EventEntry> getUpcoming() {
         ArrayList<EventEntry> upcoming = new ArrayList<>();
         long now = new Date().getTime();
-        long then = now + 604800; //seconds in a week
+        long then = now + 604800000; //milliseconds in a week
         for (Group group : groups) {
             if (group != null) {
                 for (Module module : group.getModules()) {

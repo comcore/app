@@ -28,10 +28,10 @@ public class ViewGroupsDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         /** ViewGroupsDialog uses the same layout as ViewMembersDialog **/
-        View rootView = inflater.inflate(R.layout.view_group_members, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_members_recycler);
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         CustomAdapter adapter = new CustomAdapter();
         rvGroups.setAdapter(adapter);
@@ -43,14 +43,14 @@ public class ViewGroupsDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView labelViewGroups = view.findViewById(R.id.label_view_members);
+        TextView labelViewGroups = view.findViewById(R.id.label_dialog_with_title);
         labelViewGroups.setText(R.string.pin_group_desc);
 
         /**
          * If the "back" button is clicked, close the dialog box.
          * ViewGroupsDialog uses the same layout and buttons as ViewMembersDialog.
          */
-        view.findViewById(R.id.view_members_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 

@@ -2,27 +2,22 @@ package com.gmail.comcorecrew.comcore.dialogs;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
@@ -51,10 +46,10 @@ public class ViewMembersDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.view_group_members, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_members_recycler);
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         ViewMembersDialog.CustomAdapter groupAdapter = new ViewMembersDialog.CustomAdapter(userList, flag);
         rvGroups.setAdapter(groupAdapter);
@@ -66,7 +61,7 @@ public class ViewMembersDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView labelViewMembers = view.findViewById(R.id.label_view_members);
+        TextView labelViewMembers = view.findViewById(R.id.label_dialog_with_title);
 
         if (flag == 0) {
             labelViewMembers.setText(R.string.view_members);
@@ -94,7 +89,7 @@ public class ViewMembersDialog extends DialogFragment {
         /**
          * If the "back" button is clicked, close the dialog box
          */
-        view.findViewById(R.id.view_members_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 

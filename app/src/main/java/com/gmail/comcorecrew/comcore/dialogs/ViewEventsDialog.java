@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 
@@ -29,6 +30,7 @@ public class ViewEventsDialog extends DialogFragment {
     /**
      * 0 - View events
      * 1 - Delete events
+     * 2 - View Upcoming events (Bulletin Board)
      */
     private int flag;
 
@@ -41,17 +43,21 @@ public class ViewEventsDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
 
-        if (currentDate == null) {
-            eventList = currentCalendar.getEntries();
+        if (flag == 2) {
+            eventList = AppData.getUpcoming();
         }
-        else {
+        else if (flag == 0 && currentDate != null){
             eventList = currentCalendar.getEntriesByDay(currentDate);
         }
+        else {
+            eventList = currentCalendar.getEntries();
+        }
+
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new CustomAdapter();
         rvGroups.setAdapter(adapter);
@@ -64,10 +70,21 @@ public class ViewEventsDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        TextView title = view.findViewById(R.id.label_dialog_with_title);
+        if (flag == 0) {
+            title.setText(R.string.view_events);
+        }
+        else if (flag == 1) {
+            title.setText(R.string.delete_events);
+        }
+        else if (flag == 2) {
+            title.setText(R.string.bulletin_board_label);
+        }
+
         /**
          * If the "back" button is clicked, close the dialog box
          */
-        view.findViewById(R.id.view_invites_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
@@ -80,18 +97,12 @@ public class ViewEventsDialog extends DialogFragment {
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            private final TextView textView;
             private EventEntry currentEventEntry;
 
             public ViewHolder(View view) {
                 super(view);
                 view.setOnClickListener(this);
 
-                textView = (TextView) view.findViewById(R.id.label_invite);
-            }
-
-            public TextView getTextView() {
-                return textView;
             }
 
             public void setCurrentEventEntry(EventEntry newEntry) {

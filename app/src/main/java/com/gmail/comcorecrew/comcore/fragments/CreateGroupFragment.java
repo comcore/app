@@ -38,7 +38,7 @@ public class CreateGroupFragment extends Fragment {
     private boolean list = false;
     private boolean calendar = false;
     private GroupID parentGroupID = null;
-    private ArrayList<UserID> members = new ArrayList<UserID>();
+    private ArrayList<User> members = new ArrayList<User>();
 
     public CreateGroupFragment() {
         // Required empty public constructor
@@ -138,19 +138,7 @@ public class CreateGroupFragment extends Fragment {
             }
             /** If the new group is a sub group **/
             else {
-                ServerConnector.createSubGroup(parentGroupID, groupName, members, result -> {
-                    if (result.isFailure()) {
-                        ErrorDialog.show(R.string.error_cannot_connect);
-                        return;
-                    }
-                    /** Automatically creates a chat module **/
-                    ServerConnector.createChat(result.data, groupName, result1 -> {
-                        if (result1.isFailure()) {
-                            ErrorDialog.show(R.string.error_cannot_connect);
-                        }
-                    });
-                    NavHostFragment.findNavController(this).popBackStack();
-                });
+                AppData.createSubGroup(AppData.getGroup(parentGroupID), groupName, members);
             }
 
         });
@@ -192,12 +180,12 @@ public class CreateGroupFragment extends Fragment {
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
-                if (members.contains(currentUser.getID())) {
-                    members.remove(currentUser.getID());
+                if (members.contains(currentUser)) {
+                    members.remove(currentUser);
                     textView.setTextColor(R.color.black);
                 }
                 else {
-                    members.add(currentUser.getID());
+                    members.add(currentUser);
                     textView.setTextColor(R.color.owner_color);
                 }
                 updateMemberListDisplay();
