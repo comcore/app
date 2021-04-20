@@ -255,6 +255,7 @@ public class GroupFragment extends Fragment {
                // }
                 else if (currentModule instanceof Calendar) {
                     CalendarFragment.calendar = (Calendar) currentModule;
+                    GroupCalendarFragment.calendar = (Calendar) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_calendarFragment);
                 }
