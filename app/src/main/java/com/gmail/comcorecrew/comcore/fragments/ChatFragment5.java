@@ -332,6 +332,7 @@ public class ChatFragment5 extends Fragment {
                 ServerConnector.uploadFile(x, inputData, result -> {
                     if (result.isFailure()) {
                         ErrorDialog.show(result.errorMessage);
+                        return;
                     }
                     messageToBeSent.setText(result.data);
                     sendMessage();
