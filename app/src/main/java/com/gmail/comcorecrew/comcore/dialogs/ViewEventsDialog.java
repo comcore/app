@@ -9,27 +9,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.caching.EventItem;
-import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
-import com.gmail.comcorecrew.comcore.fragments.MainFragment;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
-import com.gmail.comcorecrew.comcore.server.id.CalendarID;
-import com.gmail.comcorecrew.comcore.server.id.EventID;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class ViewEventsDialog extends DialogFragment {
 
@@ -124,7 +112,7 @@ public class ViewEventsDialog extends DialogFragment {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.event_row_item, viewGroup, false);
+                    .inflate(R.layout.subtitle_row_item, viewGroup, false);
 
             return new ViewHolder(view);
         }
@@ -132,8 +120,8 @@ public class ViewEventsDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            TextView eventDesc = viewHolder.itemView.findViewById(R.id.event_description);
-            TextView eventDate = viewHolder.itemView.findViewById(R.id.event_date_range);
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
             eventDesc.setText(eventList.get(position).description);
             String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventList.get(position).start).toString() +

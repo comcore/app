@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/create_poll"
+        android:title="@string/create_poll" />
+
+    <item
+        android:id="@+id/delete_poll"
+        android:title="@string/delete_poll" />
+
+
+</menu>

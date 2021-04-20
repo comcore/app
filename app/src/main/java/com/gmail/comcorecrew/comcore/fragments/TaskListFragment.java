@@ -93,7 +93,6 @@ public class TaskListFragment extends Fragment {
 
     /**
      * Handles click events for the option menu
-     * Most menu items are not visible unless viewing GroupFragment
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

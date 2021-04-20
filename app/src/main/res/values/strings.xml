@@ -184,7 +184,9 @@
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
 
-
+    <!-- Polling -->
+    <string name="create_poll">Create Poll</string>
+    <string name="delete_poll">Delete Poll</string>
 
 
 </resources>
