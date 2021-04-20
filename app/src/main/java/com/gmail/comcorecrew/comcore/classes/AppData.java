@@ -422,19 +422,21 @@ public class AppData {
         }
     }
 
-    public static ArrayList<EventEntry> getUpcoming() {
+    /**
+     * Returns a list of events within the next week from the group.
+     *
+     * @param group     group to get the events from
+     * @return          list of events within the next week
+     */
+    public static ArrayList<EventEntry> getUpcoming(Group group) {
         ArrayList<EventEntry> upcoming = new ArrayList<>();
         long now = new Date().getTime();
         long then = now + 604800; //seconds in a week
-        for (Group group : groups) {
-            if (group != null) {
-                for (Module module : group.getModules()) {
-                    if (module instanceof Calendar) {
-                        for (EventEntry entry : ((Calendar) module).getApproved()) {
-                            if (entry.start >= now && entry.end <= then) {
-                                upcoming.add(entry);
-                            }
-                        }
+        for (Module module : group.getModules()) {
+            if (module instanceof Calendar) {
+                for (EventEntry entry : ((Calendar) module).getApproved()) {
+                    if (entry.start >= now && entry.end <= then) {
+                        upcoming.add(entry);
                     }
                 }
             }
