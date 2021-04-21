@@ -41,7 +41,7 @@ import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 public class PollingFragment extends Fragment {
-    private Polling currentPolling;
+    public static Polling polling;
     private CustomAdapter pollingAdapter;
 
     public PollingFragment() {
@@ -73,8 +73,8 @@ public class PollingFragment extends Fragment {
         rvGroups.setAdapter(pollingAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
-        currentPolling.setCallback(this::refresh);
-        currentPolling.refresh();
+        polling.setCallback(this::refresh);
+        polling.refresh();
 
         return rootView;
     }
@@ -89,7 +89,7 @@ public class PollingFragment extends Fragment {
 
         /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_polling_fragment);
-        welcomeText.setText(currentPolling.getName());
+        welcomeText.setText(polling.getName());
 
         /**
          * If the "back" button is clicked, return to the main page
@@ -114,6 +114,12 @@ public class PollingFragment extends Fragment {
         // Handle item selection
         switch (item.getItemId()) {
 
+            case (R.id.create_poll):
+                /** Handle creating a poll **/
+                return true;
+            case (R.id.delete_poll):
+                /** Handle deleting a poll **/
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -139,23 +145,26 @@ public class PollingFragment extends Fragment {
         public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.subtitle_row_item, viewGroup, false);
+                    .inflate(R.layout.title_row_item, viewGroup, false);
 
             return new CustomAdapter.ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
-            TextView titleText = viewHolder.itemView.findViewById(R.id.row_title);
-            TextView deadlineText = viewHolder.itemView.findViewById(R.id.row_subtitle);
+            TextView titleText = viewHolder.itemView.findViewById(R.id.title_row_text);
+            PollItem poll = polling.getPolls().get(position);
 
-            PollItem poll = currentPolling.getPolls().get(position);
-
+            /**
+             * The titleText should be set to the description of an individual poll
+             *
+             *  titleText.setText(poll.getDescription());
+             **/
         }
 
         @Override
         public int getItemCount() {
-            return currentPolling.getPolls().size();
+            return polling.getPolls().size();
         }
     }
 }

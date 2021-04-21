@@ -43,6 +43,7 @@ import com.gmail.comcorecrew.comcore.server.id.GroupID;
 public class PollItemFragment extends Fragment {
     private PollItem currentPoll;
     private CustomAdapter pollingAdapter;
+    private Polling parentPolling;
 
     public PollItemFragment() {
         // Required empty public constructor
@@ -128,7 +129,10 @@ public class PollItemFragment extends Fragment {
             TextView titleText = viewHolder.itemView.findViewById(R.id.label_poll_fragment);
             TextView resultText = viewHolder.itemView.findViewById(R.id.results_label);
 
-            //PollItem poll = currentPoll.getChoices().get(position);
+             /**
+             *  PollItem poll = currentPoll.getChoices().get(position);
+             *  titleText.setText(poll.getDescription());
+              */
 
         }
 

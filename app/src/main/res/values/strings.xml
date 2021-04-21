@@ -188,6 +188,7 @@
     <string name="view_events">Events</string>
 
     <!-- Polling -->
+    <string name="polling">Poll</string>
     <string name="create_poll">Create Poll</string>
     <string name="delete_poll">Delete Poll</string>
 

@@ -71,7 +71,7 @@ public class ViewGroupsDialog extends DialogFragment {
                 super(view);
                 view.setOnClickListener(this);
 
-                textView = (TextView) view.findViewById(R.id.module_row_text);
+                textView = (TextView) view.findViewById(R.id.title_row_text);
             }
 
             public TextView getTextView() {
@@ -100,7 +100,7 @@ public class ViewGroupsDialog extends DialogFragment {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.module_row_item, viewGroup, false);
+                    .inflate(R.layout.title_row_item, viewGroup, false);
 
             return new ViewHolder(view);
         }
@@ -108,7 +108,7 @@ public class ViewGroupsDialog extends DialogFragment {
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
-            TextView nameText = viewHolder.itemView.findViewById(R.id.module_row_text);
+            TextView nameText = viewHolder.itemView.findViewById(R.id.title_row_text);
             nameText.setText(AppData.getFromPos(position).getDisplayName());
             viewHolder.setCurrentGroup(AppData.getFromPos(position));
         }

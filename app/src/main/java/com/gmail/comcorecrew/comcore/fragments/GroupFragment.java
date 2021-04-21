@@ -31,7 +31,6 @@ import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -224,7 +223,7 @@ public class GroupFragment extends Fragment {
                 view.setOnClickListener(this);
                 // Define click listener for the ViewHolder's View
 
-                textView = (TextView) view.findViewById(R.id.module_row_text);
+                textView = (TextView) view.findViewById(R.id.title_row_text);
 
             }
 
@@ -264,7 +263,7 @@ public class GroupFragment extends Fragment {
         public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.module_row_item, viewGroup, false);
+                    .inflate(R.layout.title_row_item, viewGroup, false);
 
             return new CustomAdapter.ViewHolder(view);
         }

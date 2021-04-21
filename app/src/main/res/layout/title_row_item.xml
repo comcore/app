@@ -17,7 +17,7 @@
         android:clickable="false">
 
         <TextView
-            android:id="@+id/module_row_text"
+            android:id="@+id/title_row_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/RowItemBackground"
