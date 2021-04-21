@@ -422,18 +422,18 @@ public class AppData {
         }
     }
 
-    public static ArrayList<EventEntry> getUpcoming() {
+    public static ArrayList<EventEntry> getUpcoming(GroupID currentGroup) {
         ArrayList<EventEntry> upcoming = new ArrayList<>();
         long now = new Date().getTime();
         long then = now + 604800000; //milliseconds in a week
-        for (Group group : groups) {
-            if (group != null) {
-                for (Module module : group.getModules()) {
-                    if (module instanceof Calendar) {
-                        for (EventEntry entry : ((Calendar) module).getApproved()) {
-                            if (entry.start >= now && entry.end <= then) {
-                                upcoming.add(entry);
-                            }
+
+        Group group = getGroup(currentGroup);
+        if (group != null) {
+            for (Module module : group.getModules()) {
+                if (module instanceof Calendar) {
+                    for (EventEntry entry : ((Calendar) module).getApproved()) {
+                        if (entry.start >= now && entry.end <= then) {
+                            upcoming.add(entry);
                         }
                     }
                 }
