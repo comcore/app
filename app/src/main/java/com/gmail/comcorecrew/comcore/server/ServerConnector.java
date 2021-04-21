@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -858,7 +859,7 @@ public final class ServerConnector {
                 return;
             case NONE:
                 reactionJson = JsonNull.INSTANCE;
-                return;
+                break;
             default:
                 reactionJson = new JsonPrimitive(reaction.name().toLowerCase());
         }
@@ -1074,6 +1075,79 @@ public final class ServerConnector {
         data.addProperty("calendar", event.module.id);
         data.addProperty("id", event.id);
         getConnection().send(new ServerMsg("deleteEvent", data), handler, response -> null);
+    }
+
+    /**
+     * Add a poll with a given description and options to a poll list.
+     *
+     * @param pollList    the poll list to add the poll to
+     * @param description the description of the poll
+     * @param options     the descriptions of the poll's options
+     * @param handler     the handler for the response of the server
+     */
+    public static void addPoll(PollListID pollList, String description, List<String> options,
+                               ResultHandler<PollEntry> handler) {
+        if (pollList == null) {
+            throw new IllegalArgumentException("PollListID cannot be null");
+        } else if (description == null) {
+            throw new IllegalArgumentException("poll description cannot be null");
+        } else if (options == null || options.isEmpty()) {
+            throw new IllegalArgumentException("poll options cannot be null or empty");
+        }
+
+        JsonArray array = new JsonArray();
+        for (String option : options) {
+            array.add(option);
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", pollList.group.id);
+        data.addProperty("pollList", pollList.id);
+        data.addProperty("description", description);
+        data.add("options", array);
+        getConnection().send(new ServerMsg("addPoll", data), handler,
+                response -> PollEntry.fromJson(pollList, response));
+    }
+
+    /**
+     * Get a list of the polls in a poll list.
+     *
+     * @param pollList the poll list to request polls from
+     * @param handler  the handler for the response of the server
+     * @see PollEntry
+     */
+    public static void getPolls(PollListID pollList, ResultHandler<PollEntry[]> handler) {
+        if (pollList == null) {
+            throw new IllegalArgumentException("PollListID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", pollList.group.id);
+        data.addProperty("pollList", pollList.id);
+        requestArray(new ServerMsg("getPolls", data), handler, PollEntry.class,
+                "polls", json -> PollEntry.fromJson(pollList, json));
+    }
+
+    /**
+     * Vote for a specific option on a poll.
+     *
+     * @param poll    the poll to vote on
+     * @param option  the option to vote for
+     * @param handler the handler for the response of the server
+     */
+    public static void voteOnPoll(PollID poll, int option, ResultHandler<Void> handler) {
+        if (poll == null) {
+            throw new IllegalArgumentException("PollID cannot be null");
+        } else if (option < 0) {
+            throw new IllegalArgumentException("poll vote option cannot be negative");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", poll.module.group.id);
+        data.addProperty("pollList", poll.module.id);
+        data.addProperty("id", poll.id);
+        data.addProperty("option", option);
+        getConnection().send(new ServerMsg("voteOnPoll", data), handler, response -> null);
     }
 
     /**

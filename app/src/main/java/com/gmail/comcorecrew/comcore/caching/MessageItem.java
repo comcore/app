@@ -209,14 +209,10 @@ public class MessageItem implements Cacheable {
     }
 
     public void setReactions(Map<UserID, String> newReactions) {
-        myReaction = Reaction.NONE;
+        myReaction = Reaction.fromString(newReactions.get(AppData.self.getID()));
         reactions = new ReactionHolder();
-        for (Map.Entry<UserID, String> reaction : newReactions.entrySet()) {
-            Reaction reactionEnum = Reaction.fromString(reaction.getValue());
-            reactions.addReaction(reactionEnum);
-            if (reaction.getKey().equals(AppData.self.getID())) {
-                myReaction = reactionEnum;
-            }
+        for (String reaction : newReactions.values()) {
+            reactions.addReaction(Reaction.fromString(reaction));
         }
     }
 

@@ -84,6 +84,13 @@ public interface NotificationListener {
     default void onEventDeleted(EventID event) {}
 
     /**
+     * Handle a new poll being added to a poll list.
+     *
+     * @param poll the poll received from the server
+     */
+    default void onPollAdded(PollEntry poll) {}
+
+    /**
      * Handle being sent a group invite.
      *
      * @param invite the invitation to the group

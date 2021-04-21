@@ -43,6 +43,10 @@ public enum Reaction {
     }
 
     public static Reaction fromString(String name) {
+        if (name == null) {
+            return Reaction.NONE;
+        }
+
         for (Reaction reaction : reactions) {
             if (name.equalsIgnoreCase(reaction.name())) {
                 return reaction;

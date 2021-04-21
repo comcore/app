@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.ItemID;
+import com.gmail.comcorecrew.comcore.server.id.PollListID;
 
 import java.util.ArrayList;
 
@@ -16,8 +17,8 @@ public class Polling extends Module {
     /** resultsVisible does not need to be cached between user sessions **/
     boolean resultsVisible;
 
-    public Polling(String name, CalendarID calendarID, Group group) {
-        super(name, calendarID, group, Mdid.CPLS);
+    public Polling(String name, PollListID pollListID, Group group) {
+        super(name, pollListID, group, Mdid.CPLS);
         polls = new ArrayList<>();
     }
 

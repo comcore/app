@@ -24,6 +24,7 @@ import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.PollEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
@@ -40,6 +41,7 @@ public final class NotificationHandler implements NotificationListener {
     public static final String CHANNEL_MESSAGE = "message";
     public static final String CHANNEL_TASK = "task";
     public static final String CHANNEL_EVENT = "event";
+    public static final String CHANNEL_POLL = "poll";
     public static final String CHANNEL_INVITE = "invite";
     public static final String CHANNEL_STATUS = "status";
 
@@ -98,6 +100,10 @@ public final class NotificationHandler implements NotificationListener {
         createNotificationChannel(
                 R.string.ch_name_event, R.string.ch_desc_event,
                 CHANNEL_EVENT, NotificationManager.IMPORTANCE_HIGH);
+
+        createNotificationChannel(
+                R.string.ch_name_poll, R.string.ch_desc_poll,
+                CHANNEL_POLL, NotificationManager.IMPORTANCE_HIGH);
 
         createNotificationChannel(
                 R.string.ch_name_invite, R.string.ch_desc_invite,
@@ -201,6 +207,22 @@ public final class NotificationHandler implements NotificationListener {
                     .setContentText(user.getName() + " completed: " + task.description)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()));
+    }
+
+    @Override
+    public void onPollAdded(PollEntry poll) {
+        Module module = GroupStorage.getModule(poll.id.module);
+        if (module == null || module.isMuted()) {
+            return;
+        }
+
+        UserStorage.lookup(poll.creator, user ->
+                notify(new NotificationCompat.Builder(context, CHANNEL_POLL)
+                        .setSmallIcon(R.drawable.receivedmsg)
+                        .setContentTitle(module.getName())
+                        .setContentText(user.getName() + " created: " + poll.description)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .build()));
     }
 
     @Override

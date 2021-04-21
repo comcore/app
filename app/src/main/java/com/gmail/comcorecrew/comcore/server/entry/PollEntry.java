@@ -21,11 +21,6 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
     public final UserID creator;
 
     /**
-     * The UNIX timestamp representing when the poll was last modified.
-     */
-    public final long timestamp;
-
-    /**
      * The description of the poll.
      */
     public final String description;
@@ -45,19 +40,16 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
      *
      * @param id          the PollID of the poll
      * @param creator     the user that created the poll
-     * @param timestamp   the timestamp that the poll was last modified
      * @param description the description of the poll
      * @param options     the options available in the poll
      * @param vote        the user's vote (or -1)
      */
-    public PollEntry(PollID id, UserID creator, long timestamp, String description,
-                     List<PollOption> options, int vote) {
+    public PollEntry(PollID id, UserID creator, String description, List<PollOption> options,
+                     int vote) {
         super(id);
 
         if (creator == null) {
             throw new IllegalArgumentException("poll creator cannot be null");
-        } else if (timestamp < 1) {
-            throw new IllegalArgumentException("poll timestamp cannot be less than 1");
         } else if (description == null || description.isEmpty()) {
             throw new IllegalArgumentException("poll description cannot be null or empty");
         } else if (options == null || options.isEmpty()) {
@@ -67,7 +59,6 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
         }
 
         this.creator = creator;
-        this.timestamp = timestamp;
         this.description = description;
         this.options = options;
         this.vote = vote;
@@ -84,15 +75,14 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
     public static PollEntry fromJson(PollListID pollList, JsonObject json) {
         PollID id = PollID.fromJson(pollList, json);
         UserID creator = new UserID(json.get("owner").getAsString());
-        long timestamp = json.get("timestamp").getAsLong();
         String description = json.get("description").getAsString();
         ArrayList<PollOption> options = new ArrayList<>();
         for (JsonElement option : json.getAsJsonArray("options")) {
             options.add(PollOption.fromJson(option.getAsJsonObject()));
         }
         JsonElement voteJson = json.get("vote");
-        int vote = voteJson == null ? -1 : voteJson.getAsInt();
-        return new PollEntry(id, creator, timestamp, description, options, vote);
+        int vote = voteJson.isJsonNull() ? -1 : voteJson.getAsInt();
+        return new PollEntry(id, creator, description, options, vote);
     }
 
     @Override
@@ -105,14 +95,14 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PollEntry pollEntry = (PollEntry) o;
-        return timestamp == pollEntry.timestamp &&
-                id.equals(pollEntry.id) &&
+        return vote == pollEntry.vote &&
                 creator.equals(pollEntry.creator) &&
-                description.equals(pollEntry.description);
+                description.equals(pollEntry.description) &&
+                options.equals(pollEntry.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creator, timestamp, description);
+        return Objects.hash(creator, description, options, vote);
     }
 }
