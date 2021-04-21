@@ -175,7 +175,7 @@
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
-    <string name="update_event_approval">Change Automatic Event Approval</string>
+    <string name="update_event_approval">Change Event Approval</string>
 
     <!-- Calendar -->
     <string name="view_pending_events">View Pending Events</string>

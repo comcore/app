@@ -133,10 +133,10 @@ public class CalendarFragment extends Fragment {
                     }
                     else {
                         if (calendar.getGroup().isRequireApproval()) {
-                            ErrorDialog.show(R.string.event_approval_needed);
+                            ErrorDialog.show(R.string.event_approval_not_needed);
                         }
                         else {
-                            ErrorDialog.show(R.string.event_approval_not_needed);
+                            ErrorDialog.show(R.string.event_approval_needed);
                         }
                     }
                 });
