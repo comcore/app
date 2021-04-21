@@ -165,7 +165,13 @@ public class TaskListFragment extends Fragment {
 
             TaskEntry task = taskList.getEntry(position);
             dataText.setText(task.description);
-            completedText.setText(task.getStatusDescription());
+            /** Only moderators can see the user who completed task items **/
+            if ((taskList.getGroup().getGroupRole() == GroupRole.USER) && (task.getStatus() == TaskStatus.COMPLETED)) {
+                completedText.setText(R.string.completed);
+            }
+            else {
+                completedText.setText(task.getStatusDescription());
+            }
 
             if (task.hasDeadline()) {
                 String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();

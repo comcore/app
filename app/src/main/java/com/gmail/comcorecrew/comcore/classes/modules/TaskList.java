@@ -57,7 +57,7 @@ public class TaskList extends Module {
      * @param taskID id of the task to toggle
      */
     public void toggleAssigned(TaskID taskID) {
-        boolean assigned = tasks.get(taskID).assigned.equals(AppData.self.getID());
+        boolean assigned = (tasks.get(taskID).assigned != null) && (tasks.get(taskID).assigned.equals(AppData.self.getID()));
         TaskStatus newStatus = assigned ? TaskStatus.UNASSIGNED : TaskStatus.IN_PROGRESS;
         ServerConnector.updateTaskStatus(taskID, newStatus, result -> {
             if (result.isFailure()) {
