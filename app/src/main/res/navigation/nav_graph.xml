@@ -81,6 +81,9 @@
         <action
             android:id="@+id/action_groupFragment_to_calendarFragment"
             app:destination="@id/calendarFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_pollingFragment"
+            app:destination="@id/pollingFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
@@ -103,4 +106,20 @@
         android:id="@+id/calendarFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CalendarFragment"
         android:label="CalendarFragment" />
+    <fragment
+        android:id="@+id/pollingFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.PollingFragment"
+        android:label="PollingFragment" >
+        <action
+            android:id="@+id/action_pollingFragment_to_pollItemFragment"
+            app:destination="@id/pollItemFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pollItemFragment"
+        android:name="com.gmail.comcorecrew.comcore.fragments.PollItemFragment"
+        android:label="PollItemFragment" >
+        <argument
+            android:name="parent_polling"
+            app:argType="com.gmail.comcorecrew.comcore.server.id.ModuleID" />
+    </fragment>
 </navigation>
