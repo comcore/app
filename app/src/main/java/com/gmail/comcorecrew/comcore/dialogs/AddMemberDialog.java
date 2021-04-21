@@ -43,18 +43,15 @@ public class AddMemberDialog extends DialogFragment {
                         String userEmail = text.getText().toString();
                         ServerConnector.sendInvite(groupID, userEmail, result -> {
                             if (result.isFailure()) {
-                                // getParentFragmentManager() throws an error
-                                //new ErrorDialog(R.string.error_send_invite).show(getParentFragmentManager(), null);
+                                ErrorDialog.show(result.errorMessage);
                                 return;
                             }
 
                             boolean sent = result.data;
                             if (sent) {
-                                // getParentFragmentManager() throws an error
-                                //new ErrorDialog(R.string.success_send_invite).show(getParentFragmentManager(), null);
+                                ErrorDialog.show(R.string.success_send_invite);
                             } else {
-                                // getParentFragmentManager() throws an error
-                                //new ErrorDialog(R.string.error_does_not_exist)show(getParentFragmentManager(), null);
+                                ErrorDialog.show(R.string.error_does_not_exist);
                             }
                         });
                     }

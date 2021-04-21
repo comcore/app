@@ -12,18 +12,17 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class ViewEventsDialog extends DialogFragment {
 
     private CustomAdapter adapter;
-    private ArrayList<EventEntry> eventList = new ArrayList<>();
+    private List<EventEntry> eventList = new ArrayList<>();
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
 
@@ -52,7 +51,7 @@ public class ViewEventsDialog extends DialogFragment {
             eventList = currentCalendar.getEntriesByDay(currentDate);
         }
         else {
-            eventList = currentCalendar.getEntries();
+            eventList = currentCalendar.getApproved();
         }
 
 
@@ -69,6 +68,7 @@ public class ViewEventsDialog extends DialogFragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
 
         TextView title = view.findViewById(R.id.label_dialog_with_title);
         if (flag == 0) {
@@ -112,7 +112,7 @@ public class ViewEventsDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    /** Delete event **/
+                    /* Delete event */
                     currentCalendar.deleteEvent(currentEventEntry.id);
                     dismiss();
                 }
@@ -150,4 +150,3 @@ public class ViewEventsDialog extends DialogFragment {
     }
 
 }
-

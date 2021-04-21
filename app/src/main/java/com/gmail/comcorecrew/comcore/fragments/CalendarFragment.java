@@ -64,12 +64,12 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current calendar */
+        /* Displays the name of the current calendar */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_calendar_fragment);
         welcomeText.setText(calendar.getName());
 
-        /**
-         * If the "back" button is clicked, return to the main page
+        /*
+          If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.calendar_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
@@ -114,15 +114,15 @@ public class CalendarFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.create_event:
-                /** Handle creating an event **/
+                /* Handle creating an event */
                 new CreateEventDialog(this, calendar).show(getParentFragmentManager(), null);
                 return true;
             case R.id.view_all_events:
-                /** Handle viewing all calendar events**/
+                /* Handle viewing all calendar events*/
                 new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
                 return true;
             case R.id.delete_events:
-                /** Handle deleting calendar events**/
+                /* Handle deleting calendar events*/
                 new ViewEventsDialog(calendar, null, 1).show(getParentFragmentManager(), null);
                 return true;
             case R.id.require_approval:
@@ -142,7 +142,7 @@ public class CalendarFragment extends Fragment {
                 });
                 return true;
             case R.id.view_pending_events:
-                /** Handle view pending events **/
+                /* Handle view pending events */
                 new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
                 return true;
             default:

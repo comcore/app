@@ -25,11 +25,28 @@ public interface NotificationListener {
     default void onReceiveMessage(MessageEntry message) {}
 
     /**
-     * Handle a message's contents being updated. The new contents will never be null.
+     * Handle a message's contents being updated. The new contents will never be null. This method
+     * will not receive updates to reactions in messages, only the contents of the message itself.
      *
      * @param message the updated message
      */
     default void onMessageUpdated(MessageEntry message) {}
+
+    /**
+     * Handle a reaction being added to a message.
+     *
+     * @param message  the message to update
+     * @param reaction the reaction to add
+     */
+    default void onReactionAdded(MessageID message, ReactionEntry reaction) {}
+
+    /**
+     * Handle a reaction being removed from a message.
+     *
+     * @param message  the message to update
+     * @param reaction the reaction to remove
+     */
+    default void onReactionRemoved(MessageID message, ReactionEntry reaction) {}
 
     /**
      * Handle a new task being added to a task list.

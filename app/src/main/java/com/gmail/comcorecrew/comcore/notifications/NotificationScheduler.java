@@ -44,8 +44,12 @@ public final class NotificationScheduler {
     public static void init(Context context) {
         contextWeakReference = new WeakReference<>(context);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
-        read();
+
+        // Only read from storage once (when the app first starts)
+        if (scheduleFile == null) {
+            scheduleFile = new File(context.getFilesDir(), "notificationSchedule");
+            load();
+        }
     }
 
     /**
@@ -55,6 +59,17 @@ public final class NotificationScheduler {
         for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
             setAlarm(entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * Clear all scheduled alarms (e.g. if the cache is cleared).
+     */
+    public static synchronized void clearAllAlarms() {
+        for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
+            cancelAlarm(entry.getKey(), entry.getValue());
+        }
+
+        schedule.clear();
     }
 
     /**
@@ -113,7 +128,6 @@ public final class NotificationScheduler {
         }
 
         setAlarm(key, notification);
-        dirty = true;
     }
 
     /**
@@ -125,62 +139,47 @@ public final class NotificationScheduler {
         ScheduledNotification notification = schedule.remove(key);
         if (notification != null) {
             cancelAlarm(key, notification);
-            dirty = true;
         }
     }
 
     /**
-     * Store the loaded data if necessary.
+     * Store all scheduled notifications so they can be restored when the app is next loaded.
      */
     public static void store() {
-        if (dirty) {
-            write();
-            dirty = false;
-        }
-    }
-
-    /**
-     * Register an alarm with the operating system.
-     *
-     * @param key          the key for the notification
-     * @param notification the notification to schedule
-     */
-    private static void setAlarm(String key, ScheduledNotification notification) {
-        Context context = contextWeakReference.get();
-        if (context == null) {
+        if (!dirty) {
             return;
         }
 
-        System.err.printf("setAlarm(%s)\n", key);
-        PendingIntent intent = notification.getPendingIntent(context, key);
-        alarmManager.setExact(AlarmManager.RTC, notification.timestamp, intent);
-    }
+        // Clear the dirty flag
+        dirty = false;
 
-    /**
-     * Cancel an alarm with the operating system.
-     *
-     * @param key          the key for the notification
-     * @param notification the notification to cancel
-     */
-    private static void cancelAlarm(String key, ScheduledNotification notification) {
-        Context context = contextWeakReference.get();
-        if (context == null) {
-            return;
+        // Store each event into the schedule file
+        try (PrintWriter writer = new PrintWriter(scheduleFile, "UTF-8")) {
+            long time = System.currentTimeMillis();
+            for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
+                ScheduledNotification notification = entry.getValue();
+                if (notification.timestamp < time) {
+                    continue;
+                }
+
+                JsonObject json = notification.toJson();
+                json.addProperty("key", entry.getKey());
+                writer.println(json.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        System.err.printf("cancelAlarm(%s)\n", key);
-        PendingIntent intent = notification.getPendingIntent(context, key);
-        alarmManager.cancel(intent);
     }
 
     /**
      * Load all previously scheduled events.
      */
-    private static void read() {
+    private static void load() {
         if (dirty) {
             return;
         }
 
+        // Load each event from the schedule file
         try (BufferedReader reader = new BufferedReader(new FileReader(scheduleFile))) {
             String line;
             long time = System.currentTimeMillis();
@@ -200,28 +199,54 @@ public final class NotificationScheduler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        store();
     }
 
     /**
-     * Store all scheduled events.
+     * Register an alarm with the operating system.
+     *
+     * @param key          the key for the notification
+     * @param notification the notification to schedule
      */
-    private static void write() {
-        try (PrintWriter writer = new PrintWriter(scheduleFile, "UTF-8")) {
-            long time = System.currentTimeMillis();
-            for (Map.Entry<String, ScheduledNotification> entry : schedule.entrySet()) {
-                ScheduledNotification notification = entry.getValue();
-                if (notification.timestamp < time) {
-                    continue;
-                }
-
-                JsonObject json = notification.toJson();
-                json.addProperty("key", entry.getKey());
-                writer.println(json.toString());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    private static void setAlarm(String key, ScheduledNotification notification) {
+        // Don't set the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
         }
+
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        // Add the alarm for creating the notification
+        PendingIntent intent = notification.getPendingIntent(context, key);
+        alarmManager.setExact(AlarmManager.RTC, notification.timestamp, intent);
+
+        // Set the dirty flag
+        dirty = true;
+    }
+
+    /**
+     * Cancel an alarm with the operating system.
+     *
+     * @param key          the key for the notification
+     * @param notification the notification to cancel
+     */
+    private static void cancelAlarm(String key, ScheduledNotification notification) {
+        // Don't cancel the alarm if it already passed
+        if (notification.timestamp <= System.currentTimeMillis()) {
+            return;
+        }
+
+        Context context = contextWeakReference.get();
+        if (context == null) {
+            return;
+        }
+
+        // Cancel the alarm for creating the notification
+        alarmManager.cancel(notification.getPendingIntent(context, key));
+
+        // Set the dirty flag
+        dirty = true;
     }
 }

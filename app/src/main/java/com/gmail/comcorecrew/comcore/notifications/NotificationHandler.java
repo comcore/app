@@ -16,8 +16,10 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
+import com.gmail.comcorecrew.comcore.fragments.LoginFragment;
 import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.server.LoginToken;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
@@ -33,7 +35,7 @@ import java.util.List;
 /**
  * Handles displaying notifications by forwarding them to Android.
  */
-public class NotificationHandler implements NotificationListener {
+public final class NotificationHandler implements NotificationListener {
     // Android notification channel identifiers
     public static final String CHANNEL_MESSAGE = "message";
     public static final String CHANNEL_TASK = "task";
@@ -264,6 +266,17 @@ public class NotificationHandler implements NotificationListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onLoggedOut() {
+        LoginFragment.onLoggedOut();
+        try {
+            AppData.clearToken();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ErrorDialog.show(R.string.error_logged_out);
     }
 
     @Override

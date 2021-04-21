@@ -86,8 +86,8 @@ public class ViewMembersDialog extends DialogFragment {
         }
 
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
@@ -238,4 +238,3 @@ public class ViewMembersDialog extends DialogFragment {
     }
 
 }
-

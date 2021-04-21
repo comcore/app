@@ -4,6 +4,7 @@ import android.os.Parcel;
 
 import androidx.annotation.NonNull;
 
+import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
@@ -12,6 +13,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
@@ -347,12 +349,20 @@ public class Group implements NotificationListener, Comparable<Group> {
     }
 
     public void updateRequireApproval(boolean requireApproval) {
-        //TODO Implement on server
-        try {
-            GroupStorage.storeGroup(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ServerConnector.setRequireApproval(groupID, requireApproval, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(R.string.error_cannot_connect);
+                return;
+            }
+
+            this.requireApproval = requireApproval;
+
+            try {
+                GroupStorage.storeGroup(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -467,11 +477,18 @@ public class Group implements NotificationListener, Comparable<Group> {
      * @param index the index of the module to remove
      */
     public void deleteModule(int index) {
+        modules.get(index).onDeleted();
         for (int i = index; i < modules.size() - 1; i++) {
             modules.set(i, modules.get(i + 1));
             modules.get(i).setIndex(i);
         }
         modules.remove(modules.size() - 1);
+    }
+
+    public void onDeleted() {
+        for (Module module : modules) {
+            module.onDeleted();
+        }
     }
 
     @Override

@@ -44,15 +44,15 @@ public class CreateModuleDialog extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        /**
-         * If the "back" button is clicked, close the dialog box
+        /*
+          If the "back" button is clicked, close the dialog box
          */
         view.findViewById(R.id.create_module_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
-        /**
-         * If the "submit" button is clicked, try to create the new module
+        /*
+          If the "submit" button is clicked, try to create the new module
          */
         view.findViewById(R.id.create_module_submit_button).setOnClickListener(clickedView -> {
 
@@ -64,7 +64,7 @@ public class CreateModuleDialog extends DialogFragment {
             EditText moduleName = view.findViewById(R.id.create_module_name_edit);
 
             if (chatRadio.isChecked()) {
-                /** Try to create a chat module **/
+                /* Try to create a chat module */
                 new Messaging(moduleName.getText().toString(), AppData.getGroup(groupID));
                 this.dismiss();
                 fragment.refresh();
@@ -102,7 +102,7 @@ public class CreateModuleDialog extends DialogFragment {
                 fragment.refresh();
             }
             else {
-                /** Throw an error if for some reason no radio button is checked **/
+                /* Throw an error if for some reason no radio button is checked */
                 ErrorDialog.show(R.string.error_module_not_selected);
             }
 

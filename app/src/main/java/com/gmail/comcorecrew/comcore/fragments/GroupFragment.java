@@ -85,8 +85,8 @@ public class GroupFragment extends Fragment {
         TextView groupNameText = (TextView) view.findViewById(R.id.label_group_fragment);
         groupNameText.setText(currentGroup.getDisplayName());
 
-        /**
-         * If the "back" button is clicked, return to the main page
+        /*
+          If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.group_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
@@ -102,9 +102,9 @@ public class GroupFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.groupmenu, menu);
 
-        /**  TODO
-         * If currentGroup is null, then there has been an error finding the group associated
-         * with the GroupID passed to this function
+        /*  TODO
+          If currentGroup is null, then there has been an error finding the group associated
+          with the GroupID passed to this function
          */
         if (currentGroup == null) {
             return;
@@ -127,13 +127,13 @@ public class GroupFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.view_members:
-                /** Handle viewing list of members **/
+                /* Handle viewing list of members */
 
                 new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 0)
                         .show(getParentFragmentManager(), null);
                 return true;
             case R.id.leave_group:
-                /** Handle leaving group **/
+                /* Handle leaving group */
 
                 ServerConnector.leaveGroup(currentGroup.getGroupId(), result -> {
                     if (result.isSuccess()) {
@@ -147,7 +147,7 @@ public class GroupFragment extends Fragment {
 
                 return true;
             case R.id.invite_member:
-                /** Handle inviting a new member **/
+                /* Handle inviting a new member */
                 AddMemberDialog addMemberDialog = new AddMemberDialog(currentGroup.getGroupId(), R.string.invite_member);
                 addMemberDialog.show(getParentFragmentManager(), null);
                 return true;
@@ -157,17 +157,17 @@ public class GroupFragment extends Fragment {
                 createLinkDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.add_moderator:
-                /** Handle adding moderator **/
+                /* Handle adding moderator */
                 ViewMembersDialog addModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 2);
                 addModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.remove_moderator:
-                /** Handle removing moderator **/
+                /* Handle removing moderator */
                 ViewMembersDialog removeModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 3);
                 removeModeratorDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.kick_member:
-                /** Handle kicking member **/
+                /* Handle kicking member */
                 ViewMembersDialog kickUserDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 4);
                 kickUserDialog.show(getParentFragmentManager(), null);
                 return true;
@@ -184,19 +184,19 @@ public class GroupFragment extends Fragment {
                 newModuleDialog.show(getParentFragmentManager(), null);
                 return true;
             case R.id.transfer_ownership:
-                /** Handle transfer ownership **/
+                /* Handle transfer ownership */
 
                 ViewMembersDialog transferOwnershipDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 1);
                 transferOwnershipDialog.show(getParentFragmentManager(), null);
 
                 return true;
             case R.id.create_sub_group:
-                /** Handle creating sub group **/
+                /* Handle creating sub group */
                 GroupFragmentDirections.ActionGroupFragmentToCreateGroupFragment action = GroupFragmentDirections.actionGroupFragmentToCreateGroupFragment(currentGroup.getGroupId());
                 NavHostFragment.findNavController(GroupFragment.this).navigate(action);
                 return true;
             case R.id.settingsFragment:
-                /** Handle passing the current GroupID to the settings page */
+                /* Handle passing the current GroupID to the settings page */
                 SettingsFragment.currentGroup = currentGroup;
                 NavHostFragment.findNavController(this)
                         .navigate(R.id.action_groupFragment_to_settingsFragment);

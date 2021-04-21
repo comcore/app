@@ -60,8 +60,8 @@ public class CreateEventDialog extends DialogFragment {
         EditText endTime = view.findViewById(R.id.editEndTime);
 
 
-        /**
-         * If the "cancel" button is clicked, close the dialog box
+        /*
+          If the "cancel" button is clicked, close the dialog box
          */
         view.findViewById(R.id.create_event_cancel).setOnClickListener(clickedView -> {
             this.dismiss();

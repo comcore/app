@@ -4,6 +4,7 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.ReactionHolder;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
@@ -24,9 +25,15 @@ public class MessageItem implements Cacheable {
         messageId = entry.id.id;
         timestamp = entry.timestamp;
         data = entry.contents;
-        //TODO from entry
         myReaction = Reaction.NONE;
         reactions = new ReactionHolder();
+        for (ReactionEntry reaction : entry.reactions) {
+            Reaction reactionEnum = reaction.getReaction();
+            reactions.addReaction(reactionEnum);
+            if (reaction.user.equals(AppData.self.getID())) {
+                myReaction = reactionEnum;
+            }
+        }
     }
 
     public MessageItem(int userId, long messageId, long timestamp, String data) {
@@ -154,7 +161,8 @@ public class MessageItem implements Cacheable {
 
     public MessageEntry toEntry(ChatID chatID) {
         return new MessageEntry(new MessageID(chatID, messageId),
-                UserStorage.getUser(userId).getID(), timestamp, data);
+                UserStorage.getUser(userId).getID(), timestamp, data,
+                reactions.toReactionEntries());
     }
 
     public long getBytes() {

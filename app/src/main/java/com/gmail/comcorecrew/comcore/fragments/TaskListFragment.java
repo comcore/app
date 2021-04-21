@@ -73,12 +73,12 @@ public class TaskListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current group */
+        /* Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_tasklist_fragment);
         welcomeText.setText(taskList.getName());
 
-        /**
-         * If the "back" button is clicked, return to the main page
+        /*
+          If the "back" button is clicked, return to the main page
          */
         view.findViewById(R.id.tasklist_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
@@ -101,17 +101,17 @@ public class TaskListFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.refresh_button:
-                /** Handle refresh **/
+                /* Handle refresh */
                 taskList.refresh();
                 return true;
             case R.id.settingsFragment:
-                /** Handle moving to the settings page */
+                /* Handle moving to the settings page */
                 SettingsFragment.currentGroup = taskList.getGroup();
                 NavHostFragment.findNavController(this)
                         .navigate(R.id.action_taskListFragment_to_settingsFragment);
                 return true;
             case R.id.create_task:
-                /** Handle creating a new task **/
+                /* Handle creating a new task */
                 CreateTaskDialog addTaskDialog = new CreateTaskDialog(taskList);
                 addTaskDialog.show(getParentFragmentManager(), null);
                 return true;
@@ -140,7 +140,7 @@ public class TaskListFragment extends Fragment {
      * The CustomAdapter internal class sets up the RecyclerView, which displays
      * the list of tasks in the GUI
      */
-    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+    public static class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public ViewHolder(View view) {

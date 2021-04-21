@@ -4,12 +4,14 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MessageItem;
-import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
+import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
+import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
@@ -78,24 +80,12 @@ public class Messaging extends Module {
         return messages.size();
     }
 
-    public MessageEntry getEntry(int i) {
-        MessageItem msg = messages.get(i);
-        return new MessageEntry(new MessageID((ChatID) getId(), msg.getMessageid()),
-                UserStorage.getUser(msg.getId()).getID(),
-                msg.getTimestamp(), msg.getData());
+    public MessageItem get(int i) {
+        return messages.get(i);
     }
 
-    /*
-     * Returns a list of messages in oldest first order.
-     */
-    public ArrayList<MessageEntry> getEntries() {
-        ArrayList<MessageEntry> entries = new ArrayList<>();
-        for (MessageItem msg : messages) {
-            entries.add(new MessageEntry(new MessageID((ChatID) getId(), msg.getMessageid()),
-                    UserStorage.getUser(msg.getId()).getID(),
-                    msg.getTimestamp(), msg.getData()));
-        }
-        return entries;
+    public MessageEntry getEntry(int i) {
+        return messages.get(i).toEntry((ChatID) getId());
     }
 
     /*
@@ -154,29 +144,80 @@ public class Messaging extends Module {
         this.toCache();
     }
 
+    /**
+     * Try to get the message in constant time by doing some indexing tricks. If there is an issue,
+     * clear the cache and refresh. Returns null if the message couldn't be retrieved.
+     *
+     * @param message the message to search for
+     * @return the MessageItem
+     */
+    private MessageItem fastLookupMessage(MessageID message) {
+        if (messages.isEmpty() || !message.module.equals(getId())) {
+            return null;
+        }
+
+        long id = message.id;
+        long index = id - messages.get(0).getMessageid();
+        if (index >= 0) {
+            if (index < messages.size()) {
+                MessageItem msg = messages.get((int) index);
+                if (msg.getMessageid() == id) {
+                    return msg;
+                }
+
+                clearCache();
+            }
+
+            refresh();
+        }
+
+        return null;
+    }
+
     @Override
     public void onMessageUpdated(MessageEntry message) {
-        if (messages.isEmpty()) {
+        MessageItem msg = fastLookupMessage(message.id);
+        if (msg == null) {
+            System.err.println("failed.");
             return;
         }
 
-        if (!message.id.module.equals(getId())) {
+        msg.setTimestamp(message.timestamp);
+        msg.setData(message.contents);
+        System.err.println("set!");
+        toCache();
+    }
+
+    @Override
+    public void onReactionAdded(MessageID message, ReactionEntry reaction) {
+        MessageItem msg = fastLookupMessage(message);
+        if (msg == null) {
             return;
         }
 
-        long id = message.id.id;
-        long index = id - messages.get(0).getMessageid();
-        if (index >= 0 && index < messages.size()) {
-            MessageItem msg = messages.get((int) index);
-            if (msg.getMessageid() == id) {
-                msg.setTimestamp(message.timestamp);
-                msg.setData(message.contents);
-                this.toCache();
-                return;
-            }
+        Reaction reactionEnum = reaction.getReaction();
+        msg.getReactions().addReaction(reactionEnum);
+        if (reaction.user.equals(AppData.self.getID())) {
+            msg.setMyReaction(reactionEnum);
         }
 
-        refresh();
+        toCache();
+    }
+
+    @Override
+    public void onReactionRemoved(MessageID message, ReactionEntry reaction) {
+        MessageItem msg = fastLookupMessage(message);
+        if (msg == null) {
+            return;
+        }
+
+        Reaction reactionEnum = reaction.getReaction();
+        msg.getReactions().removeReaction(reactionEnum);
+        if (reaction.user.equals(AppData.self.getID())) {
+            msg.setMyReaction(Reaction.NONE);
+        }
+
+        toCache();
     }
 
     public void createPinnedMessages(String name) {
