@@ -33,6 +33,9 @@
             android:id="@+id/action_mainFragment_to_groupFragment"
             app:destination="@id/groupFragment"
             />
+        <action
+            android:id="@+id/action_mainFragment_to_sharedCalendarFragment23"
+            app:destination="@id/sharedCalendarFragment23" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -80,7 +83,7 @@
             app:destination="@id/createGroupFragment" />
         <action
             android:id="@+id/action_groupFragment_to_calendarFragment"
-            app:destination="@id/calendarFragment" />
+            app:destination="@id/sharedCalendarFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment5"
@@ -107,4 +110,8 @@
         android:id="@+id/calendarFragment"
         android:name="com.gmail.comcorecrew.comcore.fragments.CalendarFragment"
         android:label="CalendarFragment" />
+    <fragment
+        android:id="@+id/sharedCalendarFragment23"
+        android:name="com.gmail.comcorecrew.comcore.fragments.SharedCalendarFragment2"
+        android:label="SharedCalendarFragment2" />
 </navigation>
