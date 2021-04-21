@@ -25,6 +25,7 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+import com.gmail.comcorecrew.comcore.classes.modules.Polling;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
@@ -222,7 +223,7 @@ public class GroupFragment extends Fragment {
                 view.setOnClickListener(this);
                 // Define click listener for the ViewHolder's View
 
-                textView = (TextView) view.findViewById(R.id.module_row_text);
+                textView = (TextView) view.findViewById(R.id.title_row_text);
 
             }
 
@@ -262,7 +263,7 @@ public class GroupFragment extends Fragment {
         public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.module_row_item, viewGroup, false);
+                    .inflate(R.layout.title_row_item, viewGroup, false);
 
             return new CustomAdapter.ViewHolder(view);
         }
@@ -279,6 +280,8 @@ public class GroupFragment extends Fragment {
                 viewHolder.getTextView().setText("Task List: " + name);
             } else if (module instanceof Calendar) {
                 viewHolder.getTextView().setText("Calendar: " + name);
+            } else if (module instanceof Polling) {
+                viewHolder.getTextView().setText("Polls: " + name);
             } else {
                 viewHolder.getTextView().setText(name);
             }

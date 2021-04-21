@@ -60,13 +60,16 @@ public class CreateEventDialog extends DialogFragment {
         EditText endTime = view.findViewById(R.id.editEndTime);
 
 
-        /*
+        /**
           If the "cancel" button is clicked, close the dialog box
          */
         view.findViewById(R.id.create_event_cancel).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
+        /**
+         * If the "submit" button is clicked, create the event
+         */
         view.findViewById(R.id.create_event_submit).setOnClickListener(clickedView -> {
 
             String startFull = startDate.getText().toString() + "-" + startTime.getText().toString();
@@ -87,7 +90,12 @@ public class CreateEventDialog extends DialogFragment {
                 this.dismiss();
             }
 
-            calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
+            /**
+             * Users cannot automatically create events unless the group's settings allow it
+             * **/
+            if (calendar.getGroup().isRequireApproval() && (calendar.getGroup().getGroupRole() == GroupRole.USER)) {
+                calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
+            }
             this.dismiss();
         });
 

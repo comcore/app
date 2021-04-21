@@ -19,5 +19,8 @@
             android:id="@+id/delete_events"
             android:title="@string/delete_events"
             app:showAsAction="never" />
+        <item
+            android:id="@+id/require_approval"
+            android:title="@string/update_event_approval" />
     </group>
 </menu>
