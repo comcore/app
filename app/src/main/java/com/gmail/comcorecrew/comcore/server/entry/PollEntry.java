@@ -91,7 +91,7 @@ public final class PollEntry extends ModuleEntry<PollListID, PollID> {
             options.add(PollOption.fromJson(option.getAsJsonObject()));
         }
         JsonElement voteJson = json.get("vote");
-        int vote = voteJson == null ? -1 : voteJson.getAsInt();
+        int vote = voteJson.isJsonNull() ? -1 : voteJson.getAsInt();
         return new PollEntry(id, creator, timestamp, description, options, vote);
     }
 
