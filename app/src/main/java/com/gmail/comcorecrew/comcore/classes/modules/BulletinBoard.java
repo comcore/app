@@ -1,6 +1,6 @@
-package com.gmail.comcorecrew.comcore.dialogs;
+package com.gmail.comcorecrew.comcore.classes.modules;
 
-import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,84 +8,86 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
+import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
+import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
+import com.gmail.comcorecrew.comcore.server.id.CustomModuleID;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewEventsDialog extends DialogFragment {
+public class BulletinBoard extends CustomModule {
 
     private CustomAdapter adapter;
     private List<EventEntry> eventList = new ArrayList<>();
-    private Calendar currentCalendar;
-    private java.util.Calendar currentDate;
 
-    /**
-     * 0 - View events
-     * 1 - Delete events
-     */
-    private int flag;
+    public BulletinBoard(String name, CustomModuleID id, Group group) {
+        super(name, id, group);
+    }
 
-    public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate, int flag) {
-        this.currentCalendar = currentCalendar;
-        this.currentDate = currentDate;
-        this.flag = flag;
+    public BulletinBoard(String name, Group group) {
+        super(name, group, "bulletin");
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
+    public void viewInit(@NonNull View view, Fragment current) {
 
-        if (flag == 0 && currentDate != null){
-            eventList = currentCalendar.getEntriesByDay(currentDate);
-        }
-        else {
-            eventList = currentCalendar.getApproved();
-        }
-
+        eventList = AppData.getUpcoming();
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
-        rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RecyclerView rvGroups = (RecyclerView) view.findViewById(R.id.simple_recycler);
+        rvGroups.setLayoutManager(new LinearLayoutManager(current.getActivity()));
         adapter = new CustomAdapter();
         rvGroups.setAdapter(adapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
 
+        TextView welcomeText = (TextView) view.findViewById(R.id.label_simple_fragment);
+        welcomeText.setText(R.string.bulletin_board);
 
-        return rootView;
-    }
-
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-
-        TextView title = view.findViewById(R.id.label_dialog_with_title);
-        if (flag == 0) {
-            title.setText(R.string.view_events);
-        }
-        else if (flag == 1) {
-            title.setText(R.string.delete_events);
-        }
-
-        /**
-         * If the "back" button is clicked, close the dialog box
-         */
-        view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
-            this.dismiss();
+        view.findViewById(R.id.simple_back_button).setOnClickListener(clickedView -> {
+            NavHostFragment.findNavController(current)
+                    .popBackStack();
         });
 
+        refreshView();
+    }
+
+    @Override
+    public int getLayout() {
+        return R.layout.fragment_simple_recycler;
+    }
+
+    @Override
+    public void refreshView() {
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
+        if (adapter == null) {
+            adapter = new CustomAdapter();
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void afterCreate() {
+        sendMessage("0");
     }
 
 
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
-     * the list of calendar events in the GUI
+     * the list of bulletin board events in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
@@ -104,25 +106,20 @@ public class ViewEventsDialog extends DialogFragment {
 
             @Override
             public void onClick(View view) {
-                if (flag == 1) {
-                    /* Delete event */
-                    currentCalendar.deleteEvent(currentEventEntry.id);
-                    dismiss();
-                }
             }
 
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        public CustomAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.subtitle_row_item, viewGroup, false);
 
-            return new ViewHolder(view);
+            return new CustomAdapter.ViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+        public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
 
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
@@ -141,5 +138,5 @@ public class ViewEventsDialog extends DialogFragment {
             return eventList.size();
         }
     }
-
 }
+

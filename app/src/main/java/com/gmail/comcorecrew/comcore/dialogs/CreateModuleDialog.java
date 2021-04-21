@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.modules.BulletinBoard;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
@@ -62,6 +63,7 @@ public class CreateModuleDialog extends DialogFragment {
             RadioButton pinnedRadio = view.findViewById(R.id.create_module_pinned_chat_radio);
             RadioButton calendarRadio = view.findViewById(R.id.create_module_calendar_radio);
             RadioButton pollingRadio = view.findViewById(R.id.create_module_polling_radio);
+            RadioButton bulletinRadio = view.findViewById(R.id.create_module_bulletin_radio);
             RadioButton dummyRadio = view.findViewById(R.id.create_module_dummy_radio);
             EditText moduleName = view.findViewById(R.id.create_module_name_edit);
 
@@ -100,6 +102,12 @@ public class CreateModuleDialog extends DialogFragment {
             else if (pollingRadio.isChecked()) {
 
                 new Polling(moduleName.getText().toString(), AppData.getGroup(groupID));
+
+                this.dismiss();
+                fragment.refresh();
+            }
+            else if (bulletinRadio.isChecked()) {
+                new BulletinBoard(moduleName.getText().toString(), AppData.getGroup(groupID));
 
                 this.dismiss();
                 fragment.refresh();

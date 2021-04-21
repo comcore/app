@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.modules.BulletinBoard;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.DummyButton;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
@@ -387,6 +388,8 @@ public class Group implements NotificationListener, Comparable<Group> {
             switch (customId.type) {
                 case "pinnedMessages":
                     return new PinnedMessages(info.name, customId, this, null);
+                case "bulletin":
+                    return new BulletinBoard(info.name, customId, this);
                 case "dummy":
                     return new DummyButton(info.name, customId, this);
             }
