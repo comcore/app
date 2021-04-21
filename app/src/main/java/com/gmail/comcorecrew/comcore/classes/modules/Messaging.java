@@ -11,8 +11,10 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Messaging extends Module {
 
@@ -181,6 +183,17 @@ public class Messaging extends Module {
         msg.setTimestamp(message.timestamp);
         msg.setData(message.contents);
         msg.setReactions(message.reactions);
+        toCache();
+    }
+
+    @Override
+    public void onReactionUpdated(MessageID message, Map<UserID, String> reactions) {
+        MessageItem msg = fastLookupMessage(message);
+        if (msg == null) {
+            return;
+        }
+
+        msg.setReactions(reactions);
         toCache();
     }
 

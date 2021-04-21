@@ -121,6 +121,8 @@
     <string name="ch_desc_task">Notifications for tasks added to task lists.</string>
     <string name="ch_name_event">Events</string>
     <string name="ch_desc_event">Notifications for upcoming calendar events.</string>
+    <string name="ch_name_poll">Polls</string>
+    <string name="ch_desc_poll">Notifications for new polls.</string>
     <string name="ch_name_invite">Group Invites</string>
     <string name="ch_desc_invite">Notifications for invitations to join new groups.</string>
     <string name="ch_name_status">Group Status Changes</string>

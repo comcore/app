@@ -11,6 +11,8 @@ import com.gmail.comcorecrew.comcore.server.entry.*;
 import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
+import java.util.Map;
+
 /**
  * The reader thread which handles messages received from the server.
  */
@@ -61,6 +63,13 @@ public final class ServerReader extends ServerThread {
                             listener.onMessageUpdated(entry));
                     break;
                 }
+                case "reaction": {
+                    MessageID id = MessageID.fromJson(null, message.data);
+                    Map<UserID, String> reactions = MessageEntry.parseReactions(message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onReactionUpdated(id, reactions));
+                    break;
+                }
                 case "task": {
                     TaskEntry entry = TaskEntry.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
@@ -95,6 +104,12 @@ public final class ServerReader extends ServerThread {
                     EventID id = EventID.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
                             listener.onEventDeleted(id));
+                    break;
+                }
+                case "poll": {
+                    PollEntry entry = PollEntry.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onPollAdded(entry));
                     break;
                 }
                 case "invite": {

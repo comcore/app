@@ -47,6 +47,24 @@ public final class CustomModuleID extends ModuleID {
         return new TaskListID(group, id);
     }
 
+    /**
+     * Treat this custom module as if it were a calendar.
+     *
+     * @return a CalendarID associated with this module
+     */
+    public CalendarID asCalendar() {
+        return new CalendarID(group, id);
+    }
+
+    /**
+     * Treat this custom module as if it were a poll list.
+     *
+     * @return a PollListID associated with this module
+     */
+    public PollListID asPollList() {
+        return new PollListID(group, id);
+    }
+
     @Override
     public String getType() {
         return type;
