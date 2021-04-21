@@ -30,9 +30,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="45dp"
-        android:layout_marginTop="19dp"
+        android:layout_marginTop="1dp"
         android:layout_marginEnd="45dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="1dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Name"
@@ -58,8 +58,8 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="177dp"
-        android:layout_height="283dp"
+        android:layout_width="204dp"
+        android:layout_height="326dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
@@ -102,6 +102,12 @@
             android:text="@string/polling" />
 
         <RadioButton
+            android:id="@+id/create_module_bulletin_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bulletin_board" />
+
+        <RadioButton
             android:id="@+id/create_module_dummy_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -114,9 +120,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="1dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="1dp"
         android:text="@string/create_module_type_label"
         app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"

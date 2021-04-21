@@ -113,10 +113,6 @@ public class MainFragment extends Fragment {
                 MainFragmentDirections.ActionMainFragmentToCreateGroupFragment action = MainFragmentDirections.actionMainFragmentToCreateGroupFragment(null);
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
                 return true;
-            case R.id.bulletin_board:
-                /** Handle viewing bulletin board **/
-                new ViewEventsDialog(null, null, 2).show(getParentFragmentManager(), null);
-                return true;
             case R.id.settingsFragment:
                 /* Handle moving to the settings page */
                 SettingsFragment.currentGroup = null;
