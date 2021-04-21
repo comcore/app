@@ -1,9 +1,10 @@
 package com.gmail.comcorecrew.comcore.classes;
 
 import com.gmail.comcorecrew.comcore.enums.Reaction;
-import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 
 public class ReactionHolder {
 
@@ -91,11 +92,8 @@ public class ReactionHolder {
         return 2 + 2 * reactions.length;
     }
 
-    public ArrayList<ReactionEntry> toReactionEntries() {
-        ArrayList<ReactionEntry> entries = new ArrayList<>();
-        for (int i = 0; i < reactions.length; i++) {
-            entries.add(new ReactionEntry(Reaction.fromInt(i + 1).name().toLowerCase()));
-        }
-        return entries;
+    public Map<UserID, String> toReactionEntries() {
+        // TODO decide whether this needs to be fixed
+        return Collections.emptyMap();
     }
 }

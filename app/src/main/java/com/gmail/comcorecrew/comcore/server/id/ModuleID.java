@@ -50,6 +50,8 @@ public abstract class ModuleID extends ItemID {
                 return new TaskListID(group, id);
             case "cal":
                 return new CalendarID(group, id);
+            case "poll":
+                return new PollListID(group, id);
             default:
                 return new CustomModuleID(group, id, type);
         }

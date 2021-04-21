@@ -16,12 +16,15 @@ import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Utility class representing a connection with the server.
@@ -407,6 +410,18 @@ public final class ServerConnector {
     public static void createCalendar(GroupID group, String name,
                                       ResultHandler<CalendarID> handler) {
         createModule("cal", group, name, handler, id -> new CalendarID(group, id));
+    }
+
+    /**
+     * Create a new poll list with a given name.
+     *
+     * @param group   the parent group of the poll list
+     * @param name    the name of the poll list
+     * @param handler the handler for the response of the server
+     */
+    public static void createPollList(GroupID group, String name,
+                                      ResultHandler<PollListID> handler) {
+        createModule("poll", group, name, handler, id -> new PollListID(group, id));
     }
 
     /**
@@ -820,68 +835,41 @@ public final class ServerConnector {
     }
 
     /**
-     * Add a reaction to a message. The reaction cannot be NONE. A reaction of UNKNOWN is valid,
-     * but it will always fail immediately. If the reaction is already present, this request will
-     * succeed but have no effect. A user is allowed to have multiple reactions for the same message
-     * by the server, so this method will not remove previously-added reactions. This message
-     * returns true if the user did not already have the requested reaction, and false otherwise.
+     * Set the reaction for a message. Any existing reaction will be replaced, so a reaction of
+     * NONE can be used to delete any existing reaction. A reaction of UNKNOWN will always fail
+     * immediately, since it is not an actual reaction. The new map of reactions will be returned.
      *
-     * @param message  the message to react to
-     * @param reaction the reaction to send
+     * @param message  the message to set the reaction of
+     * @param reaction the reaction to set
      * @param handler  the handler for the response of the server
      */
-    public static void addReaction(MessageID message, Reaction reaction,
-                                   ResultHandler<Boolean> handler) {
+    public static void setReaction(MessageID message, Reaction reaction,
+                                   ResultHandler<Map<UserID, String>> handler) {
         if (message == null) {
             throw new IllegalArgumentException("MessageID cannot be null");
-        } else if (reaction == null || reaction == Reaction.NONE) {
-            throw new IllegalArgumentException("Reaction cannot be null or NONE");
+        } else if (reaction == null) {
+            throw new IllegalArgumentException("Reaction cannot be null");
         }
 
-        if (reaction == Reaction.UNKNOWN) {
-            handler.handleResult(ServerResult.failure("cannot add unknown reaction"));
-            return;
+        JsonElement reactionJson;
+        switch (reaction) {
+            case UNKNOWN:
+                handler.handleResult(ServerResult.failure("cannot add unknown reaction"));
+                return;
+            case NONE:
+                reactionJson = JsonNull.INSTANCE;
+                return;
+            default:
+                reactionJson = new JsonPrimitive(reaction.name().toLowerCase());
         }
 
         JsonObject data = new JsonObject();
         data.addProperty("group", message.module.group.id);
         data.addProperty("chat", message.module.id);
         data.addProperty("id", message.id);
-        data.addProperty("reaction", reaction.name().toLowerCase());
+        data.add("reaction", reactionJson);
         getConnection().send(new ServerMsg("addReaction", data), handler,
-                response -> response.get("modified").getAsBoolean());
-    }
-
-    /**
-     * Remove a reaction from a message. The reaction cannot be NONE. Deleting a reaction of UNKNOWN
-     * is valid, but it will always fail immediately. If the reaction is not present, this request
-     * will succeed but have no effect. This message returns true if the reaction was removed, and
-     * false if the user did not have this reaction.
-     *
-     * @param message  the message to remove the reaction from
-     * @param reaction the reaction to remove
-     * @param handler  the handler for the response of the server
-     */
-    public static void removeReaction(MessageID message, Reaction reaction,
-                                      ResultHandler<Boolean> handler) {
-        if (message == null) {
-            throw new IllegalArgumentException("MessageID cannot be null");
-        } else if (reaction == null || reaction == Reaction.NONE) {
-            throw new IllegalArgumentException("Reaction cannot be null or NONE");
-        }
-
-        if (reaction == Reaction.UNKNOWN) {
-            handler.handleResult(ServerResult.failure("cannot remove unknown reaction"));
-            return;
-        }
-
-        JsonObject data = new JsonObject();
-        data.addProperty("group", message.module.group.id);
-        data.addProperty("chat", message.module.id);
-        data.addProperty("id", message.id);
-        data.addProperty("reaction", reaction.name().toLowerCase());
-        getConnection().send(new ServerMsg("removeReaction", data), handler,
-                response -> response.get("modified").getAsBoolean());
+                MessageEntry::parseReactions);
     }
 
     /**

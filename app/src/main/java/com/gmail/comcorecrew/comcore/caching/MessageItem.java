@@ -4,9 +4,11 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.ReactionHolder;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
+import com.gmail.comcorecrew.comcore.server.id.UserID;
+
+import java.util.Map;
 
 /*
  * Class for the cacheable data stored in a messaging module
@@ -25,15 +27,7 @@ public class MessageItem implements Cacheable {
         messageId = entry.id.id;
         timestamp = entry.timestamp;
         data = entry.contents;
-        myReaction = Reaction.NONE;
-        reactions = new ReactionHolder();
-        for (ReactionEntry reaction : entry.reactions) {
-            Reaction reactionEnum = reaction.getReaction();
-            reactions.addReaction(reactionEnum);
-            if (reaction.user.equals(AppData.self.getID())) {
-                myReaction = reactionEnum;
-            }
-        }
+        setReactions(entry.reactions);
     }
 
     public MessageItem(int userId, long messageId, long timestamp, String data) {
@@ -212,6 +206,18 @@ public class MessageItem implements Cacheable {
 
     public void setReactions(ReactionHolder reactions) {
         this.reactions = reactions;
+    }
+
+    public void setReactions(Map<UserID, String> newReactions) {
+        myReaction = Reaction.NONE;
+        reactions = new ReactionHolder();
+        for (Map.Entry<UserID, String> reaction : newReactions.entrySet()) {
+            Reaction reactionEnum = Reaction.fromString(reaction.getValue());
+            reactions.addReaction(reactionEnum);
+            if (reaction.getKey().equals(AppData.self.getID())) {
+                myReaction = reactionEnum;
+            }
+        }
     }
 
     public void setData(String data) {

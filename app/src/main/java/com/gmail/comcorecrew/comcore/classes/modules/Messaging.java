@@ -4,14 +4,11 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.MessageItem;
-import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
-import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
@@ -178,45 +175,12 @@ public class Messaging extends Module {
     public void onMessageUpdated(MessageEntry message) {
         MessageItem msg = fastLookupMessage(message.id);
         if (msg == null) {
-            System.err.println("failed.");
             return;
         }
 
         msg.setTimestamp(message.timestamp);
         msg.setData(message.contents);
-        System.err.println("set!");
-        toCache();
-    }
-
-    @Override
-    public void onReactionAdded(MessageID message, ReactionEntry reaction) {
-        MessageItem msg = fastLookupMessage(message);
-        if (msg == null) {
-            return;
-        }
-
-        Reaction reactionEnum = reaction.getReaction();
-        msg.getReactions().addReaction(reactionEnum);
-        if (reaction.user.equals(AppData.self.getID())) {
-            msg.setMyReaction(reactionEnum);
-        }
-
-        toCache();
-    }
-
-    @Override
-    public void onReactionRemoved(MessageID message, ReactionEntry reaction) {
-        MessageItem msg = fastLookupMessage(message);
-        if (msg == null) {
-            return;
-        }
-
-        Reaction reactionEnum = reaction.getReaction();
-        msg.getReactions().removeReaction(reactionEnum);
-        if (reaction.user.equals(AppData.self.getID())) {
-            msg.setMyReaction(Reaction.NONE);
-        }
-
+        msg.setReactions(message.reactions);
         toCache();
     }
 

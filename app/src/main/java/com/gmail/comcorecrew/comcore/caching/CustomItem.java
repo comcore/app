@@ -93,7 +93,7 @@ public class CustomItem implements Cacheable {
     public MessageEntry toEntry(ChatID chatID) {
         MessageID messageID = new MessageID(chatID, itemId);
         return new MessageEntry(messageID, UserStorage.getUser(id).getID(), timestamp, data,
-                Collections.emptyList());
+                Collections.emptyMap());
     }
 
     public TaskEntry toEntry(TaskListID listID) {

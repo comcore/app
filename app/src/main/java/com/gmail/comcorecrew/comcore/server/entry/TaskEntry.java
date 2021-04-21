@@ -208,7 +208,7 @@ public final class TaskEntry extends ModuleEntry<TaskListID, TaskID> {
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntry taskEntry = (TaskEntry) o;
         return timestamp == taskEntry.timestamp &&
-                id.equals(taskEntry.id) &&
+                deadline == taskEntry.deadline &&
                 creator.equals(taskEntry.creator) &&
                 description.equals(taskEntry.description) &&
                 Objects.equals(completer, taskEntry.completer) &&
@@ -217,6 +217,6 @@ public final class TaskEntry extends ModuleEntry<TaskListID, TaskID> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creator, timestamp, description, completer, assigned);
+        return Objects.hash(creator, timestamp, deadline, description, completer, assigned);
     }
 }
