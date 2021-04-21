@@ -99,7 +99,8 @@
     <!-- Success Messages -->
     <string name="success_set_role">The role of the user was successfully changed.</string>
     <string name="success_send_invite">The invitation was sent!</string>
-
+    <string name="event_approval_needed">Events for this group now need the approval of a moderator</string>
+    <string name="event_approval_not_needed">Events for this group can now be added by any user</string>
 
     <!-- Invitation Messages -->
     <string name="view_invites">View Invitations</string>
@@ -174,6 +175,7 @@
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
+    <string name="update_event_approval">Change Event Approval</string>
 
     <!-- Calendar -->
     <string name="view_pending_events">View Pending Events</string>
@@ -183,8 +185,16 @@
     <string name="create_event_start_time">Start Time (HH:MM)</string>
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
+    <string name="view_events">Events</string>
 
+    <!-- Polling -->
+    <string name="polling">Poll</string>
+    <string name="create_poll">Create Poll</string>
+    <string name="delete_poll">Delete Poll</string>
 
+    <!-- Bulletin Board -->
+    <string name="bulletin_board">Bulletin Board</string>
+    <string name="bulletin_board_label">Upcoming events within the next week</string>
 
 
 </resources>

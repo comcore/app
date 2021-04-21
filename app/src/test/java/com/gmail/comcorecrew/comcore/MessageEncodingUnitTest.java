@@ -1,16 +1,13 @@
 package com.gmail.comcorecrew.comcore;
 
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.ServerResult;
 import com.gmail.comcorecrew.comcore.server.connection.MockConnection;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
-import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -30,18 +27,19 @@ public class MessageEncodingUnitTest {
         ChatID chatID = new ChatID(new GroupID("gid"), "cid");
 
         // Create a message with unicode contents
-        ReactionEntry reaction = new ReactionEntry(new UserID("other"), "like");
+        UserID reactionId = new UserID("other");
+        String reaction = "like";
         MessageEntry entry = new MessageEntry(
                 new MessageID(chatID, 1),
                 new UserID("uid"),
                 System.currentTimeMillis(),
                 "Test message வணக்கம் \uD83D\uDC4D \uD83C\uDDFA\uD83C\uDDF8",
-                Collections.singletonList(reaction));
+                Collections.singletonMap(reactionId, reaction));
 
         // Encode it in JSON as if receiving from the server
         JsonObject reactionJson = new JsonObject();
-        reactionJson.addProperty("user", reaction.user.id);
-        reactionJson.addProperty("reaction", reaction.reaction);
+        reactionJson.addProperty("user", reactionId.id);
+        reactionJson.addProperty("reaction", reaction);
 
         JsonArray reactions = new JsonArray();
         reactions.add(reactionJson);

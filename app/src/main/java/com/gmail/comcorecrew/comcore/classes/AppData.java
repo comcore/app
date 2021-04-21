@@ -431,7 +431,7 @@ public class AppData {
     public static ArrayList<EventEntry> getUpcoming(Group group) {
         ArrayList<EventEntry> upcoming = new ArrayList<>();
         long now = new Date().getTime();
-        long then = now + 604800; //seconds in a week
+        long then = now + 604800000; //milliseconds in a week
         for (Module module : group.getModules()) {
             if (module instanceof Calendar) {
                 for (EventEntry entry : ((Calendar) module).getApproved()) {

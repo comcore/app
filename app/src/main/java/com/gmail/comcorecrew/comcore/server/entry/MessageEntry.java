@@ -4,12 +4,15 @@ import com.gmail.comcorecrew.comcore.notifications.ScheduledNotification;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -35,7 +38,7 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
      * The reactions of users to the message. This set is immutable, so any attempts to modify it
      * will result in an exception.
      */
-    public final Collection<ReactionEntry> reactions;
+    public final Map<UserID, String> reactions;
 
     /**
      * Create a MessageEntry with information about who sent it and when. An empty contents
@@ -48,7 +51,7 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
      * @param reactions the reactions to the message
      */
     public MessageEntry(MessageID id, UserID sender, long timestamp, String contents,
-                        Collection<ReactionEntry> reactions) {
+                        Map<UserID, String> reactions) {
         super(id);
 
         if (sender == null) {
@@ -64,7 +67,7 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
         this.sender = sender;
         this.timestamp = timestamp;
         this.contents = contents;
-        this.reactions = Collections.unmodifiableCollection(reactions);
+        this.reactions = Collections.unmodifiableMap(reactions);
     }
 
     /**
@@ -80,11 +83,26 @@ public final class MessageEntry extends ModuleEntry<ChatID, MessageID> {
         UserID sender = new UserID(json.get("sender").getAsString());
         long timestamp = json.get("timestamp").getAsLong();
         String contents = json.get("contents").getAsString();
-        ArrayList<ReactionEntry> reactions = new ArrayList<>();
-        for (JsonElement reaction : json.getAsJsonArray("reactions")) {
-            reactions.add(ReactionEntry.fromJson(reaction.getAsJsonObject()));
-        }
+        Map<UserID, String> reactions = parseReactions(json);
         return new MessageEntry(id, sender, timestamp, contents, reactions);
+    }
+
+    /**
+     * Parse a map of reactions from a JsonObject.
+     *
+     * @param json the data send by the server
+     * @return the Map of UserIDs to reaction Strings
+     */
+    public static Map<UserID, String> parseReactions(JsonObject json) {
+        HashMap<UserID, String> reactions = new HashMap<>();
+        for (JsonElement reaction : json.getAsJsonArray("reactions")) {
+            JsonObject reactionJson = reaction.getAsJsonObject();
+            reactions.put(
+                    new UserID(reactionJson.get("user").getAsString()),
+                    reactionJson.get("reaction").getAsString());
+        }
+
+        return reactions;
     }
 
     @Override

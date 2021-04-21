@@ -5,7 +5,9 @@ import androidx.core.app.NotificationCompat;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.notifications.NotificationHandler;
 import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
@@ -208,7 +210,7 @@ public final class TaskEntry extends ModuleEntry<TaskListID, TaskID> {
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntry taskEntry = (TaskEntry) o;
         return timestamp == taskEntry.timestamp &&
-                id.equals(taskEntry.id) &&
+                deadline == taskEntry.deadline &&
                 creator.equals(taskEntry.creator) &&
                 description.equals(taskEntry.description) &&
                 Objects.equals(completer, taskEntry.completer) &&
@@ -217,6 +219,6 @@ public final class TaskEntry extends ModuleEntry<TaskListID, TaskID> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creator, timestamp, description, completer, assigned);
+        return Objects.hash(creator, timestamp, deadline, description, completer, assigned);
     }
 }

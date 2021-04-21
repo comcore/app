@@ -8,6 +8,7 @@ import com.gmail.comcorecrew.comcore.server.id.*;
 import com.gmail.comcorecrew.comcore.server.info.UserInfo;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Interface containing methods that will be called by the ServerConnector when it receives a
@@ -33,20 +34,12 @@ public interface NotificationListener {
     default void onMessageUpdated(MessageEntry message) {}
 
     /**
-     * Handle a reaction being added to a message.
+     * Handle a message's reactions being updated.
      *
-     * @param message  the message to update
-     * @param reaction the reaction to add
+     * @param message   the message to update
+     * @param reactions the new reactions
      */
-    default void onReactionAdded(MessageID message, ReactionEntry reaction) {}
-
-    /**
-     * Handle a reaction being removed from a message.
-     *
-     * @param message  the message to update
-     * @param reaction the reaction to remove
-     */
-    default void onReactionRemoved(MessageID message, ReactionEntry reaction) {}
+    default void onReactionUpdated(MessageID message, Map<UserID, String> reactions) {}
 
     /**
      * Handle a new task being added to a task list.

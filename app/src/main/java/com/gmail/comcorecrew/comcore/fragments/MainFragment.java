@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewGroupsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -111,6 +112,10 @@ public class MainFragment extends Fragment {
             case R.id.createGroupFragment:
                 MainFragmentDirections.ActionMainFragmentToCreateGroupFragment action = MainFragmentDirections.actionMainFragmentToCreateGroupFragment(null);
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
+                return true;
+            case R.id.bulletin_board:
+                /** Handle viewing bulletin board **/
+                new ViewEventsDialog(null, null, 2).show(getParentFragmentManager(), null);
                 return true;
             case R.id.settingsFragment:
                 /* Handle moving to the settings page */

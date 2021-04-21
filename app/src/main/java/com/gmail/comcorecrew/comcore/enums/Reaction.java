@@ -41,4 +41,14 @@ public enum Reaction {
     public static int[] getEmptyReactionArray() {
         return new int[reactions.length];
     }
+
+    public static Reaction fromString(String name) {
+        for (Reaction reaction : reactions) {
+            if (name.equalsIgnoreCase(reaction.name())) {
+                return reaction;
+            }
+        }
+
+        return Reaction.UNKNOWN;
+    }
 }

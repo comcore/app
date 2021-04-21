@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
-    android:layout_height="500dp">
+    android:layout_height="550dp">
 
     <Button
         android:id="@+id/create_module_back_button"
@@ -38,8 +38,10 @@
         android:text="Name"
         app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_module_name_label" />
+        app:layout_constraintTop_toBottomOf="@+id/create_module_name_label"
+        app:layout_constraintVertical_bias="0.049" />
 
     <TextView
         android:id="@+id/create_module_name_label"
@@ -56,8 +58,8 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="151dp"
-        android:layout_height="240dp"
+        android:layout_width="177dp"
+        android:layout_height="283dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
@@ -92,6 +94,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/calendar_module_label" />
+
+        <RadioButton
+            android:id="@+id/create_module_polling_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/polling" />
 
         <RadioButton
             android:id="@+id/create_module_dummy_radio"
