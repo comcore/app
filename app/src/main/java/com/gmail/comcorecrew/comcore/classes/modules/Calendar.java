@@ -17,11 +17,6 @@ import com.gmail.comcorecrew.comcore.server.id.EventID;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * UNDER CONSTRUCTION
- *
- * TRESPASSERS WILL BE PROSECUTED
- */
 public class Calendar extends Module {
 
     private transient ScheduledList<EventID, EventEntry> approved;
