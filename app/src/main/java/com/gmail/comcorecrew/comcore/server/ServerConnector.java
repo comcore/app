@@ -1145,7 +1145,7 @@ public final class ServerConnector {
         JsonObject data = new JsonObject();
         data.addProperty("group", poll.module.group.id);
         data.addProperty("pollList", poll.module.id);
-        data.addProperty("poll", poll.id);
+        data.addProperty("id", poll.id);
         data.addProperty("option", option);
         getConnection().send(new ServerMsg("voteOnPoll", data), handler, response -> null);
     }
