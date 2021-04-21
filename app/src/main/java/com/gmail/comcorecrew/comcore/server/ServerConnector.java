@@ -858,7 +858,7 @@ public final class ServerConnector {
                 return;
             case NONE:
                 reactionJson = JsonNull.INSTANCE;
-                return;
+                break;
             default:
                 reactionJson = new JsonPrimitive(reaction.name().toLowerCase());
         }
