@@ -26,10 +26,13 @@ import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewGroupsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainFragment extends Fragment {
     private CustomAdapter groupAdapter;
@@ -111,6 +114,10 @@ public class MainFragment extends Fragment {
             case R.id.createGroupFragment:
                 MainFragmentDirections.ActionMainFragmentToCreateGroupFragment action = MainFragmentDirections.actionMainFragmentToCreateGroupFragment(null);
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
+                return true;
+            case R.id.viewSharedCalendar:
+                System.out.println("Viewing calendar");
+                NavHostFragment.findNavController(this).navigate(R.id.action_mainFragment_to_sharedCalendarFragment23);
                 return true;
             case R.id.settingsFragment:
                 /** Handle moving to the settings page */

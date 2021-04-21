@@ -7,6 +7,8 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,11 +21,13 @@ import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
@@ -92,6 +96,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView messageText, timeText, nameText, dateText;
+        ImageView thumbs_up, thumbs_down;
 
         SentMessageHolder(View itemView) {
             super(itemView);
@@ -101,6 +106,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
+            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction1);
+            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction2);
         }
 
         void bind(MessageItem message) {
@@ -109,6 +116,10 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText.setText(format2(message.getTimestamp()));
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
+            int[] reactions = message.getReactions().getReactions();
+            for (int i = 0; i < message.getReactions().getReactions().length; i++) {
+                System.out.println(reactions[i]);
+            }
         }
 
         @Override
@@ -158,6 +169,10 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText.setText(format2(message.getTimestamp()));
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
+            int[] reactions = message.getReactions().getReactions();
+            for (int i = 0; i < message.getReactions().getReactions().length; i++) {
+                System.out.println(reactions[i]);
+            }
         }
 
         // Creates menu for each message with 3 options
