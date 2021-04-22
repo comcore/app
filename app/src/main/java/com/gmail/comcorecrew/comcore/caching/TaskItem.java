@@ -10,6 +10,7 @@ public class TaskItem implements Cacheable {
     private int userId;
     private long taskid;
     private long timestamp;
+    private long deadline;
     private int completerId;
     private int assignedId;
     private String data;
@@ -18,6 +19,7 @@ public class TaskItem implements Cacheable {
         userId = UserStorage.getInternalId(entry.creator);
         taskid = entry.id.id;
         timestamp = entry.timestamp;
+        deadline = entry.deadline;
         completerId = entry.completer == null ? -1 : UserStorage.getInternalId(entry.completer);
         assignedId = entry.assigned == null ? -1 : UserStorage.getInternalId(entry.assigned);
         data = entry.description;
@@ -33,6 +35,10 @@ public class TaskItem implements Cacheable {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public long getDeadline() {
+        return deadline;
     }
 
     public boolean isCompleted() {
@@ -67,6 +73,10 @@ public class TaskItem implements Cacheable {
         this.timestamp = timestamp;
     }
 
+    public void setDeadline(long deadline) {
+        this.deadline = deadline;
+    }
+
     public void setTaskid(long taskid) {
         this.taskid = taskid;
     }
@@ -82,17 +92,31 @@ public class TaskItem implements Cacheable {
     public TaskEntry toEntry(TaskListID listID) {
         TaskID taskID = new TaskID(listID, taskid);
 
-        // TODO cache the deadline (and in CustomItem)
-        long deadline = 0;
-
         return new TaskEntry(taskID, UserStorage.getUser(userId).getID(), timestamp, deadline, data,
                 isCompleted() ? UserStorage.getUser(completerId).getID() : null,
                 assignedId >= 0 ? UserStorage.getUser(assignedId).getID() : null);
     }
 
+    public int charLength() {
+        int total = minLength();
+        total += data.length();
+        return total;
+    }
+
+    public static int minLength() {
+        int total = 0;
+        total += 2; //userId
+        total += 4; //taskId
+        total += 4; //timestamp
+        total += 4; //deadline
+        total += 2; //completerId
+        total += 2; //assignedId
+        return total;
+    }
+
     @Override
     public char[] toCache() {
-        char[] cache = new char[2 + 4 + 4 + 2 + 2 + data.length()];
+        char[] cache = new char[charLength()];
 
         int index = 0;
 
@@ -106,6 +130,10 @@ public class TaskItem implements Cacheable {
         cache[index++] = (char) (timestamp >> 32);
         cache[index++] = (char) (timestamp >> 16);
         cache[index++] = (char) timestamp;
+        cache[index++] = (char) (deadline>> 48);
+        cache[index++] = (char) (deadline >> 32);
+        cache[index++] = (char) (deadline >> 16);
+        cache[index++] = (char) deadline;
         cache[index++] = (char) (completerId >> 16);
         cache[index++] = (char) completerId;
         cache[index++] = (char) (assignedId >> 16);
@@ -118,7 +146,7 @@ public class TaskItem implements Cacheable {
     }
 
     public TaskItem(char[] cache) {
-        if (cache.length < 14) { //Makes sure the array length is valid.
+        if (cache.length < minLength()) { //Makes sure the array length is valid.
             throw new IllegalArgumentException();
         }
 
@@ -135,6 +163,10 @@ public class TaskItem implements Cacheable {
         timestamp = (timestamp << 16) | cache[index++];
         timestamp = (timestamp << 16) | cache[index++];
         timestamp = (timestamp << 16) | cache[index++];
+        deadline = cache[index++];
+        deadline = (deadline << 16) | cache[index++];
+        deadline = (deadline << 16) | cache[index++];
+        deadline = (deadline << 16) | cache[index++];
         completerId = cache[index++];
         completerId = (completerId << 16) | cache[index++];
         assignedId = cache[index++];

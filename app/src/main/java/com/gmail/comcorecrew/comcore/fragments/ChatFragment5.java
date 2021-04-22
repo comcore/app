@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.dialogs.AddReactionDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
@@ -44,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -163,6 +165,11 @@ public class ChatFragment5 extends Fragment {
                 /**Handle Upload File button **/
                 uploadFile();
                 return true;
+            case R.id.create_pinned:
+                /** Handle creating pinned messages module **/
+                String pinnedTitle = messaging.getName() + " Pinned Messages";
+                new PinnedMessages(pinnedTitle, messaging.getGroup(), (ChatID) messaging.getId());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -208,18 +215,18 @@ public class ChatFragment5 extends Fragment {
 
     // Sends message to the server and updates the view.
     public void sendMessage() {
-        if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().trim().isEmpty()) {
+        String message = messageToBeSent.getText().toString().trim();
+        if (message.isEmpty()) {
             return;
         }
 
         ChatID chatID = (ChatID) messaging.getId();
-        ServerConnector.sendMessage(chatID, messageToBeSent.getText().toString(), result -> {
+        ServerConnector.sendMessage(chatID, message, result -> {
             if (result.isFailure()) {
                 ErrorDialog.show(result.errorMessage);
                 return;
             }
             messaging.onReceiveMessage(result.data);
-            refresh();
             messageToBeSent.getText().clear();
         });
     }
@@ -228,15 +235,16 @@ public class ChatFragment5 extends Fragment {
     public void sendMessage(MessageEntry messageEntry1) {
         // If you're editing a message
         if (isEditMode) {
-            if (messageToBeSent.getText().toString() == null | messageToBeSent.getText().toString().trim().isEmpty()) {
+            String message = messageToBeSent.getText().toString().trim();
+            if (message.isEmpty()) {
                 return;
             }
-            ServerConnector.updateMessage(messageEntry1.id, messageToBeSent.getText().toString(), result -> {
+
+            ServerConnector.updateMessage(messageEntry1.id, message, result -> {
                 if (result.isFailure()) {
                     ErrorDialog.show(result.errorMessage);
                 } else {
                     messaging.onMessageUpdated(result.data);
-                    refresh();
                     messageToBeSent.getText().clear();
                 }
             });
@@ -248,7 +256,6 @@ public class ChatFragment5 extends Fragment {
                     ErrorDialog.show(result.errorMessage);
                 } else {
                     messaging.onMessageUpdated(result.data);
-                    refresh();
                     messageToBeSent.getText().clear();
                 }
                 isDeleteMode = false;
@@ -302,6 +309,14 @@ public class ChatFragment5 extends Fragment {
             }
         }
         this.doBrowseFile();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // Browse files automatically after requesting permission
+        if (requestCode == MY_REQUEST_CODE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            doBrowseFile();
+        }
     }
 
     private void doBrowseFile()  {

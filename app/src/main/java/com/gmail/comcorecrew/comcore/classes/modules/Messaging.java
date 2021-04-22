@@ -19,6 +19,7 @@ import java.util.Map;
 public class Messaging extends Module {
 
     public transient ArrayList<MessageItem> messages; //Messages
+    private transient boolean shouldClearCache = false;
 
     public Messaging(String name, ChatID id, Group group) {
         super(name, id, group, Mdid.CMSG);
@@ -91,7 +92,7 @@ public class Messaging extends Module {
      * Get the MessageID of the latest message
      */
     public MessageID latestMessageId() {
-        if (messages.isEmpty()) {
+        if (shouldClearCache || messages.isEmpty()) {
             return null;
         } else {
             return new MessageID((ChatID) getId(), messages.get(messages.size() - 1).getMessageid());
@@ -110,7 +111,8 @@ public class Messaging extends Module {
 
             // If the message isn't immediately after the existing messages, clear the cache
             if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
-                clearCache();
+                shouldClearCache = false;
+                messages.clear();
             }
 
             for (MessageEntry entry : result.data) {
@@ -123,12 +125,16 @@ public class Messaging extends Module {
 
     @Override
     public void clearCache() {
-        messages.clear();
+        shouldClearCache = true;
     }
 
     @Override
     public void onReceiveMessage(MessageEntry message) {
         if (!message.id.module.equals(getId())) {
+            return;
+        }
+
+        if (shouldClearCache) {
             return;
         }
 
