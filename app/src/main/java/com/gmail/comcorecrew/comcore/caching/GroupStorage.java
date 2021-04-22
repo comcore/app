@@ -50,9 +50,6 @@ public class GroupStorage {
         // Record that a refresh is in progress
         isRefreshing = true;
 
-        // Remember when the refresh started
-        long refreshStart = System.currentTimeMillis();
-
         // Get the group associated with each ID
         HashMap<GroupID, Group> existingIds = new HashMap<>(AppData.getGroupSize());
         for (int i = 0; i < AppData.getGroupSize(); i++) {
@@ -104,12 +101,15 @@ public class GroupStorage {
             // Update the group info of any existing groups
             ServerConnector.getGroupInfo(ids.keySet(), lastRefresh, resultGroups -> {
                 if (resultGroups.isSuccess()) {
-                    // Update the refresh time for the next refresh
-                    lastRefresh = refreshStart;
-
                     // Iterate over every updated group and refresh their user information as well
                     HashSet<UserID> alreadyRefreshed = new HashSet<>();
                     for (GroupInfo info : resultGroups.data) {
+                        // Update the last refresh time if this group was updated more recently
+                        if (info.lastUpdate > lastRefresh) {
+                            lastRefresh = info.lastUpdate;
+                        }
+
+                        // Get the corresponding group object, if it exists
                         Group group = ids.remove(info.id);
                         if (group == null) {
                             continue;
