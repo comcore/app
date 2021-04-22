@@ -90,9 +90,7 @@ public class CreateEventDialog extends DialogFragment {
                 this.dismiss();
             }
 
-            /**
-             * Users cannot automatically create events unless the group's settings allow it
-             * **/
+            // The server will automatically check if the user can add an event
             calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
             this.dismiss();
         });
