@@ -125,6 +125,10 @@ public class CalendarFragment extends Fragment {
                 /* Handle deleting calendar events*/
                 new ViewEventsDialog(calendar, null, 1).show(getParentFragmentManager(), null);
                 return true;
+            case R.id.pin_event:
+                /** Handle pinning event to the bulletin board **/
+                new ViewEventsDialog(calendar, null, 2).show(getParentFragmentManager(), null);
+                return true;
             case R.id.require_approval:
                 /** Handle updating event approval settings **/
                 ServerConnector.setRequireApproval(calendar.getGroup().getGroupId(), !calendar.getGroup().isRequireApproval(), result -> {

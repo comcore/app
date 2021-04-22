@@ -117,8 +117,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
             int[] reactions = message.getReactions().getReactions();
-            for (int i = 0; i < message.getReactions().getReactions().length; i++) {
-                System.out.println(reactions[i]);
+            if (message.getReactions().getReactionCount(Reaction.DISLIKE) > 0) {
+                thumbs_down.setVisibility(View.VISIBLE);
+            }
+            if (message.getReactions().getReactionCount(Reaction.LIKE) > 0) {
+                thumbs_up.setVisibility(View.VISIBLE);
             }
         }
 

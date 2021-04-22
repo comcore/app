@@ -31,6 +31,7 @@ import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
+import com.gmail.comcorecrew.comcore.dialogs.CreatePollItemDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
@@ -87,7 +88,7 @@ public class PollingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current group */
+        /** Displays the name of the current polling module */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_polling_fragment);
         welcomeText.setText(polling.getName());
 
@@ -116,9 +117,7 @@ public class PollingFragment extends Fragment {
 
             case (R.id.create_poll):
                 /** Handle creating a poll **/
-                return true;
-            case (R.id.delete_poll):
-                /** Handle deleting a poll **/
+                new CreatePollItemDialog(polling).show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -134,11 +133,26 @@ public class PollingFragment extends Fragment {
      * the list of polls in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+        private PollItem pollItem;
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
             }
+
+            @Override
+            public void onClick(View v) {
+                PollItemFragment.currentPoll = pollItem;
+                PollItemFragment.parentPolling = polling;
+                NavHostFragment.findNavController(PollingFragment.this)
+                        .navigate(R.id.action_pollingFragment_to_pollItemFragment);
+            }
+        }
+
+        public void setPollItem(PollItem currentPollItem) {
+            this.pollItem = currentPollItem;
         }
 
         @Override
@@ -155,11 +169,10 @@ public class PollingFragment extends Fragment {
             TextView titleText = viewHolder.itemView.findViewById(R.id.title_row_text);
             PollItem poll = polling.getPolls().get(position);
 
-            /**
-             * The titleText should be set to the description of an individual poll
-             *
-             *  titleText.setText(poll.getDescription());
-             **/
+            titleText.setText(poll.getDescription());
+
+            setPollItem(polling.getPolls().get(position));
+
         }
 
         @Override

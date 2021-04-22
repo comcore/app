@@ -25,9 +25,6 @@ public class Polling extends Module {
 
     private transient ArrayList<PollItem> polls;
 
-    /** resultsVisible does not need to be cached between user sessions **/
-    boolean resultsVisible;
-
     public Polling(String name, PollListID pollListID, Group group) {
         super(name, pollListID, group, Mdid.CPLS);
         polls = new ArrayList<>();
@@ -119,15 +116,6 @@ public class Polling extends Module {
      */
     public int[] getResults(PollID pollID) {
         return getPoll(pollID).getVotes();
-    }
-
-
-    public boolean getResultsVisible() {
-        return resultsVisible;
-    }
-
-    public void toggleResultsVisible() {
-        resultsVisible = !resultsVisible;
     }
 
     public void readToCache() {

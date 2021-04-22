@@ -17,6 +17,9 @@ public class PollItem implements Cacheable {
     private String[] options;
     private int[] votes;
 
+    /** resultsVisible does not need to be cached between user sessions **/
+    boolean resultsVisible;
+
     public PollItem(PollEntry entry) {
         userId = UserStorage.getInternalId(entry.creator);
         pollId = entry.id.id;
@@ -60,6 +63,14 @@ public class PollItem implements Cacheable {
         return votes;
     }
 
+    public int getTotalVotes() {
+        int totalVotes = 0;
+        for (int i = 0; i < votes.length; i++) {
+            totalVotes += votes[i];
+        }
+        return totalVotes;
+    }
+
     public String[] getOptionDescriptions() {
         return options;
     }
@@ -74,6 +85,14 @@ public class PollItem implements Cacheable {
 
     public void setVote(int vote) {
         this.vote = vote;
+    }
+
+    public boolean getResultsVisible() {
+        return resultsVisible;
+    }
+
+    public void toggleResultsVisible() {
+        resultsVisible = !resultsVisible;
     }
 
     public void setOptions(List<PollOption> options) {

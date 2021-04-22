@@ -5,9 +5,4 @@
         android:id="@+id/create_poll"
         android:title="@string/create_poll" />
 
-    <item
-        android:id="@+id/delete_poll"
-        android:title="@string/delete_poll" />
-
-
 </menu>

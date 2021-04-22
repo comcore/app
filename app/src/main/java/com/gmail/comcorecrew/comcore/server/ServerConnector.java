@@ -869,7 +869,7 @@ public final class ServerConnector {
         data.addProperty("chat", message.module.id);
         data.addProperty("id", message.id);
         data.add("reaction", reactionJson);
-        getConnection().send(new ServerMsg("addReaction", data), handler,
+        getConnection().send(new ServerMsg("setReaction", data), handler,
                 MessageEntry::parseReactions);
     }
 

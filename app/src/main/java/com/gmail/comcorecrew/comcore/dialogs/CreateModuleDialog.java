@@ -60,7 +60,6 @@ public class CreateModuleDialog extends DialogFragment {
 
             RadioButton chatRadio = view.findViewById(R.id.create_module_chat_radio);
             RadioButton tasklistRadio = view.findViewById(R.id.create_module_tasklist_radio);
-            RadioButton pinnedRadio = view.findViewById(R.id.create_module_pinned_chat_radio);
             RadioButton calendarRadio = view.findViewById(R.id.create_module_calendar_radio);
             RadioButton pollingRadio = view.findViewById(R.id.create_module_polling_radio);
             RadioButton bulletinRadio = view.findViewById(R.id.create_module_bulletin_radio);
@@ -77,17 +76,6 @@ public class CreateModuleDialog extends DialogFragment {
             else if (tasklistRadio.isChecked()) {
 
                 new TaskList(moduleName.getText().toString(), AppData.getGroup(groupID)).init();
-
-                this.dismiss();
-                fragment.refresh();
-            }
-            else if (false) { //TODO use pinnedRadio.isChecked() once following line is fixed
-                ChatID selectedChat = null; //TODO Prompt user for chat to create module for
-
-                if (selectedChat != null) {
-                    new PinnedMessages(moduleName.getText().toString(), AppData.getGroup(groupID),
-                            selectedChat).init("pinnedMessages");
-                }
 
                 this.dismiss();
                 fragment.refresh();

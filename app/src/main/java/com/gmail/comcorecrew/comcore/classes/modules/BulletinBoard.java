@@ -41,8 +41,9 @@ public class BulletinBoard extends CustomModule {
 
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
-        // TODO FIX THIS
-        eventList = AppData.getUpcoming(null);
+
+        eventList = AppData.getUpcoming(getGroup());
+        addInBulletin();
 
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) view.findViewById(R.id.simple_recycler);
@@ -60,6 +61,18 @@ public class BulletinBoard extends CustomModule {
         });
 
         refreshView();
+    }
+
+    private void addInBulletin() {
+        Group group = getGroup();
+        for (int i = 0; i < group.getModules().size(); i++) {
+            if (group.getModule(i) instanceof Calendar) {
+                Calendar calendar = (Calendar) group.getModule(i);
+                ArrayList<EventEntry> inBulletin = calendar.getInBulletin();
+                inBulletin.removeAll(eventList);
+                eventList.addAll(inBulletin);
+            }
+        }
     }
 
     @Override
