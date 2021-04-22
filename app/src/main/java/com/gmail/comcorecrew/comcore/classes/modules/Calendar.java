@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.classes.modules;
 
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
@@ -114,14 +115,12 @@ public class Calendar extends Module {
         return inBulletin;
     }
 
-    public void addToBulletin(EventID id) {
-        for (int i = 0; i < approved.size(); i++) {
-            if (approved.get(i).id == id) {
-                EventItem updatedEvent = new EventItem(approved.get(id));
-                updatedEvent.setBulletin(true);
-                approved.set(i, updatedEvent.toEntry((CalendarID) this.getId()));
+    public void addToBulletin(EventID id, boolean setBulletin) {
+        ServerConnector.setBulletin(id, setBulletin, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(R.string.error_cannot_connect);
             }
-        }
+        });
     }
 
     public List<EventEntry> getApproved() {

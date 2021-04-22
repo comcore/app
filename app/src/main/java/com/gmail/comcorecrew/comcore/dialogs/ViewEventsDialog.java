@@ -116,7 +116,7 @@ public class ViewEventsDialog extends DialogFragment {
                 }
                 else if (flag == 2) {
                     /** Pin event to the bulletin board */
-                    currentCalendar.addToBulletin(currentEventEntry.id);
+                    currentCalendar.addToBulletin(currentEventEntry.id, true);
                     dismiss();
                 }
             }

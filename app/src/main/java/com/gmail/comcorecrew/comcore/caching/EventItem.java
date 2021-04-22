@@ -13,7 +13,6 @@ public class EventItem implements Cacheable {
     private boolean approved;
     private boolean bulletin;
     private String data;
-    private boolean bulletin;
 
     public EventItem(EventEntry entry) {
         userId = UserStorage.getInternalId(entry.creator);
