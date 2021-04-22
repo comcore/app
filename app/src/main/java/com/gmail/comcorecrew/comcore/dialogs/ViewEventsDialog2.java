@@ -44,7 +44,7 @@ public class ViewEventsDialog2 extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_invites, container, false);
+        View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
 
         System.out.println("We creating the view");
 
@@ -60,7 +60,7 @@ public class ViewEventsDialog2 extends DialogFragment {
                                     System.out.println(eventEntries.get(k).start);
                                 }
 
-                                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.view_invites_recycler);
+                                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
                                 rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
                                 adapter = new CustomAdapter2();
                                 rvGroups.setAdapter(adapter);
@@ -81,7 +81,7 @@ public class ViewEventsDialog2 extends DialogFragment {
         /**
          * If the "back" button is clicked, close the dialog box
          */
-        view.findViewById(R.id.view_invites_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.dialog_with_title_back_button).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
@@ -126,7 +126,7 @@ public class ViewEventsDialog2 extends DialogFragment {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.event_row_item, viewGroup, false);
+                    .inflate(R.layout.subtitle_row_item, viewGroup, false);
 
             System.out.println("HEYO");
 
@@ -136,8 +136,8 @@ public class ViewEventsDialog2 extends DialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
-            TextView eventDesc = viewHolder.itemView.findViewById(R.id.event_description);
-            TextView eventDate = viewHolder.itemView.findViewById(R.id.event_date_range);
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
             eventDesc.setText(eventEntries.get(position).description);
             String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).start).toString() +
