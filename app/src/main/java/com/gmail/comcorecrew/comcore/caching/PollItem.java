@@ -109,12 +109,21 @@ public class PollItem implements Cacheable {
     }
 
     public int charLength() {
-        int total = 2 + 4 + 2; //Basic Fields
-        total += 2 + description.length(); //Description
-        total += 2;
+        int total = minLength();
+        total += description.length(); //Description
         for (String option : options) {
             total += 2 + 2 + option.length(); //Options
         }
+        return total;
+    }
+
+    public static int minLength() {
+        int total = 0;
+        total += 2; //userId
+        total += 4; //pollId
+        total += 2; //vote
+        total += 2; //description length
+        total += 2; //options length
         return total;
     }
 
@@ -160,7 +169,7 @@ public class PollItem implements Cacheable {
     }
 
     public PollItem(char[] cache) {
-        if (cache.length < 10) { //Min size
+        if (cache.length < minLength()) { //Min size
             throw new IllegalArgumentException("Invalid Poll Item length");
         }
         int index = 0;
