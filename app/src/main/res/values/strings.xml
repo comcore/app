@@ -200,6 +200,10 @@
     <string name="polling">Poll</string>
     <string name="create_poll">Create Poll</string>
     <string name="delete_poll">Delete Poll</string>
+    <string name="view_results">Results</string>
+    <string name="create_poll_label">Create A Poll</string>
+    <string name="options_label">Poll Choice</string>
+    <string name="create_options_label">Create Choice</string>
 
     <!-- Bulletin Board -->
     <string name="bulletin_board">Bulletin Board</string>

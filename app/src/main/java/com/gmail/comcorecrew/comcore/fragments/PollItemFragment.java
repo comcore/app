@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -40,11 +41,13 @@ import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.PollOption;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.PollID;
+import com.gmail.comcorecrew.comcore.server.id.PollListID;
 
 public class PollItemFragment extends Fragment {
-    private PollItem currentPoll;
+    public static PollItem currentPoll;
     private CustomAdapter pollingAdapter;
-    private Polling parentPolling;
+    public static Polling parentPolling;
 
     public PollItemFragment() {
         // Required empty public constructor
@@ -89,15 +92,24 @@ public class PollItemFragment extends Fragment {
 
         /** Displays the name of the current group */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_poll_fragment);
-        //welcomeText.setText(currentPoll.getName());
+        welcomeText.setText(currentPoll.getDescription());
 
         /**
          * If the "back" button is clicked, return to the main page
          */
-        view.findViewById(R.id.polling_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.poll_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
+
+        /**
+         * If the "view results" button is clicked, display the number of votes for each choice
+         */
+        view.findViewById(R.id.view_results_button).setOnClickListener(clickedView -> {
+            currentPoll.toggleResultsVisible();
+            pollingAdapter.notifyDataSetChanged();
+        });
+
     }
 
 
@@ -110,9 +122,31 @@ public class PollItemFragment extends Fragment {
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private final TextView choiceLabel;
+            private int currentChoice;
+
             public ViewHolder(View view) {
                 super(view);
+                view.setOnClickListener(this);
+
+                choiceLabel = (TextView) view.findViewById(R.id.label_choice);
+
+            }
+
+
+            public void setCurrentChoice(int newChoice) {
+                currentChoice = newChoice;
+            }
+
+            @Override
+            public void onClick(View v) {
+                parentPolling.votePoll(new PollID((PollListID) parentPolling.getId(), currentPoll.getPollId()), currentChoice);
+                if (!currentPoll.getResultsVisible()) {
+                    currentPoll.toggleResultsVisible();
+                }
+                parentPolling.refresh();
+                refresh();
             }
         }
 
@@ -125,22 +159,32 @@ public class PollItemFragment extends Fragment {
             return new CustomAdapter.ViewHolder(view);
         }
 
+        @SuppressLint("ResourceAsColor")
         @Override
         public void onBindViewHolder(CustomAdapter.ViewHolder viewHolder, final int position) {
-            TextView titleText = viewHolder.itemView.findViewById(R.id.label_poll_fragment);
+            TextView titleText = viewHolder.itemView.findViewById(R.id.label_choice);
             TextView resultText = viewHolder.itemView.findViewById(R.id.results_label);
 
             PollOption option = currentPoll.getOptions().get(position);
             titleText.setText(option.description);
 
-            String resultsText;
+            String resultString;
             if (currentPoll.getTotalVotes() == 0) {
-                resultsText = "No votes";
+                resultString = "No votes";
             }
             else {
-                resultsText = String.format("%d votes (%.2f%)", option.numberOfVotes, option.numberOfVotes / currentPoll.getTotalVotes());
+                resultString = String.format("%d votes (%.2f%%)", option.numberOfVotes, 100 * (float) option.numberOfVotes / (float) currentPoll.getTotalVotes());
             }
-            resultText.setText(resultsText);
+            resultText.setText(resultString);
+
+            if (currentPoll.getResultsVisible()) {
+                resultText.setVisibility(View.VISIBLE);
+            }
+            else {
+                resultText.setVisibility(View.INVISIBLE);
+            }
+
+            viewHolder.setCurrentChoice(position);
 
         }
 
