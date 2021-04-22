@@ -157,7 +157,7 @@ public class PollItem implements Cacheable {
         vote = (vote << 16) | cache[index++];
         length = cache[index++];
         length = (length << 16) | cache[index++];
-        description = String.copyValueOf(cache, index, index + length);
+        description = String.copyValueOf(cache, index, length);
         index += length;
         length = cache[index++];
         length = (length << 16) | cache[index++];
@@ -168,7 +168,7 @@ public class PollItem implements Cacheable {
             votes[i] = (votes[i] << 16) | cache[index++];
             length = cache[index++];
             length = (length << 16) | cache[index++];
-            options[i] = String.copyValueOf(cache, index, index + length);
+            options[i] = String.copyValueOf(cache, index, length);
             index += length;
         }
     }
