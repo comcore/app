@@ -44,6 +44,11 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
     public final boolean approved;
 
     /**
+     * Whether the event should appear on a bulletin board regardless of the start time.
+     */
+    public final boolean bulletin;
+
+    /**
      * Create an EventEntry with a description of the event and whether it has been approved.
      *
      * @param id          the EventID of the event
@@ -52,9 +57,10 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
      * @param start       the start timestamp
      * @param end         the end timestamp
      * @param approved    whether the event has been approved by a moderator
+     * @param bulletin    whether the event should appear on a bulletin board
      */
     public EventEntry(EventID id, UserID creator, String description, long start, long end,
-                      boolean approved) {
+                      boolean approved, boolean bulletin) {
         super(id);
 
         if (creator == null) {
@@ -72,6 +78,7 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
         this.start = start;
         this.end = end;
         this.approved = approved;
+        this.bulletin = bulletin;
     }
 
     /**
@@ -89,7 +96,8 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
         long start = json.get("start").getAsLong();
         long end = json.get("end").getAsLong();
         boolean approved = json.get("approved").getAsBoolean();
-        return new EventEntry(id, creator, description, start, end, approved);
+        boolean bulletin = json.get("bulletin").getAsBoolean();
+        return new EventEntry(id, creator, description, start, end, approved, bulletin);
     }
 
     @Override
@@ -124,13 +132,13 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
         return start == that.start &&
                 end == that.end &&
                 approved == that.approved &&
-                id.equals(that.id) &&
+                bulletin == that.bulletin &&
                 creator.equals(that.creator) &&
                 description.equals(that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creator, description, start, end, approved);
+        return Objects.hash(creator, description, start, end, approved, bulletin);
     }
 }
