@@ -114,9 +114,8 @@ public class PollingFragment extends Fragment {
      * the list of polls in the GUI
      */
     public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-        private PollItem pollItem;
-
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            private PollItem pollItem;
 
             public ViewHolder(View view) {
                 super(view);
@@ -130,10 +129,10 @@ public class PollingFragment extends Fragment {
                 NavHostFragment.findNavController(PollingFragment.this)
                         .navigate(R.id.action_pollingFragment_to_pollItemFragment);
             }
-        }
 
-        public void setPollItem(PollItem currentPollItem) {
-            this.pollItem = currentPollItem;
+            public void setPollItem(PollItem currentPollItem) {
+                this.pollItem = currentPollItem;
+            }
         }
 
         @Override
@@ -152,7 +151,7 @@ public class PollingFragment extends Fragment {
 
             titleText.setText(poll.getDescription());
 
-            setPollItem(polling.getPolls().get(position));
+            viewHolder.setPollItem(poll);
 
         }
 

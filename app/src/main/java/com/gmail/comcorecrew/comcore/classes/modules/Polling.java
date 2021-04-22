@@ -6,6 +6,7 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.PollItem;
 import com.gmail.comcorecrew.comcore.caching.TaskItem;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationScheduler;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -84,6 +85,7 @@ public class Polling extends Module {
         if (poll != null) {
             ServerConnector.voteOnPoll(pollID, choice, result -> {
                 if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
                     return;
                 }
 

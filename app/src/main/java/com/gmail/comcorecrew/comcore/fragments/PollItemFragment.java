@@ -54,8 +54,7 @@ public class PollItemFragment extends Fragment {
         pollingAdapter = new CustomAdapter();
         rvGroups.setAdapter(pollingAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
-
-        refresh();
+        parentPolling.setCallback(this::refresh);
 
         return rootView;
     }
@@ -119,12 +118,8 @@ public class PollItemFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                parentPolling.votePoll(new PollID((PollListID) parentPolling.getId(), currentPoll.getPollId()), currentChoice);
-                if (!currentPoll.getResultsVisible()) {
-                    currentPoll.toggleResultsVisible();
-                }
-                parentPolling.refresh();
-                refresh();
+                PollID pollId = new PollID((PollListID) parentPolling.getId(), currentPoll.getPollId());
+                parentPolling.votePoll(pollId, currentChoice);
             }
         }
 
