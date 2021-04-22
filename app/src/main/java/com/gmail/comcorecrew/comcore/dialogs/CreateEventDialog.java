@@ -93,9 +93,7 @@ public class CreateEventDialog extends DialogFragment {
             /**
              * Users cannot automatically create events unless the group's settings allow it
              * **/
-            if (calendar.getGroup().isRequireApproval() && (calendar.getGroup().getGroupRole() == GroupRole.USER)) {
-                calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
-            }
+            calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
             this.dismiss();
         });
 
