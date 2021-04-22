@@ -1,5 +1,7 @@
 package com.gmail.comcorecrew.comcore.classes.modules;
 
+import androidx.preference.PreferenceFragmentCompat;
+
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.Cacheable;
 import com.gmail.comcorecrew.comcore.caching.Cacher;
@@ -100,6 +102,26 @@ public class Calendar extends Module {
             }
         }
         return eventList;
+    }
+
+    public ArrayList<EventEntry> getInBulletin () {
+        ArrayList<EventEntry> inBulletin = new ArrayList<>();
+        for (int i = 0; i < approved.size(); i++) {
+            if (approved.get(i).bulletin) {
+                inBulletin.add(approved.get(i));
+            }
+        }
+        return inBulletin;
+    }
+
+    public void addToBulletin(EventID id) {
+        for (int i = 0; i < approved.size(); i++) {
+            if (approved.get(i).id == id) {
+                EventItem updatedEvent = new EventItem(approved.get(id));
+                updatedEvent.setBulletin(true);
+                approved.set(i, updatedEvent.toEntry((CalendarID) this.getId()));
+            }
+        }
     }
 
     public List<EventEntry> getApproved() {

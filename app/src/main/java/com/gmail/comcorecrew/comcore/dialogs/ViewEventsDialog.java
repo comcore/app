@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.caching.EventItem;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
@@ -29,6 +30,7 @@ public class ViewEventsDialog extends DialogFragment {
     /**
      * 0 - View events
      * 1 - Delete events
+     * 2 - Add event to bulletin board
      */
     private int flag;
 
@@ -73,6 +75,9 @@ public class ViewEventsDialog extends DialogFragment {
         else if (flag == 1) {
             title.setText(R.string.delete_events);
         }
+        else if (flag == 2) {
+            title.setText(R.string.pin_event);
+        }
 
         /**
          * If the "back" button is clicked, close the dialog box
@@ -105,8 +110,13 @@ public class ViewEventsDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    /* Delete event */
+                    /** Delete event */
                     currentCalendar.deleteEvent(currentEventEntry.id);
+                    dismiss();
+                }
+                else if (flag == 2) {
+                    /** Pin event to the bulletin board */
+                    currentCalendar.addToBulletin(currentEventEntry.id);
                     dismiss();
                 }
             }

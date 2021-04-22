@@ -21,9 +21,11 @@ import android.widget.CalendarView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.CreateEventDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
@@ -116,6 +118,26 @@ public class GroupCalendarFragment extends Fragment {
             case R.id.view_pending_events:
                 /** Handle view pending events **/
                 new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.pin_event:
+                /** Handle pinning event to the bulletin board **/
+                new ViewEventsDialog(calendar, null, 2).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.require_approval:
+                /** Handle updating event approval settings **/
+                ServerConnector.setRequireApproval(calendar.getGroup().getGroupId(), !calendar.getGroup().isRequireApproval(), result -> {
+                    if (result.isFailure()) {
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                    }
+                    else {
+                        if (calendar.getGroup().isRequireApproval()) {
+                            ErrorDialog.show(R.string.event_approval_not_needed);
+                        }
+                        else {
+                            ErrorDialog.show(R.string.event_approval_needed);
+                        }
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

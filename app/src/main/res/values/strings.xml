@@ -190,6 +190,8 @@
     <string name="create_event_start_time">Start Time (HH:MM)</string>
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
+    <string name="pin_event">Pin Event</string>
+    <string name="pin_event_title">Pin event to the bulletin board</string>
 
     <string name="remove_event">Remove Event</string>
     <string name="view_events">View Events</string>
