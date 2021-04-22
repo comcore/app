@@ -14,18 +14,20 @@ import java.util.Collections;
 public class CustomItem implements Cacheable {
 
     private int id;
+    private int altId;
     private long itemId;
     private long timestamp;
     private int metaInt;
-    private int altId;
+    private long metaLong;
     private String data;
 
     public CustomItem(MessageEntry entry) {
         id = UserStorage.getInternalId(entry.sender);
+        altId = -1;
         itemId = entry.id.id;
         timestamp = entry.timestamp;
         metaInt = -1;
-        altId = -1;
+        metaLong = -1;
         data = entry.contents;
     }
 
@@ -33,6 +35,7 @@ public class CustomItem implements Cacheable {
         id = UserStorage.getInternalId(entry.creator);
         itemId = entry.id.id;
         timestamp = entry.timestamp;
+        metaLong = entry.deadline;
         metaInt = entry.completer == null ? -1 : UserStorage.getInternalId(entry.completer);
         altId = entry.assigned == null ? -1 : UserStorage.getInternalId(entry.assigned);
         data = entry.description;
@@ -40,6 +43,10 @@ public class CustomItem implements Cacheable {
 
     public int getId() {
         return id;
+    }
+
+    public int getAltId() {
+        return altId;
     }
 
     public long getItemId() {
@@ -54,8 +61,8 @@ public class CustomItem implements Cacheable {
         return metaInt;
     }
 
-    public int getAltId() {
-        return altId;
+    public long getMetaLong() {
+        return metaLong;
     }
 
     public boolean isCompleted() {
@@ -74,6 +81,10 @@ public class CustomItem implements Cacheable {
         this.id = id;
     }
 
+    public void setAltId(int altId) {
+        this.altId = altId;
+    }
+
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
@@ -86,8 +97,8 @@ public class CustomItem implements Cacheable {
         this.metaInt = metaInt;
     }
 
-    public void setAltId(int altId) {
-        this.altId = altId;
+    public void setMetaLong(long metaLong) {
+        this.metaLong = metaLong;
     }
 
     public MessageEntry toEntry(ChatID chatID) {
@@ -99,22 +110,21 @@ public class CustomItem implements Cacheable {
     public TaskEntry toEntry(TaskListID listID) {
         TaskID taskID = new TaskID(listID, itemId);
 
-        // TODO cache the deadline (and in TaskItem)
-        long deadline = 0;
-
-        return new TaskEntry(taskID, UserStorage.getUser(id).getID(), timestamp, deadline, data,
+        return new TaskEntry(taskID, UserStorage.getUser(id).getID(), timestamp, metaLong, data,
                 isCompleted() ? UserStorage.getUser(metaInt).getID() : null,
                 altId >= 0 ? UserStorage.getUser(altId).getID() : null);
     }
 
     @Override
     public char[] toCache() {
-        char[] cache = new char[2 + 4 + 4 + 2 + 2 + data.length()];
+        char[] cache = new char[charLength()];
 
         int index = 0;
 
         cache[index++] = (char) (id >> 16);
         cache[index++] = (char) id;
+        cache[index++] = (char) (altId >> 16);
+        cache[index++] = (char) altId;
         cache[index++] = (char) (itemId >> 48);
         cache[index++] = (char) (itemId >> 32);
         cache[index++] = (char) (itemId >> 16);
@@ -125,8 +135,10 @@ public class CustomItem implements Cacheable {
         cache[index++] = (char) timestamp;
         cache[index++] = (char) (metaInt >> 16);
         cache[index++] = (char) metaInt;
-        cache[index++] = (char) (altId >> 16);
-        cache[index++] = (char) altId;
+        cache[index++] = (char) (metaLong >> 48);
+        cache[index++] = (char) (metaLong >> 32);
+        cache[index++] = (char) (metaLong >> 16);
+        cache[index++] = (char) metaLong;
         for (int i = 0; i < data.length(); i++) {
             cache[index++] = data.charAt(i);
         }
@@ -135,7 +147,7 @@ public class CustomItem implements Cacheable {
     }
 
     public CustomItem(char[] cache) {
-        if (cache.length < 11) { //Makes sure the array length is valid.
+        if (cache.length < minLength()) { //Makes sure the array length is valid.
             throw new IllegalArgumentException();
         }
 
@@ -144,6 +156,8 @@ public class CustomItem implements Cacheable {
         //Reads the array into the object.
         id = cache[index++];
         id = (id << 16) | cache[index++];
+        altId = cache[index++];
+        altId = (altId << 16) | cache[index++];
         itemId = cache[index++];
         itemId = (itemId << 16) | cache[index++];
         itemId = (itemId << 16) | cache[index++];
@@ -154,12 +168,31 @@ public class CustomItem implements Cacheable {
         timestamp = (timestamp << 16) | cache[index++];
         metaInt = cache[index++];
         metaInt = (metaInt << 16) | cache[index++];
-        altId = cache[index++];
-        altId = (altId << 16) | cache[index++];
+        metaLong = cache[index++];
+        metaLong = (metaLong << 16) | cache[index++];
+        metaLong = (metaLong << 16) | cache[index++];
+        metaLong = (metaLong << 16) | cache[index++];
         data = new String(cache, index, cache.length - index);
     }
 
+    public static int minLength() {
+        int total = 0;
+        total += 2; //userId
+        total += 2; //altId
+        total += 4; //itemId
+        total += 4; //timestamp
+        total += 2; //metaInt
+        total += 4; //metaLong
+        return total;
+    }
+
+    public int charLength() {
+        int total = minLength();
+        total += data.length();
+        return total;
+    }
+
     public long getBytes() {
-        return 4 + 4 + 8 + 8 + 4 + 4 + (data.length() * 2);
+        return charLength() * 2;
     }
 }
