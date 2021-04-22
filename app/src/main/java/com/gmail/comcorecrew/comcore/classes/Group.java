@@ -534,11 +534,22 @@ public class Group implements NotificationListener, Comparable<Group> {
 
     @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
+        if (!group.equals(groupID)) {
+            return;
+        }
+
         groupRole = role;
+        if (role == GroupRole.OWNER) {
+            owner = AppData.self.getID();
+        }
     }
 
     @Override
     public void onMuteChanged(GroupID group, boolean muted) {
+        if (!group.equals(groupID)) {
+            return;
+        }
+
         isMuted = muted;
     }
 
