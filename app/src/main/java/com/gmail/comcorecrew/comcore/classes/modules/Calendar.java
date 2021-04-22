@@ -157,7 +157,8 @@ public class Calendar extends Module {
                     entry.description,
                     entry.start,
                     entry.end,
-                    true));
+                    true,
+                    entry.bulletin));
             toCache();
         }
     }

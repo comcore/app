@@ -1078,6 +1078,26 @@ public final class ServerConnector {
     }
 
     /**
+     * As a moderator, set whether an event should appear on a bulletin board.
+     *
+     * @param event    the event
+     * @param bulletin whether the event should appear on a bulletin board
+     * @param handler  the handler for the response of the server
+     */
+    public static void setBulletin(EventID event, boolean bulletin, ResultHandler<Void> handler) {
+        if (event == null) {
+            throw new IllegalArgumentException("EventID cannot be null");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", event.module.group.id);
+        data.addProperty("calendar", event.module.id);
+        data.addProperty("id", event.id);
+        data.addProperty("bulletin", bulletin);
+        getConnection().send(new ServerMsg("setBulletin", data), handler, response -> null);
+    }
+
+    /**
      * Add a poll with a given description and options to a poll list.
      *
      * @param pollList    the poll list to add the poll to

@@ -80,7 +80,8 @@ public class EventItem implements Cacheable {
 
     public EventEntry toEntry(CalendarID calendarID) {
         EventID eventID = new EventID(calendarID, eventId);
-        return new EventEntry(eventID, UserStorage.getUser(userId).getID(), data, start, end, approved);
+        boolean bulletin = false;
+        return new EventEntry(eventID, UserStorage.getUser(userId).getID(), data, start, end, approved, bulletin);
     }
 
     public int getUserId() {

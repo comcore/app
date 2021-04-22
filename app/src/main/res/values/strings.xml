@@ -173,11 +173,14 @@
     <string name="pin_message">Pin a Message</string>
 
     <string name="pinned_messages">Pinned Messages</string>
-
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="upload_file">Upload File</string>
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
     <string name="update_event_approval">Change Event Approval</string>
+    <string name="create_event">Create Event</string>
 
     <!-- Calendar -->
     <string name="view_pending_events">View Pending Events</string>
@@ -187,7 +190,9 @@
     <string name="create_event_start_time">Start Time (HH:MM)</string>
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
-    <string name="view_events">Events</string>
+
+    <string name="remove_event">Remove Event</string>
+    <string name="view_events">View Events</string>
 
     <!-- Polling -->
     <string name="polling">Poll</string>

@@ -21,11 +21,6 @@
         android:title="@string/title_create_group"
         app:showAsAction="never" />
     <item
-        android:id="@+id/bulletin_board"
-        android:title="@string/bulletin_board"
-        app:showAsAction="never"
-        />
-    <item
         android:id="@+id/settingsFragment"
         android:title="@string/action_settings"
         app:showAsAction="never" />

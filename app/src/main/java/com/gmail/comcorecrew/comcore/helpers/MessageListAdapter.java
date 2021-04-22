@@ -77,7 +77,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MessageItem message = messaging.get(position);
@@ -116,6 +115,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
             menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
+            menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
             if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
             }
@@ -167,6 +167,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 0, "Delete");
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 1, "Pin");
             }
+            menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
         }
     }
 }

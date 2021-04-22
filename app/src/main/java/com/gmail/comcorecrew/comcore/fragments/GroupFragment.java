@@ -23,6 +23,7 @@ import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
 import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.BulletinBoard;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.Polling;
@@ -64,10 +65,10 @@ public class GroupFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_group, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_simple_recycler, container, false);
 
         // Create the RecyclerView
-        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.group_recycler);
+        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.simple_recycler);
         rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
         moduleAdapter = new CustomAdapter();
         rvGroups.setAdapter(moduleAdapter);
@@ -81,13 +82,13 @@ public class GroupFragment extends Fragment {
 
         refresh();
 
-        TextView groupNameText = (TextView) view.findViewById(R.id.label_group_fragment);
+        TextView groupNameText = (TextView) view.findViewById(R.id.label_simple_fragment);
         groupNameText.setText(currentGroup.getDisplayName());
 
         /*
           If the "back" button is clicked, return to the main page
          */
-        view.findViewById(R.id.group_back_button).setOnClickListener(clickedView -> {
+        view.findViewById(R.id.simple_back_button).setOnClickListener(clickedView -> {
             NavHostFragment.findNavController(this)
                     .popBackStack();
         });
@@ -250,11 +251,20 @@ public class GroupFragment extends Fragment {
                     TaskListFragment.taskList = (TaskList) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_taskListFragment);
-                }
+                } //else if (currentModule instanceof Calendar) {
+                   // GroupCalendarFragment.calendar = (Calendar) currentModule;
+                    //NavHostFragment.findNavController(GroupFragment.this).navigate(R.id.action_groupFragment_to_calendarFragment);
+               // }
                 else if (currentModule instanceof Calendar) {
                     CalendarFragment.calendar = (Calendar) currentModule;
+                    GroupCalendarFragment.calendar = (Calendar) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_calendarFragment);
+                }
+                else if (currentModule instanceof BulletinBoard) {
+                    CustomFragment.custom = (BulletinBoard) currentModule;
+                    NavHostFragment.findNavController(GroupFragment.this)
+                            .navigate(R.id.action_groupFragment_to_customFragment);
                 }
             }
         }
@@ -282,6 +292,8 @@ public class GroupFragment extends Fragment {
                 viewHolder.getTextView().setText("Calendar: " + name);
             } else if (module instanceof Polling) {
                 viewHolder.getTextView().setText("Polls: " + name);
+            } else if (module instanceof BulletinBoard) {
+                viewHolder.getTextView().setText("Bulletin Board: " + name);
             } else {
                 viewHolder.getTextView().setText(name);
             }
