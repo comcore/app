@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
+import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
@@ -161,6 +162,11 @@ public class ChatFragment5 extends Fragment {
             case R.id.upload_file:
                 /**Handle Upload File button **/
                 uploadFile();
+                return true;
+            case R.id.create_pinned:
+                /** Handle creating pinned messages module **/
+                String pinnedTitle = messaging.getName() + " Pinned Messages";
+                new PinnedMessages(pinnedTitle, messaging.getGroup(), (ChatID) messaging.getId());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

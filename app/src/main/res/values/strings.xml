@@ -171,6 +171,7 @@
 
     <!-- Pin Messages -->
     <string name="pin_message">Pin a Message</string>
+    <string name="create_pinned">Create Pinned Messages</string>
 
     <string name="pinned_messages">Pinned Messages</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -190,6 +191,8 @@
     <string name="create_event_start_time">Start Time (HH:MM)</string>
     <string name="create_event_end_time">End Time (HH:MM)</string>
     <string name="delete_events">Remove Event</string>
+    <string name="pin_event">Pin Event</string>
+    <string name="pin_event_title">Pin event to the bulletin board</string>
 
     <string name="remove_event">Remove Event</string>
     <string name="view_events">View Events</string>
@@ -198,6 +201,10 @@
     <string name="polling">Poll</string>
     <string name="create_poll">Create Poll</string>
     <string name="delete_poll">Delete Poll</string>
+    <string name="view_results">Results</string>
+    <string name="create_poll_label">Create A Poll</string>
+    <string name="options_label">Poll Choice</string>
+    <string name="create_options_label">Create Choice</string>
 
     <!-- Bulletin Board -->
     <string name="bulletin_board">Bulletin Board</string>

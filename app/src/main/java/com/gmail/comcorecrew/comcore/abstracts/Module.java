@@ -90,6 +90,20 @@ public abstract class Module implements Serializable, NotificationListener {
                 });
                 break;
             }
+            case CPLS: {
+                ServerConnector.createPollList(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                    this.name = name;
+                    this.group = group;
+                    muted = false;
+                    mentionMuted = false;
+                    mnum = group.addModule(this);
+                });
+                break;
+            }
             default: {
                 throw new RuntimeException("Invalid MDID");
             }
@@ -132,6 +146,17 @@ public abstract class Module implements Serializable, NotificationListener {
                     id = result.data;
                     afterCreate();
                 });
+            }
+            case CPLS: {
+                ServerConnector.createPollList(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        throw new RuntimeException(result.errorMessage);
+                    }
+                    id = result.data;
+                    this.name = name;
+                    afterCreate();
+                });
+                break;
             }
             default: {
                 throw new RuntimeException("Invalid MDID");

@@ -22,6 +22,7 @@ public class EventItem implements Cacheable {
         approved = entry.approved;
         bulletin = entry.bulletin;
         data = entry.description;
+        bulletin = entry.bulletin;
     }
 
     public EventItem(char[] cache) {
@@ -96,7 +97,6 @@ public class EventItem implements Cacheable {
 
     public EventEntry toEntry(CalendarID calendarID) {
         EventID eventID = new EventID(calendarID, eventId);
-        boolean bulletin = false;
         return new EventEntry(eventID, UserStorage.getUser(userId).getID(), data, start, end, approved, bulletin);
     }
 
@@ -146,5 +146,13 @@ public class EventItem implements Cacheable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public void setBulletin(boolean inBulletin) {
+        this.bulletin = inBulletin;
+    }
+
+    public boolean getBulletin() {
+        return bulletin;
     }
 }

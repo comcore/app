@@ -261,6 +261,11 @@ public class GroupFragment extends Fragment {
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_calendarFragment);
                 }
+                else if (currentModule instanceof Polling) {
+                    PollingFragment.polling = (Polling) currentModule;
+                    NavHostFragment.findNavController(GroupFragment.this)
+                            .navigate(R.id.action_groupFragment_to_pollingFragment);
+                }
                 else if (currentModule instanceof BulletinBoard) {
                     CustomFragment.custom = (BulletinBoard) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
