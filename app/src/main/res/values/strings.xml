@@ -171,6 +171,7 @@
 
     <!-- Pin Messages -->
     <string name="pin_message">Pin a Message</string>
+    <string name="create_pinned">Create Pinned Messages</string>
 
     <string name="pinned_messages">Pinned Messages</string>
     <!-- TODO: Remove or change this placeholder text -->

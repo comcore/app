@@ -60,7 +60,6 @@ public class CreateModuleDialog extends DialogFragment {
 
             RadioButton chatRadio = view.findViewById(R.id.create_module_chat_radio);
             RadioButton tasklistRadio = view.findViewById(R.id.create_module_tasklist_radio);
-            RadioButton pinnedRadio = view.findViewById(R.id.create_module_pinned_chat_radio);
             RadioButton calendarRadio = view.findViewById(R.id.create_module_calendar_radio);
             RadioButton pollingRadio = view.findViewById(R.id.create_module_polling_radio);
             RadioButton bulletinRadio = view.findViewById(R.id.create_module_bulletin_radio);
@@ -81,24 +80,12 @@ public class CreateModuleDialog extends DialogFragment {
                 this.dismiss();
                 fragment.refresh();
             }
-            else if (false) { //TODO use pinnedRadio.isChecked() once following line is fixed
-                ChatID selectedChat = null; //TODO Prompt user for chat to create module for
-
-                if (selectedChat != null) {
-                    new PinnedMessages(moduleName.getText().toString(), AppData.getGroup(groupID),
-                            selectedChat);
-                }
-
-                this.dismiss();
-                fragment.refresh();
-            }
             else if (calendarRadio.isChecked()) {
                 ServerConnector.createCalendar(groupID, moduleName.getText().toString(), result -> {
                     if (result.isFailure()) {
                         ErrorDialog.show(R.string.error_cannot_connect);
                         return;
                     }
-
                     this.dismiss();
                     fragment.refresh();
                 });
