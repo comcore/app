@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/RowItemBackground"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
     android:clickable="true"
-    android:focusable="auto"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:layout_height="50dp"
+    android:focusable="auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/RowItemBackground"
@@ -19,15 +19,17 @@
 
         <TextView
             android:id="@+id/group_row_text"
+            style="@style/RowItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/RowItemBackground"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:text="@string/error_unknown"
             android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -38,7 +40,7 @@
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/btn_star" />
+            app:srcCompat="@color/secondary_d1" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
