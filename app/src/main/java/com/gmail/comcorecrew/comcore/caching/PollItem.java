@@ -17,6 +17,9 @@ public class PollItem implements Cacheable {
     private String[] options;
     private int[] votes;
 
+    /** resultsVisible does not need to be cached between user sessions **/
+    boolean resultsVisible;
+
     public PollItem(PollEntry entry) {
         userId = UserStorage.getInternalId(entry.creator);
         pollId = entry.id.id;
@@ -60,6 +63,14 @@ public class PollItem implements Cacheable {
         return votes;
     }
 
+    public int getTotalVotes() {
+        int totalVotes = 0;
+        for (int i = 0; i < votes.length; i++) {
+            totalVotes += votes[i];
+        }
+        return totalVotes;
+    }
+
     public String[] getOptionDescriptions() {
         return options;
     }
@@ -76,6 +87,14 @@ public class PollItem implements Cacheable {
         this.vote = vote;
     }
 
+    public boolean getResultsVisible() {
+        return resultsVisible;
+    }
+
+    public void toggleResultsVisible() {
+        resultsVisible = !resultsVisible;
+    }
+
     public void setOptions(List<PollOption> options) {
         this.options = new String[options.size()];
         votes = new int[options.size()];
@@ -90,12 +109,21 @@ public class PollItem implements Cacheable {
     }
 
     public int charLength() {
-        int total = 2 + 4 + 2; //Basic Fields
-        total += 2 + description.length(); //Description
-        total += 2;
+        int total = minLength();
+        total += description.length(); //Description
         for (String option : options) {
             total += 2 + 2 + option.length(); //Options
         }
+        return total;
+    }
+
+    public static int minLength() {
+        int total = 0;
+        total += 2; //userId
+        total += 4; //pollId
+        total += 2; //vote
+        total += 2; //description length
+        total += 2; //options length
         return total;
     }
 
@@ -126,6 +154,8 @@ public class PollItem implements Cacheable {
             cache[index++] = (char) (votes[j] >> 16);
             cache[index++] = (char) votes[j];
             length = options[j].length();
+            cache[index++] = (char) (length >> 16);
+            cache[index++] = (char) length;
             for (int i = 0; i < length; i++) {
                 cache[index++] = options[j].charAt(i);
             }
@@ -139,7 +169,7 @@ public class PollItem implements Cacheable {
     }
 
     public PollItem(char[] cache) {
-        if (cache.length < 10) { //Min size
+        if (cache.length < minLength()) { //Min size
             throw new IllegalArgumentException("Invalid Poll Item length");
         }
         int index = 0;
@@ -155,7 +185,7 @@ public class PollItem implements Cacheable {
         vote = (vote << 16) | cache[index++];
         length = cache[index++];
         length = (length << 16) | cache[index++];
-        description = String.copyValueOf(cache, index, index + length);
+        description = String.copyValueOf(cache, index, length);
         index += length;
         length = cache[index++];
         length = (length << 16) | cache[index++];
@@ -166,7 +196,7 @@ public class PollItem implements Cacheable {
             votes[i] = (votes[i] << 16) | cache[index++];
             length = cache[index++];
             length = (length << 16) | cache[index++];
-            options[i] = String.copyValueOf(cache, index, index + length);
+            options[i] = String.copyValueOf(cache, index, length);
             index += length;
         }
     }

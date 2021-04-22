@@ -22,12 +22,10 @@
         android:id="@+id/poll_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginEnd="114dp"
+        android:layout_marginStart="40dp"
         android:layout_marginBottom="48dp"
         android:text="@string/back"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/poll_submit_button"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -44,12 +42,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/poll_submit_button"
+        android:id="@+id/view_results_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="60dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="48dp"
-        android:text="@string/submit"
+        android:text="@string/view_results"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
