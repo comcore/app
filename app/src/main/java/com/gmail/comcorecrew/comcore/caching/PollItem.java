@@ -126,6 +126,8 @@ public class PollItem implements Cacheable {
             cache[index++] = (char) (votes[j] >> 16);
             cache[index++] = (char) votes[j];
             length = options[j].length();
+            cache[index++] = (char) (length >> 16);
+            cache[index++] = (char) length;
             for (int i = 0; i < length; i++) {
                 cache[index++] = options[j].charAt(i);
             }
