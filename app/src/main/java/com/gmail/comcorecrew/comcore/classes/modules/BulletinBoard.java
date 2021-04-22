@@ -41,8 +41,8 @@ public class BulletinBoard extends CustomModule {
 
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
-
-        eventList = AppData.getUpcoming();
+        // TODO FIX THIS
+        eventList = AppData.getUpcoming(null);
 
         // Create the RecyclerView
         RecyclerView rvGroups = (RecyclerView) view.findViewById(R.id.simple_recycler);

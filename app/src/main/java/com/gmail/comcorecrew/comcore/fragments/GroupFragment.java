@@ -251,9 +251,13 @@ public class GroupFragment extends Fragment {
                     TaskListFragment.taskList = (TaskList) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_taskListFragment);
-                }
+                } //else if (currentModule instanceof Calendar) {
+                   // GroupCalendarFragment.calendar = (Calendar) currentModule;
+                    //NavHostFragment.findNavController(GroupFragment.this).navigate(R.id.action_groupFragment_to_calendarFragment);
+               // }
                 else if (currentModule instanceof Calendar) {
                     CalendarFragment.calendar = (Calendar) currentModule;
+                    GroupCalendarFragment.calendar = (Calendar) currentModule;
                     NavHostFragment.findNavController(GroupFragment.this)
                             .navigate(R.id.action_groupFragment_to_calendarFragment);
                 }

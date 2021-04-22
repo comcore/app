@@ -93,6 +93,15 @@ public class CreateModuleDialog extends DialogFragment {
                 fragment.refresh();
             }
             else if (calendarRadio.isChecked()) {
+                ServerConnector.createCalendar(groupID, moduleName.getText().toString(), result -> {
+                    if (result.isFailure()) {
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                        return;
+                    }
+
+                    this.dismiss();
+                    fragment.refresh();
+                });
 
                 new Calendar(moduleName.getText().toString(), AppData.getGroup(groupID));
 
