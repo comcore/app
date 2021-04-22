@@ -82,7 +82,7 @@ public class GroupStorage {
                     // Check for an existing group object to reuse
                     Group group = existingIds.get(id);
                     if (group != null) {
-                        // If group is still active, removes from old group.
+                        // Don't delete this group since it will be reused
                         oldGroups.set(AppData.getPosition(id), null);
                         ids.put(id, group);
                         continue;

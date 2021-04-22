@@ -62,7 +62,7 @@
     <string name="remove_moderator">Remove Moderator</string>
     <string name="leave_group">Leave Group</string>
     <string name="group_settings">Group Settings</string>
-    <string name="create_sub_group">Create Sub Group</string>
+    <string name="create_sub_group">Create Sub-Group</string>
 
     <!-- Create Link -->
     <string name="create_link_does_expire">Do you want the invite link to expire?</string>
@@ -113,6 +113,10 @@
     <string name="pick_kick_user">Pick a user to kick.</string>
     <string name="pick_mute_user">Pick a user to mute.</string>
     <string name="pick_unmute_user">Pick a user to unmute.</string>
+
+    <!-- View Members -->
+    <string name="select_action">What do you want to do?</string>
+    <string name="select_member">Select a Member</string>
 
     <!-- Notification Channels -->
     <string name="ch_name_message">Chat Messages</string>
