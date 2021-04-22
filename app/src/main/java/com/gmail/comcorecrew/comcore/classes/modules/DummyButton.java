@@ -32,7 +32,7 @@ public class DummyButton extends CustomChat {
     }
 
     public DummyButton(String name, Group group) {
-        super(name, group, "dummy");
+        super(name, group);
     }
 
     @Override

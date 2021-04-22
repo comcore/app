@@ -405,7 +405,8 @@ public class Group implements NotificationListener, Comparable<Group> {
         for (int i = 0; i < modules.size(); i++) {
             m = modules.get(i);
             if (m.getMdid() == mdid) {
-                if (module.getId().id.equals(m.getId().id)) {
+                if ((module.getId() != null) &&
+                        module.getId().id.equals(m.getId().id)) {
                     //Duplicate found! Replace module and store module!
                     modules.set(i, module);
                     module.setIndex(m.getIndex());

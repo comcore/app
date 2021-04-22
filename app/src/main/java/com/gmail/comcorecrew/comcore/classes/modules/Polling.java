@@ -34,7 +34,7 @@ public class Polling extends Module {
     }
 
     public Polling(String name, Group group) {
-        super(name, null, group, Mdid.CPLS);
+        super(name, group, Mdid.CPLS);
         polls = new ArrayList<>();
     }
 

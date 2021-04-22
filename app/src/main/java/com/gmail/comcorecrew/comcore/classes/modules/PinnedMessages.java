@@ -39,7 +39,7 @@ public class PinnedMessages extends CustomChat {
     }
 
     public PinnedMessages(String name, Group group, ChatID chat) {
-        super(name, group, "pinnedMessages");
+        super(name, group);
         chatId = chat.id;
     }
 

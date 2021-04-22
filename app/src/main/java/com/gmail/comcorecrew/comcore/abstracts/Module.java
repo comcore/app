@@ -1,8 +1,10 @@
 package com.gmail.comcorecrew.comcore.abstracts;
 
+import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.LockObject;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.notifications.NotificationListener;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -29,6 +31,9 @@ public abstract class Module implements Serializable, NotificationListener {
     private transient Runnable onUpdate;
 
     public Module(String name, ModuleID id, Group group, Mdid mdid) {
+        if (id == null) {
+            throw new IllegalArgumentException("ModuleID must not be null!");
+        }
         this.name = name;
         this.id = id;
         this.group = group;
@@ -46,54 +51,13 @@ public abstract class Module implements Serializable, NotificationListener {
      * @param mdid mdid of the group to add
      */
     public Module(String name, Group group, Mdid mdid) {
+        this.name = name;
+        id = null;
+        this.group = group;
         this.mdid = mdid;
-        switch (mdid) {
-            case CMSG: {
-                ServerConnector.createChat(group.getGroupId(), name, result -> {
-                    if (result.isFailure()) {
-                        throw new RuntimeException(result.errorMessage);
-                    }
-                    id = result.data;
-                    this.name = name;
-                    this.group = group;
-                    muted = false;
-                    mentionMuted = false;
-                    mnum = group.addModule(this);
-                });
-                break;
-            }
-            case CTSK: {
-                ServerConnector.createTaskList(group.getGroupId(), name, result -> {
-                    if (result.isFailure()) {
-                        throw new RuntimeException(result.errorMessage);
-                    }
-                    id = result.data;
-                    this.name = name;
-                    this.group = group;
-                    muted = false;
-                    mentionMuted = false;
-                    mnum = group.addModule(this);
-                });
-                break;
-            }
-            case CCLD: {
-                ServerConnector.createCalendar(group.getGroupId(), name, result -> {
-                    if (result.isFailure()) {
-                        throw new RuntimeException(result.errorMessage);
-                    }
-                    id = result.data;
-                    this.name = name;
-                    this.group = group;
-                    muted = false;
-                    mentionMuted = false;
-                    mnum = group.addModule(this);
-                });
-                break;
-            }
-            default: {
-                throw new RuntimeException("Invalid MDID");
-            }
-        }
+        muted = false;
+        mentionMuted = false;
+        mnum = -1;
     }
 
     /**
@@ -107,9 +71,11 @@ public abstract class Module implements Serializable, NotificationListener {
             case CMSG: {
                 ServerConnector.createChat(group.getGroupId(), name, result -> {
                     if (result.isFailure()) {
-                        throw new RuntimeException(result.errorMessage);
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                        return;
                     }
                     id = result.data;
+                    mnum = group.addModule(this);
                     afterCreate();
                 });
                 break;
@@ -120,6 +86,7 @@ public abstract class Module implements Serializable, NotificationListener {
                         throw new RuntimeException(result.errorMessage);
                     }
                     id = result.data;
+                    mnum = group.addModule(this);
                     afterCreate();
                 });
                 break;
@@ -127,17 +94,31 @@ public abstract class Module implements Serializable, NotificationListener {
             case CCLD: {
                 ServerConnector.createCalendar(group.getGroupId(), name, result -> {
                     if (result.isFailure()) {
-                        throw new RuntimeException(result.errorMessage);
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                        return;
                     }
                     id = result.data;
+                    mnum = group.addModule(this);
                     afterCreate();
                 });
+                break;
+            }
+            case CPLS: {
+                ServerConnector.createPollList(group.getGroupId(), name, result -> {
+                    if (result.isFailure()) {
+                        ErrorDialog.show(R.string.error_cannot_connect);
+                        return;
+                    }
+                    id = result.data;
+                    mnum = group.addModule(this);
+                    afterCreate();
+                });
+                break;
             }
             default: {
                 throw new RuntimeException("Invalid MDID");
             }
         }
-
     }
 
     /**
@@ -145,38 +126,28 @@ public abstract class Module implements Serializable, NotificationListener {
      *
      * @param name name of the module
      * @param group group that contains the module
-     * @param type custom type of the module
      */
-    public Module(String name, Group group, String type) {
+    public Module(String name, Group group) {
         mdid = Mdid.CSTM;
-        ServerConnector.createCustomModule(group.getGroupId(), name, type, result -> {
-            if (result.isFailure()) {
-                throw new RuntimeException(result.errorMessage);
-            }
-            this.id = result.data;
-            this.name = name;
-            this.group = group;
-            muted = false;
-            mentionMuted = false;
-            mnum = group.addModule(this);
-            afterCreate();
-            try {
-                GroupStorage.storeModule(this);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        id = null;
+        this.name = name;
+        this.group = group;
+        muted = false;
+        mentionMuted = false;
+        mnum = -1;
     }
 
     public void init(String type) {
-        if (id != null) {
-            return;
+        if (id != null || mdid != Mdid.CSTM) {
+            throw new IllegalArgumentException("Invalid module.init() call!");
         }
         ServerConnector.createCustomModule(group.getGroupId(), name, type, result -> {
             if (result.isFailure()) {
-                throw new RuntimeException(result.errorMessage);
+                ErrorDialog.show(R.string.error_cannot_connect);
+                return;
             }
             this.id = result.data;
+            mnum = group.addModule(this);
             afterCreate();
             try {
                 GroupStorage.storeModule(this);
