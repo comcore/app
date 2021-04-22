@@ -17,6 +17,7 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.User;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 
 public class SelectMemberDialog extends DialogFragment {
@@ -130,7 +131,9 @@ public class SelectMemberDialog extends DialogFragment {
             User user = group.getUsers().get(position);
             viewHolder.getTextView().setText(user.getName());
             viewHolder.setCurrentUser(user);
-            MainFragment.setRoleIndicator(viewHolder.memberViewTag, group.getRole(user.getID()));
+
+            GroupRole role = group.getRole(user.getID());
+            MainFragment.setRoleIndicator(viewHolder.memberViewTag, role, group.isDirect());
         }
 
         @Override
