@@ -1,30 +1,19 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
-import android.app.Dialog;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
-import com.gmail.comcorecrew.comcore.server.entry.ReactionEntry;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.MessageID;
 
 public class AddReactionDialog extends DialogFragment {
@@ -55,7 +44,7 @@ public class AddReactionDialog extends DialogFragment {
 
 
         view.findViewById(R.id.choose_reaction_thumbs_down).setOnClickListener(clickedView -> {
-            ServerConnector.addReaction(messageID, Reaction.DISLIKE, result -> {
+            ServerConnector.setReaction(messageID, Reaction.DISLIKE, result -> {
                 if (result.isFailure()) {
                     ErrorDialog.show(result.errorMessage);
                 } else {
