@@ -1,15 +1,10 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.widget.DatePicker;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -20,8 +15,6 @@ import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
-import java.util.Calendar;
-
 public class CreateLinkDialog extends DialogFragment {
     private final Fragment fragment;
     private final GroupID group;
@@ -31,7 +24,7 @@ public class CreateLinkDialog extends DialogFragment {
         this.group = group;
     }
 
-    private void finishLink(long expireTimestamp) {
+    private void finishLink(Fragment fragment, long expireTimestamp) {
         ServerConnector.createInviteLink(group, expireTimestamp, result -> {
             if (result.isFailure()) {
                 ErrorDialog.show(R.string.error_cannot_connect);
@@ -58,84 +51,11 @@ public class CreateLinkDialog extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.create_link_does_expire)
                 .setPositiveButton(R.string.yes, (dialog, id) ->
-                    new PickDateDialog(this).show(fragment.getParentFragmentManager(), null))
+                    new PickDateTimeDialog(fragment, this::finishLink, false)
+                            .show(fragment.getParentFragmentManager(), null))
                 .setNegativeButton(R.string.no, (dialog, id) ->
-                        finishLink(0))
+                        finishLink(fragment, 0))
                 .setNeutralButton(R.string.cancel, null)
                 .create();
-    }
-
-    public static class PickDateDialog extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        private final CreateLinkDialog parent;
-
-        public PickDateDialog(CreateLinkDialog parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.clear();
-            calendar.set(year, month, day);
-
-            // Make sure the date is not in the past
-            long expireTimestamp = calendar.getTimeInMillis();
-            if (expireTimestamp + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
-                ErrorDialog.show(R.string.error_expire_past);
-                return;
-            }
-
-            // Have the user pick the time next
-            new PickTimeDialog(parent, calendar)
-                    .show(parent.fragment.getParentFragmentManager(), null);
-        }
-    }
-
-    public static class PickTimeDialog extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
-
-        private final CreateLinkDialog parent;
-        private final Calendar calendar;
-
-        public PickTimeDialog(CreateLinkDialog parent, Calendar calendar) {
-            this.parent = parent;
-            this.calendar = calendar;
-        }
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            calendar.set(Calendar.MINUTE, minute);
-
-            // Make sure the timestamp is not in the past
-            long expireTimestamp = calendar.getTimeInMillis();
-            if (expireTimestamp < System.currentTimeMillis()) {
-                ErrorDialog.show(R.string.error_expire_past);
-                return;
-            }
-
-            // Finish creating the link
-            parent.finishLink(calendar.getTimeInMillis());
-        }
     }
 }
