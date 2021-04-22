@@ -15,15 +15,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog2;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SharedCalendarFragment2 extends Fragment {
     public static Calendar calendar;
@@ -55,27 +48,6 @@ public class SharedCalendarFragment2 extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //ArrayList<EventEntry> eventEntries = AppData.getUpcoming();
-        //System.out.println(Arrays.deepToString(eventEntries.toArray()));
-
-        System.out.println("We in the MAIN onViewCreated");
-
-//        ServerConnector.getGroups(result -> {
-//            for (int i = 0; i < result.data.length; i++) {
-//                ServerConnector.getModules(result.data[i], result1 -> {
-//                    for (int j = 0; j < result1.data.length; j++) {
-//                        if (result1.data[j].id instanceof CalendarID) {
-//                            ServerConnector.getEvents((CalendarID) result1.data[j].id, result2 -> {
-//                                for (int k = 0; k < result2.data.length; k++) {
-//                                    System.out.println(result2.data[k].description);
-//                                    eventEntries.add(result2.data[k]);
-//                                }
-//                            });
-//                        }
-//                    }
-//                });
-//            }
-//        });
 
         toolBar = (Toolbar) view.findViewById(R.id.toolbar_group_calendar);
         toolBar.setTitle("Shared Calendar");
@@ -100,7 +72,7 @@ public class SharedCalendarFragment2 extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.groupcalendarmenu, menu);
+        inflater.inflate(R.menu.sharedchatmenu, menu);
 
     }
 

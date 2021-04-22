@@ -47,8 +47,21 @@ public class AddReactionDialog extends DialogFragment {
             ServerConnector.setReaction(messageID, Reaction.DISLIKE, result -> {
                 if (result.isFailure()) {
                     ErrorDialog.show(result.errorMessage);
+                    return;
                 } else {
-                    System.out.println(result.data.toString());
+                    System.out.println("Thumbs Down: " + result.data.toString());
+                    this.dismiss();
+                }
+            });
+        });
+
+        view.findViewById(R.id.choose_reaction_thumbs_up).setOnClickListener(clickedView -> {
+            ServerConnector.setReaction(messageID, Reaction.LIKE, result -> {
+                if (result.isFailure()) {
+                    ErrorDialog.show(result.errorMessage);
+                    return;
+                } else {
+                    System.out.println("Thumbs Up: " + result.data.toString());
                     this.dismiss();
                 }
             });

@@ -31,6 +31,7 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
+import com.gmail.comcorecrew.comcore.dialogs.AddReactionDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
@@ -274,6 +275,8 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void reactMessage(MenuItem item) {
+        messageEntry = messaging.getEntry(item.getGroupId());
+        new AddReactionDialog(messageEntry, messageEntry.id, 0).show(getParentFragmentManager(), null);
     }
 
     private void uploadFile() {
