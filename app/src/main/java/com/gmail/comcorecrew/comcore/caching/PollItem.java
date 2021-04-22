@@ -60,6 +60,14 @@ public class PollItem implements Cacheable {
         return votes;
     }
 
+    public int getTotalVotes() {
+        int totalVotes = 0;
+        for (int i = 0; i < votes.length; i++) {
+            totalVotes += votes[i];
+        }
+        return totalVotes;
+    }
+
     public String[] getOptionDescriptions() {
         return options;
     }

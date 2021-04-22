@@ -37,6 +37,7 @@ import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.PollOption;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
@@ -129,17 +130,23 @@ public class PollItemFragment extends Fragment {
             TextView titleText = viewHolder.itemView.findViewById(R.id.label_poll_fragment);
             TextView resultText = viewHolder.itemView.findViewById(R.id.results_label);
 
-             /**
-             *  PollItem poll = currentPoll.getChoices().get(position);
-             *  titleText.setText(poll.getDescription());
-              */
+            PollOption option = currentPoll.getOptions().get(position);
+            titleText.setText(option.description);
+
+            String resultsText;
+            if (currentPoll.getTotalVotes() == 0) {
+                resultsText = "No votes";
+            }
+            else {
+                resultsText = String.format("%d votes (%.2f%)", option.numberOfVotes, option.numberOfVotes / currentPoll.getTotalVotes());
+            }
+            resultText.setText(resultsText);
 
         }
 
         @Override
         public int getItemCount() {
-            //return currentPoll.getChoices().size();
-            return 0;
+            return currentPoll.getOptions().size();
         }
     }
 }

@@ -87,7 +87,7 @@ public class PollingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        /** Displays the name of the current group */
+        /** Displays the name of the current polling module */
         TextView welcomeText = (TextView) view.findViewById(R.id.label_polling_fragment);
         welcomeText.setText(polling.getName());
 
@@ -155,11 +155,8 @@ public class PollingFragment extends Fragment {
             TextView titleText = viewHolder.itemView.findViewById(R.id.title_row_text);
             PollItem poll = polling.getPolls().get(position);
 
-            /**
-             * The titleText should be set to the description of an individual poll
-             *
-             *  titleText.setText(poll.getDescription());
-             **/
+            titleText.setText(poll.getDescription());
+
         }
 
         @Override
