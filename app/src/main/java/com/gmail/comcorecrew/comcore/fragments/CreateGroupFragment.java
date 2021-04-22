@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -34,9 +35,7 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class CreateGroupFragment extends Fragment {
-    private boolean chat = false;
-    private boolean list = false;
-    private boolean calendar = false;
+
     private GroupID parentGroupID = null;
     private ArrayList<User> members = new ArrayList<User>();
 
@@ -103,10 +102,6 @@ public class CreateGroupFragment extends Fragment {
                     .popBackStack();
         });
 
-        view.findViewById(R.id.switch_chat).setOnClickListener(clickedView -> {
-            chat = !chat;
-        });
-
         /*
           If the "submit" button is clicked, try to create a group using the given information
          */
@@ -140,6 +135,8 @@ public class CreateGroupFragment extends Fragment {
             /* If the new group is a sub group */
             else {
                 AppData.createSubGroup(AppData.getGroup(parentGroupID), groupName, members);
+                NavHostFragment.findNavController(this)
+                        .popBackStack();
             }
 
         });
@@ -178,16 +175,15 @@ public class CreateGroupFragment extends Fragment {
                 this.currentUser = currentUser;
             }
 
-            @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
                 if (members.contains(currentUser)) {
                     members.remove(currentUser);
-                    textView.setTextColor(R.color.black);
+                    textView.setTextColor(Color.BLACK);
                 }
                 else {
                     members.add(currentUser);
-                    textView.setTextColor(R.color.owner_color);
+                    textView.setTextColor(Color.parseColor("#214222"));
                 }
                 updateMemberListDisplay();
             }

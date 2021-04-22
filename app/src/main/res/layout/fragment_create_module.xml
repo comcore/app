@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
-    android:layout_height="550dp">
+    android:layout_height="wrap_content">
 
     <Button
         android:id="@+id/create_module_back_button"
@@ -30,18 +30,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="45dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="55dp"
         android:layout_marginEnd="45dp"
-        android:layout_marginBottom="1dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Name"
-        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_module_name_label"
-        app:layout_constraintVertical_bias="0.049" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/create_module_name_label"
@@ -61,13 +58,13 @@
         android:layout_width="206dp"
         android:layout_height="290dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="150dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_module_type_label">
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/create_module_tasklist_radio"
@@ -114,7 +111,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="95dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="1dp"
         android:text="@string/create_module_type_label"
@@ -122,6 +119,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_module_name_edit" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
