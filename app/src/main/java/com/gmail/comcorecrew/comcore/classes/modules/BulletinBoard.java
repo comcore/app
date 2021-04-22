@@ -28,7 +28,7 @@ import java.util.List;
 
 public class BulletinBoard extends CustomModule {
 
-    private CustomAdapter adapter;
+    private transient CustomAdapter adapter;
     private List<EventEntry> eventList = new ArrayList<>();
 
     public BulletinBoard(String name, CustomModuleID id, Group group) {
@@ -36,7 +36,7 @@ public class BulletinBoard extends CustomModule {
     }
 
     public BulletinBoard(String name, Group group) {
-        super(name, group, "bulletin");
+        super(name, group);
     }
 
     @Override

@@ -32,7 +32,7 @@ import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
+import com.gmail.comcorecrew.comcore.dialogs.SelectMemberDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
@@ -129,8 +129,7 @@ public class GroupFragment extends Fragment {
             case R.id.view_members:
                 /* Handle viewing list of members */
 
-                new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 0)
-                        .show(getParentFragmentManager(), null);
+                new SelectMemberDialog(currentGroup).show(getParentFragmentManager(), null);
                 return true;
             case R.id.leave_group:
                 /* Handle leaving group */
@@ -156,39 +155,9 @@ public class GroupFragment extends Fragment {
                 CreateLinkDialog createLinkDialog = new CreateLinkDialog(this, currentGroup.getGroupId());
                 createLinkDialog.show(getParentFragmentManager(), null);
                 return true;
-            case R.id.add_moderator:
-                /* Handle adding moderator */
-                ViewMembersDialog addModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 2);
-                addModeratorDialog.show(getParentFragmentManager(), null);
-                return true;
-            case R.id.remove_moderator:
-                /* Handle removing moderator */
-                ViewMembersDialog removeModeratorDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 3);
-                removeModeratorDialog.show(getParentFragmentManager(), null);
-                return true;
-            case R.id.kick_member:
-                /* Handle kicking member */
-                ViewMembersDialog kickUserDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 4);
-                kickUserDialog.show(getParentFragmentManager(), null);
-                return true;
-            case R.id.mute_member:
-                ViewMembersDialog muteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 5);
-                muteDialog.show(getParentFragmentManager(), null);
-                return true;
-            case R.id.unmute_member:
-                ViewMembersDialog unmuteDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 6);
-                unmuteDialog.show(getParentFragmentManager(), null);
-                return true;
             case R.id.create_module:
                 CreateModuleDialog newModuleDialog = new CreateModuleDialog(currentGroup.getGroupId(), this);
                 newModuleDialog.show(getParentFragmentManager(), null);
-                return true;
-            case R.id.transfer_ownership:
-                /* Handle transfer ownership */
-
-                ViewMembersDialog transferOwnershipDialog = new ViewMembersDialog(currentGroup.getUsers(), currentGroup.getGroupId(), 1);
-                transferOwnershipDialog.show(getParentFragmentManager(), null);
-
                 return true;
             case R.id.create_sub_group:
                 /* Handle creating sub group */

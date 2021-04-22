@@ -20,12 +20,12 @@ public abstract class CustomChat extends CustomModule {
         super(name, id, group, cacheByteLimit);
     }
 
-    public CustomChat(String name, Group group, String type) {
-        super(name, group, type);
+    public CustomChat(String name, Group group) {
+        super(name, group);
     }
 
-    public CustomChat(String name, Group group, String type, long cacheByteLimit) {
-        super(name, group, type, cacheByteLimit);
+    public CustomChat(String name, Group group, long cacheByteLimit) {
+        super(name, group, cacheByteLimit);
     }
 
     protected ArrayList<MessageEntry> getMessages() {

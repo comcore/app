@@ -109,8 +109,12 @@ public class Messaging extends Module {
                 return;
             }
 
+            if (result.data.length == 0) {
+                return;
+            }
+
             // If the message isn't immediately after the existing messages, clear the cache
-            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
+            if (shouldClearCache || !result.data[0].id.immediatelyAfter(latestMessageId())) {
                 shouldClearCache = false;
                 messages.clear();
             }
@@ -134,13 +138,8 @@ public class Messaging extends Module {
             return;
         }
 
-        if (shouldClearCache) {
-            return;
-        }
-
-        // Don't add it directly if the cache is empty, but refresh the whole chat instead
-        MessageID lastMessageId = latestMessageId();
-        if (lastMessageId == null || !message.id.immediatelyAfter(lastMessageId)) {
+        // Don't add it directly if the cache is old, but refresh the whole chat instead
+        if (shouldClearCache || !message.id.immediatelyAfter(latestMessageId())) {
             refresh();
             return;
         }

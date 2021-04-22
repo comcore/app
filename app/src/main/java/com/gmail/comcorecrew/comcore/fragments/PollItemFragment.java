@@ -2,11 +2,7 @@ package com.gmail.comcorecrew.comcore.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -20,27 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.abstracts.CustomModule;
-import com.gmail.comcorecrew.comcore.abstracts.Module;
 import com.gmail.comcorecrew.comcore.caching.PollItem;
-import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.classes.Group;
-import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.classes.modules.Polling;
-import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
-import com.gmail.comcorecrew.comcore.dialogs.AddMemberDialog;
-import com.gmail.comcorecrew.comcore.dialogs.CreateLinkDialog;
-import com.gmail.comcorecrew.comcore.dialogs.CreateModuleDialog;
-import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewMembersDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.PollOption;
-import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.PollID;
 import com.gmail.comcorecrew.comcore.server.id.PollListID;
 
@@ -76,8 +54,7 @@ public class PollItemFragment extends Fragment {
         pollingAdapter = new CustomAdapter();
         rvGroups.setAdapter(pollingAdapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
-
-        refresh();
+        parentPolling.setCallback(this::refresh);
 
         return rootView;
     }
@@ -141,12 +118,8 @@ public class PollItemFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                parentPolling.votePoll(new PollID((PollListID) parentPolling.getId(), currentPoll.getPollId()), currentChoice);
-                if (!currentPoll.getResultsVisible()) {
-                    currentPoll.toggleResultsVisible();
-                }
-                parentPolling.refresh();
-                refresh();
+                PollID pollId = new PollID((PollListID) parentPolling.getId(), currentPoll.getPollId());
+                parentPolling.votePoll(pollId, currentChoice);
             }
         }
 

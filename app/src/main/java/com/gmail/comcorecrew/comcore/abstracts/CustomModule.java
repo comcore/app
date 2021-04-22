@@ -41,14 +41,14 @@ public abstract class CustomModule extends Module {
         items = new ArrayList<>();
     }
 
-    public CustomModule(String name, Group group, String type) {
-        super(name, group, type);
+    public CustomModule(String name, Group group) {
+        super(name, group);
         cacheByteLimit = -1;
         items = new ArrayList<>();
     }
 
-    public CustomModule(String name, Group group, String type, long cacheByteLimit) {
-        super(name, group, type);
+    public CustomModule(String name, Group group, long cacheByteLimit) {
+        super(name, group);
         this.cacheByteLimit = cacheByteLimit;
         items = new ArrayList<>();
     }

@@ -26,6 +26,7 @@ import com.gmail.comcorecrew.comcore.dialogs.InviteLinkDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewGroupsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewInvitesDialog;
+import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.GroupInviteEntry;
@@ -131,6 +132,31 @@ public class MainFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Changes or removes the image on each group list item based on whether
+     * the user is the owner, moderator, or neither. If the user is both owner and moderator,
+     * the owner tag will take preference.
+     *
+     * The shape of the image tag can be changed in group_row_item.xml
+     * The colors can be changed in colors.xml
+     */
+    public static void setRoleIndicator(ImageView tag, GroupRole role) {
+        switch (role) {
+            case OWNER:
+                tag.setVisibility(View.VISIBLE);
+                tag.setColorFilter(tag.getResources().getColor(R.color.owner_color));
+                break;
+            case MODERATOR:
+                tag.setVisibility(View.VISIBLE);
+                tag.setColorFilter(tag.getResources().getColor(R.color.moderator_color));
+                break;
+            case USER:
+                tag.setVisibility(View.INVISIBLE);
+                break;
+        }
+    }
+
     /** The CustomAdapter internal class sets up the RecyclerView, which displays
      * the list of groups in the GUI
      */
@@ -185,29 +211,11 @@ public class MainFragment extends Fragment {
             viewHolder.getTextView().setText(group.getDisplayName());
             viewHolder.setGroup(group);
 
-            /* Changes or removes the image on each group list item based on whether
-             * the user is the owner, moderator, or neither. If the user is both owner and moderator,
-             * the owner tag will take preference.
-             *
-             * The shape of the image tag can be changed in group_row_item.xml
-             * The colors can be changed in colors.xml
-             */
-            switch (group.getGroupRole()) {
-                case OWNER:
-                    viewHolder.viewTag.setVisibility(View.VISIBLE);
-                    viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.owner_color));
-                    break;
-                case MODERATOR:
-                    viewHolder.viewTag.setVisibility(View.VISIBLE);
-                    if (group.isDirect()) {
-                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.primary_d1));
-                    } else {
-                        viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.moderator_color));
-                    }
-                    break;
-                case USER:
-                    viewHolder.viewTag.setVisibility(View.INVISIBLE);
-                    break;
+            if (group.isDirect()) {
+                viewHolder.viewTag.setVisibility(View.VISIBLE);
+                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.primary_d1));
+            } else {
+                setRoleIndicator(viewHolder.viewTag, group.getGroupRole());
             }
 
             if (group.isPinned()) {

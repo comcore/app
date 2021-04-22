@@ -47,6 +47,9 @@ public class Group implements NotificationListener, Comparable<Group> {
     private transient int index;
     private boolean requireApproval;
 
+    // This field is not stored and is only available when connected to the server
+    private transient HashMap<UserID, Boolean> isUserMuted;
+
     public Group(GroupID groupID) {
         this.groupID = groupID;
         modules = new ArrayList<>();
@@ -124,6 +127,7 @@ public class Group implements NotificationListener, Comparable<Group> {
                 // Find the users, moderators, and owner of the group
                 ArrayList<User> groupUsers = new ArrayList<>(entries.length);
                 ArrayList<UserID> groupModerators = new ArrayList<>();
+                HashMap<UserID, Boolean> muted = new HashMap<>();
                 UserID groupOwner = null;
                 for (GroupUserEntry entry : entries) {
                     User user = UserStorage.getUser(entry.id);
@@ -133,6 +137,7 @@ public class Group implements NotificationListener, Comparable<Group> {
                     }
 
                     groupUsers.add(user);
+                    muted.put(user.getID(), entry.muted);
 
                     if (entry.role == GroupRole.MODERATOR) {
                         groupModerators.add(entry.id);
@@ -149,6 +154,7 @@ public class Group implements NotificationListener, Comparable<Group> {
                 users = groupUsers;
                 moderators = groupModerators;
                 owner = groupOwner;
+                isUserMuted = muted;
 
                 // Store the updated group data
                 try {
@@ -276,6 +282,10 @@ public class Group implements NotificationListener, Comparable<Group> {
     }
 
     public ArrayList<UserID> getModerators() {
+        if (moderators == null) {
+            moderators = new ArrayList<>();
+        }
+
         return moderators;
     }
 
@@ -328,6 +338,30 @@ public class Group implements NotificationListener, Comparable<Group> {
             disabledModules = new ArrayList<>(0);
         }
         return disabledModules;
+    }
+
+    public Boolean getUserMuted(UserID user) {
+        return isUserMuted == null ? null : isUserMuted.get(user);
+    }
+
+    public void setUserMuted(UserID user, boolean muted) {
+        if (isUserMuted == null) {
+            isUserMuted = new HashMap<>();
+        }
+
+        isUserMuted.put(user, muted);
+    }
+
+    public GroupRole getRole(UserID user) {
+        if (user.equals(AppData.self.getID())) {
+            return groupRole;
+        } else if (user.equals(owner)) {
+            return GroupRole.OWNER;
+        } else if (getModerators().contains(user)) {
+            return GroupRole.MODERATOR;
+        } else {
+            return GroupRole.USER;
+        }
     }
 
     public boolean isDirect() {
@@ -405,7 +439,8 @@ public class Group implements NotificationListener, Comparable<Group> {
         for (int i = 0; i < modules.size(); i++) {
             m = modules.get(i);
             if (m.getMdid() == mdid) {
-                if (module.getId().id.equals(m.getId().id)) {
+                if ((module.getId() != null) &&
+                        module.getId().id.equals(m.getId().id)) {
                     //Duplicate found! Replace module and store module!
                     modules.set(i, module);
                     module.setIndex(m.getIndex());
@@ -499,11 +534,22 @@ public class Group implements NotificationListener, Comparable<Group> {
 
     @Override
     public void onRoleChanged(GroupID group, GroupRole role) {
+        if (!group.equals(groupID)) {
+            return;
+        }
+
         groupRole = role;
+        if (role == GroupRole.OWNER) {
+            owner = AppData.self.getID();
+        }
     }
 
     @Override
     public void onMuteChanged(GroupID group, boolean muted) {
+        if (!group.equals(groupID)) {
+            return;
+        }
+
         isMuted = muted;
     }
 

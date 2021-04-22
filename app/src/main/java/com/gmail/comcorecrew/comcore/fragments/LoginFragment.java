@@ -33,12 +33,16 @@ public class LoginFragment extends Fragment {
             return;
         }
 
+        navigateBackTo(R.id.loginFragment);
+    }
+
+    public static void navigateBackTo(int id) {
         NavController navController = navControllerWeakReference.get();
         if (navController == null) {
             return;
         }
 
-        navController.popBackStack(R.id.loginFragment, false);
+        navController.popBackStack(id, false);
     }
 
     public LoginFragment() {

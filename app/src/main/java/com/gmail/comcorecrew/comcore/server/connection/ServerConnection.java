@@ -229,7 +229,7 @@ public final class ServerConnection implements Connection {
      * @param token    the login token of the user
      */
     public void loggedIn(UserInfo userInfo, LoginToken token) {
-        if (token == this.token) {
+        if (token.equals(this.token)) {
             return;
         }
 

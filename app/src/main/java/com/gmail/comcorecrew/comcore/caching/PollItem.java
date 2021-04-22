@@ -31,6 +31,7 @@ public class PollItem implements Cacheable {
             options[i] = entry.options.get(i).description;
             votes[i] = entry.options.get(i).numberOfVotes;
         }
+        resultsVisible = entry.vote != -1;
     }
 
     public int getUserId() {
@@ -84,7 +85,14 @@ public class PollItem implements Cacheable {
     }
 
     public void setVote(int vote) {
+        if (this.vote != -1) {
+            votes[this.vote]--;
+        }
         this.vote = vote;
+        if (this.vote != -1) {
+            votes[this.vote]++;
+            resultsVisible = true;
+        }
     }
 
     public boolean getResultsVisible() {

@@ -68,48 +68,40 @@ public class CreateModuleDialog extends DialogFragment {
 
             if (chatRadio.isChecked()) {
                 /* Try to create a chat module */
-                new Messaging(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new Messaging(moduleName.getText().toString(), AppData.getGroup(groupID)).init();
                 this.dismiss();
                 fragment.refresh();
 
             }
             else if (tasklistRadio.isChecked()) {
 
-                new TaskList(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new TaskList(moduleName.getText().toString(), AppData.getGroup(groupID)).init();
 
                 this.dismiss();
                 fragment.refresh();
             }
             else if (calendarRadio.isChecked()) {
-                ServerConnector.createCalendar(groupID, moduleName.getText().toString(), result -> {
-                    if (result.isFailure()) {
-                        ErrorDialog.show(R.string.error_cannot_connect);
-                        return;
-                    }
-                    this.dismiss();
-                    fragment.refresh();
-                });
 
-                new Calendar(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new Calendar(moduleName.getText().toString(), AppData.getGroup(groupID)).init();
 
                 this.dismiss();
                 fragment.refresh();
             }
             else if (pollingRadio.isChecked()) {
 
-                new Polling(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new Polling(moduleName.getText().toString(), AppData.getGroup(groupID)).init();
 
                 this.dismiss();
                 fragment.refresh();
             }
             else if (bulletinRadio.isChecked()) {
-                new BulletinBoard(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new BulletinBoard(moduleName.getText().toString(), AppData.getGroup(groupID)).init("bulletin");
 
                 this.dismiss();
                 fragment.refresh();
             }
             else if (dummyRadio.isChecked()) {
-                new DummyButton(moduleName.getText().toString(), AppData.getGroup(groupID));
+                new DummyButton(moduleName.getText().toString(), AppData.getGroup(groupID)).init("dummy");
 
                 this.dismiss();
                 fragment.refresh();
