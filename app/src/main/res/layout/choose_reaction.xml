@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/choose_reaction_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Choose a reaction you would like to add."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.729"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/choose_reaction_thumbs_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:clickable="true"
+        android:layout_marginTop="28dp"
+        android:src="@drawable/thumb_up"
+        app:layout_constraintStart_toStartOf="@id/choose_reaction_title"
+        app:layout_constraintTop_toBottomOf="@+id/choose_reaction_title" />
+
+    <ImageButton
+        android:id="@+id/choose_reaction_thumbs_down"
+        android:clickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="28dp"
+        android:src="@drawable/thumb_down"
+        app:layout_constraintStart_toEndOf="@+id/choose_reaction_thumbs_up"
+        app:layout_constraintTop_toBottomOf="@+id/choose_reaction_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

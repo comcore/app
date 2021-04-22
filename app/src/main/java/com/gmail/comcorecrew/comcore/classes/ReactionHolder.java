@@ -6,6 +6,9 @@ import com.gmail.comcorecrew.comcore.server.id.UserID;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ *
+ */
 public class ReactionHolder {
 
     private int[] reactions;
