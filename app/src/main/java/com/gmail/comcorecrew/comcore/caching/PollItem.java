@@ -94,7 +94,7 @@ public class PollItem implements Cacheable {
         total += 2 + description.length(); //Description
         total += 2;
         for (String option : options) {
-            total += 2 + 2 + options.length; //Options
+            total += 2 + 2 + option.length(); //Options
         }
         return total;
     }
