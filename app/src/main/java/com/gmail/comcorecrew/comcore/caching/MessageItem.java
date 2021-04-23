@@ -95,29 +95,29 @@ public class MessageItem implements Cacheable {
     }
 
     //Creates a new object from cache string.
-    public MessageItem(String cache) {
-        if (cache.length() < 14) { //Makes sure the array length is valid.
+    public MessageItem(String global) {
+        if (global.length() < 22) { //Makes sure the array length is valid.
             throw new IllegalArgumentException();
         }
 
-        int index = 0;
+        int index = 24;
 
         //Reads the array into the object.
-        userId = cache.charAt(index++);
-        userId = (userId << 16) | cache.charAt(index++);
-        messageId = cache.charAt(index++);
-        messageId = (messageId << 16) | cache.charAt(index++);
-        messageId = (messageId << 16) | cache.charAt(index++);
-        messageId = (messageId << 16) | cache.charAt(index++);
-        timestamp = cache.charAt(index++);
-        timestamp = (timestamp << 16) | cache.charAt(index++);
-        timestamp = (timestamp << 16) | cache.charAt(index++);
-        timestamp = (timestamp << 16) | cache.charAt(index++);
-        int reaction = cache.charAt(index++);
-        reaction = (reaction << 16) | cache.charAt(index++);
+        String user = global.substring(0, 24);
+        userId = UserStorage.getInternalId(new UserID(user));
+        messageId = global.charAt(index++);
+        messageId = (messageId << 16) | global.charAt(index++);
+        messageId = (messageId << 16) | global.charAt(index++);
+        messageId = (messageId << 16) | global.charAt(index++);
+        timestamp = global.charAt(index++);
+        timestamp = (timestamp << 16) | global.charAt(index++);
+        timestamp = (timestamp << 16) | global.charAt(index++);
+        timestamp = (timestamp << 16) | global.charAt(index++);
+        int reaction = global.charAt(index++);
+        reaction = (reaction << 16) | global.charAt(index++);
         myReaction = Reaction.fromInt(reaction);
-        reactions = new ReactionHolder(cache, index);
-        data = cache.substring(index + reactions.getCharLength());
+        reactions = new ReactionHolder(global, index);
+        data = global.substring(index + reactions.getCharLength());
     }
 
     @Override
@@ -218,5 +218,39 @@ public class MessageItem implements Cacheable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public char[] toGlobal() {
+        char[] cache = new char[24 + 4 + 4 + 2 + reactions.getCharLength() +  data.length()];
+
+        int index = 0;
+
+        String user = UserStorage.getUser(userId).getID().id;
+        for (int i = 0; i < user.length(); i++) {
+            cache[index++] = user.charAt(i);
+        }
+        cache[index++] = (char) (messageId >> 48);
+        cache[index++] = (char) (messageId >> 32);
+        cache[index++] = (char) (messageId >> 16);
+        cache[index++] = (char) messageId;
+        cache[index++] = (char) (timestamp >> 48);
+        cache[index++] = (char) (timestamp >> 32);
+        cache[index++] = (char) (timestamp >> 16);
+        cache[index++] = (char) timestamp;
+        cache[index++] = (char) (myReaction.toInt() >> 16);
+        cache[index++] = (char) myReaction.toInt();
+        cache[index++] = (char) (reactions.getReactions().length >> 16);
+        cache[index++] = (char) reactions.getReactions().length;
+
+        for (int reaction : reactions.getReactions()) {
+            cache[index++] = (char) (reaction >> 16);
+            cache[index++] = (char) reaction;
+        }
+
+        for (int i = 0; i < data.length(); i++) {
+            cache[index++] = data.charAt(i);
+        }
+
+        return cache;
     }
 }

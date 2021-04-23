@@ -35,6 +35,10 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
         this.messageEntry = messageEntry;
     }
 
+    public void setMessageEntry(ArrayList<MessageEntry> messageEntry) {
+        this.messageEntry = messageEntry;
+    }
+
     @Override
     public int getItemCount() {
         return messageEntry.size();

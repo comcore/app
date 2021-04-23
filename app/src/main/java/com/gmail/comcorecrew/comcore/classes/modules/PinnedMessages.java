@@ -25,6 +25,10 @@ import java.util.ArrayList;
 
 public class PinnedMessages extends CustomChat {
 
+    private transient PinnedMessageAdapter pinnedAdapter;
+    private transient RecyclerView pinnedRecycler;
+    private transient LinearLayoutManager manager;
+
     private String chatId;
 
     public PinnedMessages(String name, CustomModuleID id, Group group, ChatID chat) {
@@ -77,7 +81,7 @@ public class PinnedMessages extends CustomChat {
      * @param message the message to check
      * @return true if the message is pinned; false otherwise.
      */
-    public static boolean isPined(MessageEntry message) {
+    public static boolean isPinnedHere(MessageEntry message) {
         ChatID chatID = message.id.module;
         GroupID groupID = chatID.group;
         for (Group group : AppData.getGroups()) {
@@ -116,7 +120,7 @@ public class PinnedMessages extends CustomChat {
      * @return true if the message was pinned; false if it was not
      */
     public boolean pinMessage(MessageEntry message) {
-        String contents = String.copyValueOf(new MessageItem(message).toCache());
+        String contents = String.copyValueOf(new MessageItem(message).toGlobal());
         for (MessageEntry entry : getMessages()) {
             if (entry.contents.equals(contents)) {
                 deleteMessage(entry);
@@ -156,14 +160,12 @@ public class PinnedMessages extends CustomChat {
     @Override
     public void viewInit(@NonNull View view, Fragment current) {
 
-        PinnedMessageAdapter pinnedAdapter;
-        RecyclerView pinnedRecycler;
-
         pinnedRecycler = (RecyclerView) view.findViewById(R.id.recycler_pinned_messages);
-        LinearLayoutManager manager = new LinearLayoutManager(current.getContext());
+        manager = new LinearLayoutManager(current.getContext());
+        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), readPinned());
+
         manager.setStackFromEnd(true);
         pinnedRecycler.setLayoutManager(manager);
-        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), readPinned());
         pinnedRecycler.setAdapter(pinnedAdapter);
         pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
         refresh();
@@ -171,7 +173,13 @@ public class PinnedMessages extends CustomChat {
 
     @Override
     public void refreshView() {
+        pinnedAdapter.setMessageEntry(readPinned());
 
+        manager.setStackFromEnd(true);
+        pinnedRecycler.setLayoutManager(manager);
+        pinnedRecycler.setAdapter(pinnedAdapter);
+        pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
+        refresh();
     }
 
     @Override
