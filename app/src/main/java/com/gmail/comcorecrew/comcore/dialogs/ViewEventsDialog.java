@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -39,6 +40,12 @@ public class ViewEventsDialog extends DialogFragment {
         this.currentCalendar = currentCalendar;
         this.currentDate = currentDate;
         this.flag = flag;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        currentCalendar.refresh();
     }
 
     @Override

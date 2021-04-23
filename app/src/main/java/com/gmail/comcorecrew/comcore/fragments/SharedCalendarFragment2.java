@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +29,8 @@ import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +77,9 @@ public class SharedCalendarFragment2 extends Fragment {
         getActivity().setTitle("Shared Calendar");
         calendarView = (CalendarView) view.findViewById(R.id.calendarView);
 
+        rvGroups = (RecyclerView) view.findViewById(R.id.group_calendar_recyclerview);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+
         textView = (TextView) view.findViewById(R.id.group_calendar_titleText);
         textView.setText("Upcoming Events");
 
@@ -83,16 +89,26 @@ public class SharedCalendarFragment2 extends Fragment {
                     for (int j = 0; j < result1.data.length; j++) {
                         if (result1.data[j].id instanceof CalendarID) {
                             ServerConnector.getEvents((CalendarID) result1.data[j].id, result2 -> {
+                                java.util.Calendar currentDate = java.util.Calendar.getInstance();
+                                currentDate.setTime(new Date());
+
                                 for (int k = 0; k < result2.data.length; k++) {
                                     eventEntries.add(result2.data[k]);
                                 }
                                 eventEntries1 = eventEntries;
 
-                                rvGroups = (RecyclerView) view.findViewById(R.id.group_calendar_recyclerview);
-                                rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
-                                adapter = new CustomAdapter();
-                                rvGroups.setAdapter(adapter);
-                                rvGroups.setItemAnimator(new DefaultItemAnimator());
+                                if (getEvents(currentDate, eventEntries, true).size() > 0) {
+                                    textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate.getTimeInMillis())));
+                                    eventEntries1 = getEvents(currentDate, eventEntries, true);
+                                    refresh();
+                                    //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);
+                                } else {
+                                    System.out.println("Failed TRUE");
+                                    textView.setText("Upcoming Events");
+                                    //eventEntries1 = eventEntries;
+                                    eventEntries1 = getEvents(currentDate, eventEntries, false);
+                                    refresh();
+                                }
                             });
                         }
                     }
@@ -107,52 +123,125 @@ public class SharedCalendarFragment2 extends Fragment {
                 currentDate.clear();
                 currentDate.set(year, month, day);
 
-                if (getEvents(currentDate, eventEntries).size() > 0) {
-                    textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
-                    eventEntries1 = getEvents(currentDate, eventEntries);
-                    adapter = new CustomAdapter();
-                    rvGroups.setAdapter(adapter);
-                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                java.util.Calendar currentDate1 = java.util.Calendar.getInstance();
+                currentDate1.setTime(new Date());
+
+                if (getEvents(currentDate, eventEntries, true).size() > 0) {
+                    textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate.getTimeInMillis())));
+                    eventEntries1 = getEvents(currentDate, eventEntries, true);
+                    refresh();
                     //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);
                 } else {
+                    System.out.println("Failed TRUE");
                     textView.setText("Upcoming Events");
-                    eventEntries1 = eventEntries;
-                    adapter = new CustomAdapter();
-                    rvGroups.setAdapter(adapter);
-                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                    //eventEntries1 = eventEntries;
+                    eventEntries1 = getEvents(currentDate1, eventEntries, false);
+                    refresh();
                 }
             }
 
         });
     }
 
-    public List<EventEntry> getEvents(java.util.Calendar currentDay, List<EventEntry> eventEntries) {
-        if (currentDay == null) {
-            return null;
+    public void refresh(){
+        adapter = new CustomAdapter();
+        rvGroups.setAdapter(adapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public List<EventEntry> getEvents(java.util.Calendar currentDay, List<EventEntry> eventEntries, boolean bool) {
+        if (!bool) {
+            if (currentDay == null) {
+                return null;
+            }
+
+            ArrayList<EventEntry> eventList = new ArrayList<>();
+
+            java.util.Calendar startDay = java.util.Calendar.getInstance();
+            java.util.Calendar endDay = java.util.Calendar.getInstance();
+
+            for (int i = 0; i < eventEntries.size(); i++) {
+                startDay.setTimeInMillis(eventEntries.get(i).start);
+                endDay.setTimeInMillis(eventEntries.get(i).end);
+
+                /* Currently gets entries based on their starting day
+             TODO match entries as long as the currentDay overlaps with its time range */
+                if (currentDay.get(java.util.Calendar.YEAR) >= endDay.get(java.util.Calendar.YEAR) &&
+                        currentDay.get(java.util.Calendar.MONTH) >= endDay.get(java.util.Calendar.MONTH) &&
+                        currentDay.get(java.util.Calendar.DATE) >= endDay.get(java.util.Calendar.DATE)) {
+                } else {
+                    eventList.add(eventEntries.get(i));
+                }
+
+                Collections.sort(eventList, (a, b) -> {
+                    int result = Long.compare(a.start, b.start);
+                    if (result != 0) {
+                        return result;
+                    }
+
+                        result = Long.compare(b.end, a.end);
+                        if (result != 0) {
+                            return result;
+                        }
+
+                        return a.description.compareTo(b.description);
+                    });
+
+
+                }
+                return eventList;
         }
+        if (bool) {
+            if (currentDay == null) {
+                return null;
+            }
 
-        ArrayList<EventEntry> eventList = new ArrayList<>();
+            ArrayList<EventEntry> eventList = new ArrayList<>();
 
-        java.util.Calendar startDay = java.util.Calendar.getInstance();
+            java.util.Calendar startDay = java.util.Calendar.getInstance();
+            java.util.Calendar endDay = java.util.Calendar.getInstance();
 
-        for (int i = 0; i < eventEntries.size(); i++) {
-            startDay.setTimeInMillis(eventEntries.get(i).start);
 
+            for (int i = 0; i < eventEntries.size(); i++) {
+                startDay.setTimeInMillis(eventEntries.get(i).start);
+                endDay.setTimeInMillis(eventEntries.get(i).end);
             /* Currently gets entries based on their starting day
               TODO match entries as long as the currentDay overlaps with its time range */
-            if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
-                    currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
-                    currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
+                if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
+                        currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
+                        currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
 
-                eventList.add(eventEntries.get(i));
+                    eventList.add(eventEntries.get(i));
+                } else if (currentDay.getTimeInMillis() <= endDay.getTimeInMillis() && currentDay.getTimeInMillis() >= startDay.getTimeInMillis()) {
+                    eventList.add(eventEntries.get(i));
+                } else if (currentDay.get(java.util.Calendar.YEAR) == endDay.get(java.util.Calendar.YEAR) &&
+                        currentDay.get(java.util.Calendar.MONTH) == endDay.get(java.util.Calendar.MONTH) &&
+                        currentDay.get(java.util.Calendar.DATE) == endDay.get(java.util.Calendar.DATE)) {
+                    eventList.add(eventEntries.get(i));
+                }
+
+                Collections.sort(eventList, (a, b) -> {
+                    int result = Long.compare(a.start, b.start);
+                    if (result != 0) {
+                        return result;
+                    }
+
+                    result = Long.compare(b.end, a.end);
+                    if (result != 0) {
+                        return result;
+                    }
+
+                    return a.description.compareTo(b.description);
+                });
             }
+            return eventList;
         }
-        return eventList;
+        return null;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.sharedchatmenu, menu);
+        inflater.inflate(R.menu.sharedcalendarmenu, menu);
     }
 
     @Override
@@ -165,10 +254,22 @@ public class SharedCalendarFragment2 extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.view_events:
+            case R.id.shared_calendar_back_button:
                 /** Handle viewing all calendar events**/
-                new ViewEventsDialog2(null, null).show(getParentFragmentManager(), null);
+                NavHostFragment.findNavController(this).popBackStack();
                 return true;
+            case R.id.shared_calendar_view_upcoming_events:
+                java.util.Calendar currentDate = java.util.Calendar.getInstance();
+                currentDate.setTime(new Date());
+
+                textView.setText("Here are all your upcoming events");
+                eventEntries1 = getEvents(currentDate, eventEntries, false);
+                refresh();
+                return true;
+            case R.id.shared_calendar_view_all_events:
+                textView.setText("Here are all of your events");
+                eventEntries1 = eventEntries;
+                refresh();
             default:
                 return super.onOptionsItemSelected(item);
         }

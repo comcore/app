@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/shared_calendar_view_all_events"
+        android:title="@string/view_all_events"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/shared_calendar_view_upcoming_events"
+        android:title="View Upcoming Events"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/shared_calendar_back_button"
+        android:title="@string/back"
+        app:showAsAction="never" />
+</menu>
