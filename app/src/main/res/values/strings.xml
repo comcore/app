@@ -147,8 +147,7 @@
     <string name="complete_task_short">Complete A Task</string>
     <string name="in_progress_task_short">Claim A Task</string>
     <string name="no_deadline">No Deadline</string>
-    <string name="task_deadline_date_label">Deadline Date (MM/DD/YYYY)</string>
-    <string name="task_deadline_time_label">Deadline  (HH:MM)</string>
+    <string name="select_deadline">Select Deadline</string>
 
     <!-- Create Module Dialog -->
     <string name="create_module">Create Module</string>

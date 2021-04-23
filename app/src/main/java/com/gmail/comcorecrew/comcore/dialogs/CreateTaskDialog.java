@@ -5,31 +5,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.User;
 import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
-import com.gmail.comcorecrew.comcore.fragments.GroupFragment;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
-import com.gmail.comcorecrew.comcore.server.id.TaskListID;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Date;
 
 public class CreateTaskDialog extends DialogFragment {
 
-    private TaskListID tasklistID;
     private TaskList currentTaskList;
+    private long deadline = 0;
+    private TextView deadlineLabel;
 
     public CreateTaskDialog (TaskList currentTasklist) {
         this.currentTaskList = currentTasklist;
@@ -46,6 +37,26 @@ public class CreateTaskDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        deadlineLabel = view.findViewById(R.id.deadline_label);
+
+        // Select an end date and time when the second select button is pressed
+        view.findViewById(R.id.select_deadline_button).setOnClickListener(clickedView -> {
+            long oldDeadline = deadline;
+            deadline = 0;
+            deadlineLabel.setText(R.string.no_deadline);
+            new PickDateTimeDialog(this, false,
+                    oldDeadline,
+                    (fragment, timestamp) -> {
+                        deadline = timestamp;
+
+                        if (deadline == 0) {
+                            deadlineLabel.setText(R.string.no_deadline);
+                        } else {
+                            deadlineLabel.setText(EventEntry.dateTimeFormat.format(new Date(deadline)));
+                        }
+                    })
+                    .show(getParentFragmentManager(), null);
+        });
 
         /*
           If the "back" button is clicked, close the dialog box
@@ -58,24 +69,14 @@ public class CreateTaskDialog extends DialogFragment {
           If the "submit" button is clicked, try to create the task
          */
         view.findViewById(R.id.create_task_submit_button).setOnClickListener(clickedView -> {
-
             EditText taskDesc = view.findViewById(R.id.create_task_name_edit);
-            EditText dateDeadline = view.findViewById(R.id.editTaskDate);
-            EditText timeDeadline = view.findViewById(R.id.editTaskTime);
-
-            String startFull = dateDeadline.getText().toString() + "-" + timeDeadline.getText().toString();
-            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy-HH:mm");
-            java.util.Calendar deadline = java.util.Calendar.getInstance();
-
-
-            try {
-                deadline.setTime(df.parse(startFull, new ParsePosition(0)));
-                currentTaskList.sendTask(deadline.getTimeInMillis(), taskDesc.getText().toString());
+            String name = taskDesc.getText().toString().trim();
+            if (name.isEmpty()) {
+                ErrorDialog.show("Please enter a name for the task.");
+                return;
             }
-            catch (NullPointerException e) {
-                /* If an error occurs parsing the deadline, create the task without a deadline */
-                currentTaskList.sendTask(0, taskDesc.getText().toString());
-            }
+
+            currentTaskList.sendTask(deadline, name);
             this.dismiss();
         });
 
