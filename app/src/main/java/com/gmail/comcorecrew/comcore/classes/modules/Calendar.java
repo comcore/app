@@ -73,6 +73,17 @@ public class Calendar extends Module {
         });
     }
 
+    public void modifyEvent(EventID id, String description, long start, long end) {
+        ServerConnector.updateEvent(id, description, start, end, result -> {
+            if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
+                return;
+            }
+
+            onEventUpdated(result.data);
+        });
+    }
+
     public void deleteEvent(EventID eventID) {
         ServerConnector.deleteEvent(eventID, result -> {
             if (result.isFailure()) {
