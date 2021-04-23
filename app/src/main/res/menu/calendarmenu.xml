@@ -10,14 +10,17 @@
         android:id="@+id/view_all_events"
         android:title="@string/view_all_events"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/modify_events"
+        android:title="@string/modify_events" />
+    <item
+        android:id="@+id/delete_events"
+        android:title="@string/delete_events"
+        app:showAsAction="never" />
     <group android:id="@+id/menu_group_moderator_actions">
         <item
             android:id="@+id/view_pending_events"
             android:title="@string/view_pending_events"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/delete_events"
-            android:title="@string/delete_events"
             app:showAsAction="never" />
         <item
             android:id="@+id/pin_event"

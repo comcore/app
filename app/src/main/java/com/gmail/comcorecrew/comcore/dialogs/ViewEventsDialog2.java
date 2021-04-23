@@ -27,7 +27,6 @@ import java.util.List;
 public class ViewEventsDialog2 extends DialogFragment {
 
     private CustomAdapter2 adapter;
-    private List<EventEntry> eventList = new ArrayList<>();
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
     private List<EventEntry> eventEntries = new ArrayList<>();
@@ -39,7 +38,7 @@ public class ViewEventsDialog2 extends DialogFragment {
      */
     private int flag;
 
-    public ViewEventsDialog2 (java.util.Calendar currentDate, List<EventEntry> eventEntries) {
+    public ViewEventsDialog2(java.util.Calendar currentDate, List<EventEntry> eventEntries) {
         this.currentDate = currentDate;
         this.eventEntries1 = eventEntries;
     }
@@ -147,7 +146,7 @@ public class ViewEventsDialog2 extends DialogFragment {
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
-            EventEntry event = eventList.get(position);
+            EventEntry event = eventEntries.get(position);
             eventDesc.setText(event.description);
             eventDate.setText(event.format(true));
 

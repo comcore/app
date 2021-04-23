@@ -185,7 +185,7 @@
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
-    <string name="update_event_approval">Change Event Approval</string>
+    <string name="update_event_approval">Approve Event</string>
     <string name="create_event">Create Event</string>
     <string name="select_start_time">Select the Start Time</string>
     <string name="select_end_time">Select the End Time</string>
@@ -194,10 +194,7 @@
     <!-- Calendar -->
     <string name="view_pending_events">View Pending Events</string>
     <string name="view_all_events">View All Events</string>
-    <string name="create_event_start_date">Start Date (MM/DD/YYYY)</string>
-    <string name="create_event_end_date">End Date (MM/DD/YYYY)</string>
-    <string name="create_event_start_time">Start Time (HH:MM)</string>
-    <string name="create_event_end_time">End Time (HH:MM)</string>
+    <string name="modify_events">Modify Event</string>
     <string name="delete_events">Remove Event</string>
     <string name="pin_event">Pin Event</string>
     <string name="pin_event_title">Pin event to the bulletin board</string>

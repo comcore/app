@@ -46,6 +46,7 @@ public class GroupCalendarFragment extends Fragment {
     private TextView textView;
     private RecyclerView rvGroups;
     private java.util.Calendar currentDay;
+    private boolean pending = false;
 
     public GroupCalendarFragment() {
         // Required empty public constructor
@@ -106,12 +107,20 @@ public class GroupCalendarFragment extends Fragment {
                 currentDay = java.util.Calendar.getInstance();
                 currentDay.clear();
                 currentDay.set(year, month, day);
+                pending = false;
                 refresh();
             }
         });
     }
 
     private void refresh() {
+        if (pending) {
+            eventEntries = calendar.getUnapproved();
+            textView.setText("Pending Events");
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
         eventEntries = calendar.getEntriesByDay(currentDay);
         if (eventEntries.isEmpty() && currentDay != null) {
             currentDay = null;
@@ -149,11 +158,16 @@ public class GroupCalendarFragment extends Fragment {
 
             case R.id.create_event:
                 /** Handle creating an event **/
-                new CreateEventDialog(this, calendar).show(getParentFragmentManager(), null);
+                new CreateEventDialog(this, calendar, null)
+                        .show(getParentFragmentManager(), null);
                 return true;
             case R.id.view_events:
                 /** Handle viewing all calendar events**/
                 new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.modify_event:
+                /* Handle deleting calendar events*/
+                new ViewEventsDialog(calendar, null, 3).show(getParentFragmentManager(), null);
                 return true;
             case R.id.remove_event:
                 /** Handle deleting calendar events**/
@@ -161,12 +175,9 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
-                eventEntries = calendar.getUnapproved();
-                textView.setText("Here are all your pending events");
-                adapter = new CustomAdapter();
-                rvGroups.setAdapter(adapter);
-                rvGroups.setItemAnimator(new DefaultItemAnimator());
-                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+                currentDay = null;
+                pending = true;
+                refresh();
                 return true;
             case R.id.pin_event:
                 /** Handle pinning event to the bulletin board **/

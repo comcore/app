@@ -117,11 +117,16 @@ public class CalendarFragment extends Fragment {
 
             case R.id.create_event:
                 /* Handle creating an event */
-                new CreateEventDialog(this, calendar).show(getParentFragmentManager(), null);
+                new CreateEventDialog(this, calendar, null)
+                        .show(getParentFragmentManager(), null);
                 return true;
             case R.id.view_all_events:
                 /* Handle viewing all calendar events*/
                 new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.modify_events:
+                /* Handle deleting calendar events*/
+                new ViewEventsDialog(calendar, null, 3).show(getParentFragmentManager(), null);
                 return true;
             case R.id.delete_events:
                 /* Handle deleting calendar events*/

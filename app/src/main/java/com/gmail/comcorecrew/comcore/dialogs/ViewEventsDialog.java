@@ -31,6 +31,7 @@ public class ViewEventsDialog extends DialogFragment {
      * 0 - View events
      * 1 - Delete events
      * 2 - Add event to bulletin board
+     * 3 - Modify events
      */
     private int flag;
 
@@ -110,13 +111,16 @@ public class ViewEventsDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if (flag == 1) {
-                    /** Delete event */
+                    /* Delete event */
                     currentCalendar.deleteEvent(currentEventEntry.id);
                     dismiss();
-                }
-                else if (flag == 2) {
-                    /** Pin event to the bulletin board */
+                } else if (flag == 2) {
+                    /* Pin event to the bulletin board */
                     currentCalendar.addToBulletin(currentEventEntry.id, true);
+                    dismiss();
+                } else if (flag == 3) {
+                    new CreateEventDialog(getParentFragment(), currentCalendar, currentEventEntry)
+                            .show(getParentFragmentManager(), null);
                     dismiss();
                 }
             }

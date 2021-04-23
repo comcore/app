@@ -20,13 +20,15 @@ import java.util.Date;
 public class CreateEventDialog extends DialogFragment {
     private final Fragment fragment;
     private final Calendar calendar;
+    private final EventEntry replace;
     private long startTimestamp = 0;
     private long endTimestamp = 0;
-    TextView startLabel, endLabel;
+    private TextView startLabel, endLabel;
 
-    public CreateEventDialog(Fragment fragment, Calendar calendar) {
+    public CreateEventDialog(Fragment fragment, Calendar calendar, EventEntry replace) {
         this.fragment = fragment;
         this.calendar = calendar;
+        this.replace = replace;
     }
 
     @Override
@@ -54,6 +56,14 @@ public class CreateEventDialog extends DialogFragment {
         EditText desc = view.findViewById(R.id.create_event_desc);
         startLabel = view.findViewById(R.id.start_time_label);
         endLabel = view.findViewById(R.id.end_time_label);
+
+        // Default to the existing event information if updating
+        if (replace != null) {
+            desc.setText(replace.description);
+            startTimestamp = replace.start;
+            endTimestamp = replace.end;
+            updateLabels();
+        }
 
         // Select a start date and time when the first select button is pressed
         view.findViewById(R.id.select_start_button).setOnClickListener(clickedView -> {
@@ -102,7 +112,11 @@ public class CreateEventDialog extends DialogFragment {
                 return;
             }
 
-            calendar.sendEvent(name, startTimestamp, endTimestamp);
+            if (replace == null) {
+                calendar.sendEvent(name, startTimestamp, endTimestamp);
+            } else {
+                calendar.modifyEvent(replace.id, name, startTimestamp, endTimestamp);
+            }
             this.dismiss();
         });
 
