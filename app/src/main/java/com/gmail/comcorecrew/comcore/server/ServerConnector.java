@@ -1060,6 +1060,38 @@ public final class ServerConnector {
     }
 
     /**
+     * Modify an existing event in a calendar.
+     *
+     * @param event       the event to modify
+     * @param description the description of the event
+     * @param start       the start timestamp of the event
+     * @param end         the end timestamp of the event
+     * @param handler     the handler for the response of the server
+     */
+    public static void updateEvent(EventID event, String description, long start, long end,
+                                   ResultHandler<EventEntry> handler) {
+        if (event == null) {
+            throw new IllegalArgumentException("EventID cannot be null");
+        } else if (description == null) {
+            throw new IllegalArgumentException("event description cannot be null");
+        } else if (start < 1) {
+            throw new IllegalArgumentException("event start timestamp cannot be less than 1");
+        } else if (end < start) {
+            throw new IllegalArgumentException("event end cannot come before start");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("group", event.module.group.id);
+        data.addProperty("calendar", event.module.id);
+        data.addProperty("id", event.id);
+        data.addProperty("description", description);
+        data.addProperty("start", start);
+        data.addProperty("end", end);
+        getConnection().send(new ServerMsg("updateEvent", data), handler,
+                response -> EventEntry.fromJson(event.module, response));
+    }
+
+    /**
      * Delete an event from a calendar. The EventID becomes invalid and can no longer be used.
      *
      * @param event   the event to delete

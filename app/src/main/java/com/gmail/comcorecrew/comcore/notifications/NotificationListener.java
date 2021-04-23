@@ -77,6 +77,13 @@ public interface NotificationListener {
     default void onEventApproved(EventID event) {}
 
     /**
+     * Handle an event being updated.
+     *
+     * @param event the event being updated
+     */
+    default void onEventUpdated(EventEntry event) {}
+
+    /**
      * Handle an event being deleted.
      *
      * @param event the event being deleted

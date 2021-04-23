@@ -221,7 +221,7 @@ public class GroupCalendarFragment extends Fragment {
 
             EventEntry event = eventEntries.get(position);
             eventDesc.setText(event.description);
-            eventDate.setText(event.format(false));
+            eventDate.setText(event.format(currentDay == null));
 
             viewHolder.setCurrentEventEntry(event);
 

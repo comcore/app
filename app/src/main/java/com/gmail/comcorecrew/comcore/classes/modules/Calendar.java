@@ -159,13 +159,21 @@ public class Calendar extends Module {
         return unapproved;
     }
 
-    private EventEntry removeUnapproved(EventID event) {
+    private EventEntry updateUnapproved(EventID event, EventEntry newEvent) {
         for (int i = 0, s = unapproved.size(); i < s; i++) {
             EventEntry entry = unapproved.get(i);
             if (entry.id.equals(event)) {
-                unapproved.remove(i);
+                if (newEvent == null) {
+                    unapproved.remove(i);
+                } else {
+                    unapproved.set(i, newEvent);
+                }
                 return entry;
             }
+        }
+
+        if (newEvent != null) {
+            unapproved.add(newEvent);
         }
 
         return null;
@@ -198,7 +206,7 @@ public class Calendar extends Module {
             return;
         }
 
-        EventEntry entry = removeUnapproved(event);
+        EventEntry entry = updateUnapproved(event, null);
         if (entry != null) {
             approved.add(new EventEntry(
                     entry.id,
@@ -213,13 +221,28 @@ public class Calendar extends Module {
     }
 
     @Override
+    public void onEventUpdated(EventEntry event) {
+        if (!event.id.module.equals(getId())) {
+            return;
+        }
+
+        if (event.approved) {
+            approved.update(event);
+        } else {
+            updateUnapproved(event.id, event);
+        }
+
+        toCache();
+    }
+
+    @Override
     public void onEventDeleted(EventID event) {
         if (!event.module.equals(getId())) {
             return;
         }
 
         if (!approved.remove(event)) {
-            if (removeUnapproved(event) == null) {
+            if (updateUnapproved(event, null) == null) {
                 return;
             }
         }

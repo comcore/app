@@ -100,6 +100,12 @@ public final class ServerReader extends ServerThread {
                             listener.onEventApproved(id));
                     break;
                 }
+                case "eventUpdated": {
+                    EventEntry entry = EventEntry.fromJson(null, message.data);
+                    ServerConnector.sendNotification(listener ->
+                            listener.onEventUpdated(entry));
+                    break;
+                }
                 case "eventDeleted": {
                     EventID id = EventID.fromJson(null, message.data);
                     ServerConnector.sendNotification(listener ->
