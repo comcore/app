@@ -5,6 +5,7 @@ import com.gmail.comcorecrew.comcore.caching.Cacher;
 import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.Mdid;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -219,6 +220,7 @@ public abstract class CustomModule extends Module {
     protected void deleteItem(MessageID messageID) {
         ServerConnector.updateMessage(messageID, null, result -> {
             if (result.isFailure()) {
+                ErrorDialog.show(result.errorMessage);
                 return;
             }
 
