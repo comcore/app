@@ -67,7 +67,6 @@
     <!-- Create Link -->
     <string name="create_link_does_expire">Do you want the invite link to expire?</string>
     <string name="create_link_copied">The link was copied to your clipboard.</string>
-    <string name="error_expire_past">The expire time cannot be in the past.</string>
     <string name="error_event_past">The calendar event cannot be in the past.</string>
 
     <!-- Error Messages -->
@@ -79,6 +78,7 @@
     <string name="error_already_exists">An account with that email address already exists.</string>
     <string name="error_incorrect_code">Incorrect code. Please try again.</string>
     <string name="error_missing_data">Please enter all necessary information.</string>
+    <string name="error_datetime_past">The date and time cannot be in the past.</string>
 
     <string name="error_unknown">An error occurred.</string>
     <string name="error_set_role">The role of the user could not be changed.</string>

@@ -28,7 +28,7 @@ public class PickDateTimeDialog extends DialogFragment
     }
 
     public PickDateTimeDialog(Fragment fragment, DateTimeCallback callback, boolean allowPast) {
-        this(fragment, callback, allowPast, System.currentTimeMillis());
+        this(fragment, callback, allowPast, 0);
     }
 
     public PickDateTimeDialog(Fragment fragment, DateTimeCallback callback, boolean allowPast,
@@ -37,12 +37,14 @@ public class PickDateTimeDialog extends DialogFragment
             throw new IllegalArgumentException("Fragment cannot be null");
         } else if (callback == null) {
             throw new IllegalArgumentException("DateTimeCallback cannot be null");
+        } else if (initialTime < 0) {
+            throw new IllegalArgumentException("initial timestamp cannot be negative");
         }
 
         this.fragment = fragment;
         this.callback = callback;
         this.allowPast = allowPast;
-        this.initialTime = initialTime;
+        this.initialTime = initialTime == 0 ? System.currentTimeMillis() : initialTime;
     }
 
     @Override
@@ -52,10 +54,11 @@ public class PickDateTimeDialog extends DialogFragment
         c.setTimeInMillis(initialTime);
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        int day = c.get(Calendar.DATE);
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
+    @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
@@ -64,7 +67,7 @@ public class PickDateTimeDialog extends DialogFragment
         if (!allowPast) {
             // Make sure the date is not in the past
             if (calendar.getTimeInMillis() + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
-                ErrorDialog.show(R.string.error_expire_past);
+                ErrorDialog.show(R.string.error_datetime_past);
                 return;
             }
         }
@@ -95,21 +98,22 @@ public class PickDateTimeDialog extends DialogFragment
                     DateFormat.is24HourFormat(getActivity()));
         }
 
+        @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
 
+            long timestamp = calendar.getTimeInMillis();
             if (!parent.allowPast) {
                 // Make sure the timestamp is not in the past
-                long expireTimestamp = calendar.getTimeInMillis();
-                if (expireTimestamp < System.currentTimeMillis()) {
-                    ErrorDialog.show(R.string.error_expire_past);
+                if (timestamp < System.currentTimeMillis()) {
+                    ErrorDialog.show(R.string.error_datetime_past);
                     return;
                 }
             }
 
-            // Finish creating the link
-            parent.callback.onSelected(parent.fragment, calendar.getTimeInMillis());
+            // Call the provided callback
+            parent.callback.onSelected(parent.fragment, timestamp);
         }
     }
 }

@@ -87,19 +87,28 @@ public class Calendar extends Module {
     public List<EventEntry> getEntriesByDay(java.util.Calendar currentDay) {
         ArrayList<EventEntry> eventList = new ArrayList<>();
 
-        java.util.Calendar startDay = java.util.Calendar.getInstance();
-        long currentTime = System.currentTimeMillis();
+        boolean checkEnd = currentDay != null;
+        if (currentDay == null) {
+            currentDay = java.util.Calendar.getInstance();
+        }
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.clear();
+        calendar.set(currentDay.get(java.util.Calendar.YEAR),
+                currentDay.get(java.util.Calendar.MONTH),
+                currentDay.get(java.util.Calendar.DATE));
+
+        long startOfDay = calendar.getTimeInMillis();
+        calendar.add(java.util.Calendar.DATE, 1);
+        long endOfDay = calendar.getTimeInMillis();
+
         for (int i = 0; i < getApproved().size(); i++) {
             EventEntry event = approved.get(i);
-            if (currentDay != null) {
-                startDay.setTimeInMillis(event.start);
+            if (event.end < startOfDay) {
+                continue;
+            }
 
-                if (currentDay.get(java.util.Calendar.YEAR) != startDay.get(java.util.Calendar.YEAR) ||
-                    currentDay.get(java.util.Calendar.MONTH) != startDay.get(java.util.Calendar.MONTH) ||
-                    currentDay.get(java.util.Calendar.DATE) != startDay.get(java.util.Calendar.DATE)) {
-                    continue;
-                }
-            } else if (event.end < currentTime) {
+            if (checkEnd && event.start >= endOfDay) {
                 continue;
             }
 
