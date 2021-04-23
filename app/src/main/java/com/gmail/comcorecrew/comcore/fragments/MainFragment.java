@@ -150,7 +150,7 @@ public class MainFragment extends Fragment {
             case MODERATOR:
                 tag.setVisibility(View.VISIBLE);
                 if (isDirect) {
-                    tag.setColorFilter(tag.getResources().getColor(R.color.primary_d1));
+                    tag.setColorFilter(tag.getResources().getColor(R.color.direct_color));
                 } else {
                     tag.setColorFilter(tag.getResources().getColor(R.color.moderator_color));
                 }
