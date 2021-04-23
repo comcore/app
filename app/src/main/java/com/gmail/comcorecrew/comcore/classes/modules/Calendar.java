@@ -19,6 +19,8 @@ import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.EventID;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Calendar extends Module {
@@ -83,26 +85,42 @@ public class Calendar extends Module {
     }
 
     public List<EventEntry> getEntriesByDay(java.util.Calendar currentDay) {
-        if (currentDay == null) {
-            return getApproved();
-        }
-
         ArrayList<EventEntry> eventList = new ArrayList<>();
 
         java.util.Calendar startDay = java.util.Calendar.getInstance();
-
+        long currentTime = System.currentTimeMillis();
         for (int i = 0; i < getApproved().size(); i++) {
-            startDay.setTimeInMillis(approved.get(i).start);
+            EventEntry event = approved.get(i);
+            if (currentDay != null) {
+                startDay.setTimeInMillis(event.start);
 
-            /* Currently gets entries based on their starting day
-              TODO match entries as long as the currentDay overlaps with its time range */
-            if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
-                currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
-                currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
-
-                eventList.add(approved.get(i));
+                if (currentDay.get(java.util.Calendar.YEAR) != startDay.get(java.util.Calendar.YEAR) ||
+                    currentDay.get(java.util.Calendar.MONTH) != startDay.get(java.util.Calendar.MONTH) ||
+                    currentDay.get(java.util.Calendar.DATE) != startDay.get(java.util.Calendar.DATE)) {
+                    continue;
+                }
+            } else if (event.end < currentTime) {
+                continue;
             }
+
+            eventList.add(approved.get(i));
         }
+
+        // Sort the returned list in chronological order
+        Collections.sort(eventList, (a, b) -> {
+            int result = Long.compare(a.start, b.start);
+            if (result != 0) {
+                return result;
+            }
+
+            result = Long.compare(b.end, a.end);
+            if (result != 0) {
+                return result;
+            }
+
+            return a.description.compareTo(b.description);
+        });
+
         return eventList;
     }
 

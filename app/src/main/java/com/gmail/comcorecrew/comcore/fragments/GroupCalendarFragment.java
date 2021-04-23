@@ -53,7 +53,7 @@ public class GroupCalendarFragment extends Fragment {
     private CalendarView calendarView;
     private Toolbar toolBar;
     private CustomAdapter adapter;
-    private List<EventEntry> eventEntries = calendar.getApproved();
+    private List<EventEntry> eventEntries = calendar.getEntriesByDay(null);
     private TextView textView;
     private RecyclerView rvGroups;
 
@@ -136,7 +136,7 @@ public class GroupCalendarFragment extends Fragment {
                     rvGroups.setAdapter(adapter);
                     rvGroups.setItemAnimator(new DefaultItemAnimator());
                 } else {
-                    eventEntries = calendar.getApproved();
+                    eventEntries = calendar.getEntriesByDay(null);
                     textView.setText("Here are all your upcoming events");
                     adapter = new CustomAdapter();
                     rvGroups.setAdapter(adapter);
