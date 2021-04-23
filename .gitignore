@@ -9,4 +9,6 @@
 local.properties
 
 # Ignore the built files since they may be large
+build/
 app/build/
+app/release
