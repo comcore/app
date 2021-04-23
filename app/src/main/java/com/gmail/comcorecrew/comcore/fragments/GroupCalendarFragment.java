@@ -5,14 +5,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,25 +17,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.CreateEventDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
-import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.id.CalendarID;
-import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,15 +38,14 @@ import java.util.List;
 public class GroupCalendarFragment extends Fragment {
 
     public static Calendar calendar;
+
     private CalendarView calendarView;
     private Toolbar toolBar;
     private CustomAdapter adapter;
     private List<EventEntry> eventEntries = calendar.getEntriesByDay(null);
     private TextView textView;
     private RecyclerView rvGroups;
-
-
-    private  static final String TAG = "CalendarActivity";
+    private java.util.Calendar currentDay;
 
     public GroupCalendarFragment() {
         // Required empty public constructor
@@ -111,39 +98,34 @@ public class GroupCalendarFragment extends Fragment {
         adapter = new CustomAdapter();
         rvGroups.setAdapter(adapter);
         rvGroups.setItemAnimator(new DefaultItemAnimator());
-
+        calendar.setCallback(this::refresh);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
-                java.util.Calendar currentDate = java.util.Calendar.getInstance();
-                currentDate.set(java.util.Calendar.YEAR, year);
-                currentDate.set(java.util.Calendar.MONTH, month);
-                currentDate.set(java.util.Calendar.DATE, day);
-                currentDate.set(java.util.Calendar.HOUR, 0);
-
-                System.out.println(currentDate.get(java.util.Calendar.YEAR));
-                System.out.println(currentDate.get(java.util.Calendar.MONTH));
-                System.out.println(currentDate.get(java.util.Calendar.DATE));
-                System.out.println(currentDate.get(java.util.Calendar.HOUR));
-
-                System.out.println(currentDate.getTime().toString());
-
-                if (calendar.getEntriesByDay(currentDate).size() > 0) {
-                    textView.setText("Here are your event(s) for " + currentDate.get(java.util.Calendar.MONTH) + "/" + currentDate.get(java.util.Calendar.DATE) + "/" + currentDate.get(java.util.Calendar.YEAR));
-                    eventEntries = calendar.getEntriesByDay(currentDate);
-                    adapter = new CustomAdapter();
-                    rvGroups.setAdapter(adapter);
-                    rvGroups.setItemAnimator(new DefaultItemAnimator());
-                } else {
-                    eventEntries = calendar.getEntriesByDay(null);
-                    textView.setText("Here are all your upcoming events");
-                    adapter = new CustomAdapter();
-                    rvGroups.setAdapter(adapter);
-                    rvGroups.setItemAnimator(new DefaultItemAnimator());
-                }
+                currentDay = java.util.Calendar.getInstance();
+                currentDay.clear();
+                currentDay.set(year, month, day);
+                refresh();
             }
         });
+    }
+
+    private void refresh() {
+        eventEntries = calendar.getEntriesByDay(currentDay);
+        if (eventEntries.isEmpty() && currentDay != null) {
+            currentDay = null;
+            eventEntries = calendar.getEntriesByDay(null);
+        }
+
+        if (currentDay == null) {
+            textView.setText("Upcoming Events");
+        } else {
+            String currentDate = EventEntry.dateFormat.format(new Date(currentDay.getTimeInMillis()));
+            textView.setText("Events on " + currentDate);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -237,12 +219,11 @@ public class GroupCalendarFragment extends Fragment {
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
-            eventDesc.setText(eventEntries.get(position).description);
-            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).start).toString() +
-                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).end).toString();
-            eventDate.setText(parsedDate);
+            EventEntry event = eventEntries.get(position);
+            eventDesc.setText(event.description);
+            eventDate.setText(event.format(false));
 
-            viewHolder.setCurrentEventEntry(eventEntries.get(position));
+            viewHolder.setCurrentEventEntry(event);
 
         }
 

@@ -27,18 +27,18 @@ public class PickDateTimeDialog extends DialogFragment
         void onSelected(Fragment fragment, long timestamp);
     }
 
-    public PickDateTimeDialog(Fragment fragment, DateTimeCallback callback, boolean allowPast) {
-        this(fragment, callback, allowPast, 0);
+    public PickDateTimeDialog(Fragment fragment, boolean allowPast, DateTimeCallback callback) {
+        this(fragment, allowPast, 0, callback);
     }
 
-    public PickDateTimeDialog(Fragment fragment, DateTimeCallback callback, boolean allowPast,
-                              long initialTime) {
+    public PickDateTimeDialog(Fragment fragment, boolean allowPast, long initialTime,
+                              DateTimeCallback callback) {
         if (fragment == null) {
             throw new IllegalArgumentException("Fragment cannot be null");
-        } else if (callback == null) {
-            throw new IllegalArgumentException("DateTimeCallback cannot be null");
         } else if (initialTime < 0) {
             throw new IllegalArgumentException("initial timestamp cannot be negative");
+        } else if (callback == null) {
+            throw new IllegalArgumentException("DateTimeCallback cannot be null");
         }
 
         this.fragment = fragment;
@@ -66,7 +66,7 @@ public class PickDateTimeDialog extends DialogFragment
 
         if (!allowPast) {
             // Make sure the date is not in the past
-            if (calendar.getTimeInMillis() + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
+            if (calendar.getTimeInMillis() + 24 * 60 * 60 * 1000 < initialTime) {
                 ErrorDialog.show(R.string.error_datetime_past);
                 return;
             }
@@ -106,7 +106,7 @@ public class PickDateTimeDialog extends DialogFragment
             long timestamp = calendar.getTimeInMillis();
             if (!parent.allowPast) {
                 // Make sure the timestamp is not in the past
-                if (timestamp < System.currentTimeMillis()) {
+                if (timestamp < parent.initialTime) {
                     ErrorDialog.show(R.string.error_datetime_past);
                     return;
                 }

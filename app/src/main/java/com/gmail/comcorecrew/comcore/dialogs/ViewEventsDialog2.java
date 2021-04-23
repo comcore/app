@@ -147,12 +147,11 @@ public class ViewEventsDialog2 extends DialogFragment {
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
-            eventDesc.setText(eventEntries.get(position).description);
-            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).start).toString() +
-                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).end).toString();
-            eventDate.setText(parsedDate);
+            EventEntry event = eventList.get(position);
+            eventDesc.setText(event.description);
+            eventDate.setText(event.format(true));
 
-            viewHolder.setCurrentEventEntry(eventEntries.get(position));
+            viewHolder.setCurrentEventEntry(event);
         }
 
         @Override

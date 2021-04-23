@@ -12,12 +12,19 @@ import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.UserID;
 import com.google.gson.JsonObject;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * Represents an entry of event data returned by the server.
  */
 public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
+    public static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+    public static final DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+    public static final DateFormat dateTimeFormat =
+            DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+
     /**
      * The user that created the event.
      */
@@ -98,6 +105,22 @@ public final class EventEntry extends ModuleEntry<CalendarID, EventID> {
         boolean approved = json.get("approved").getAsBoolean();
         boolean bulletin = json.get("bulletin").getAsBoolean();
         return new EventEntry(id, creator, description, start, end, approved, bulletin);
+    }
+
+    public String format(boolean explicitDate) {
+        String startDate = dateFormat.format(new Date(start));
+        String endDate = dateFormat.format(new Date(end));
+        String startTime = timeFormat.format(new Date(start));
+        String endTime = timeFormat.format(new Date(end));
+        if (startDate.equals(endDate)) {
+            if (explicitDate) {
+                return startDate + " " + startTime + "-" + endTime;
+            } else {
+                return startTime + "-" + endTime;
+            }
+        } else {
+            return startDate + " " + startTime + " - " + endDate + " " + endTime;
+        }
     }
 
     @Override

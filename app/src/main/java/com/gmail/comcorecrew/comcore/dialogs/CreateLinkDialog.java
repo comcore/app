@@ -51,7 +51,7 @@ public class CreateLinkDialog extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.create_link_does_expire)
                 .setPositiveButton(R.string.yes, (dialog, id) ->
-                    new PickDateTimeDialog(fragment, this::finishLink, false)
+                    new PickDateTimeDialog(fragment, false, this::finishLink)
                             .show(fragment.getParentFragmentManager(), null))
                 .setNegativeButton(R.string.no, (dialog, id) ->
                         finishLink(fragment, 0))

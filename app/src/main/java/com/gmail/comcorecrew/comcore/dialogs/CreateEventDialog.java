@@ -1,41 +1,28 @@
 package com.gmail.comcorecrew.comcore.dialogs;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.gmail.comcorecrew.comcore.R;
-import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
-import com.gmail.comcorecrew.comcore.server.id.GroupID;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CreateEventDialog extends DialogFragment {
     private final Fragment fragment;
     private final Calendar calendar;
+    private long startTimestamp = 0;
+    private long endTimestamp = 0;
+    TextView startLabel, endLabel;
 
     public CreateEventDialog(Fragment fragment, Calendar calendar) {
         this.fragment = fragment;
@@ -44,56 +31,78 @@ public class CreateEventDialog extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_create_event, container, false);
+        return inflater.inflate(R.layout.fragment_create_event, container, false);
+    }
 
-        return rootView;
+    private void updateLabels() {
+        if (startTimestamp == 0) {
+            startLabel.setText(R.string.no_time_selected);
+        } else {
+            startLabel.setText(EventEntry.dateTimeFormat.format(new Date(startTimestamp)));
+        }
+
+        if (endTimestamp == 0) {
+            endLabel.setText(R.string.no_time_selected);
+        } else {
+            endLabel.setText(EventEntry.dateTimeFormat.format(new Date(endTimestamp)));
+        }
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         EditText desc = view.findViewById(R.id.create_event_desc);
-        EditText startDate = view.findViewById(R.id.editStartDate);
-        EditText endDate = view.findViewById(R.id.editEndDate);
-        EditText startTime = view.findViewById(R.id.editStartTime);
-        EditText endTime = view.findViewById(R.id.editEndTime);
+        startLabel = view.findViewById(R.id.start_time_label);
+        endLabel = view.findViewById(R.id.end_time_label);
 
+        // Select a start date and time when the first select button is pressed
+        view.findViewById(R.id.select_start_button).setOnClickListener(clickedView -> {
+            new PickDateTimeDialog(this, true,
+                    startTimestamp == 0 ? endTimestamp : startTimestamp,
+                    (fragment, timestamp) -> {
+                        startTimestamp = timestamp;
+                        if (endTimestamp != 0 && endTimestamp < startTimestamp) {
+                            endTimestamp = startTimestamp;
+                        }
+                        updateLabels();
+                    })
+                    .show(getParentFragmentManager(), null);
+        });
 
-        /**
-          If the "cancel" button is clicked, close the dialog box
-         */
+        // Select an end date and time when the second select button is pressed
+        view.findViewById(R.id.select_end_button).setOnClickListener(clickedView -> {
+            new PickDateTimeDialog(this, true,
+                    endTimestamp == 0 ? startTimestamp : endTimestamp,
+                    (fragment, timestamp) -> {
+                        endTimestamp = timestamp;
+                        if (startTimestamp != 0 && startTimestamp > endTimestamp ) {
+                            startTimestamp = endTimestamp;
+                        }
+                        updateLabels();
+                    })
+                    .show(getParentFragmentManager(), null);
+        });
+
+        // Close the dialog if cancel is selected
         view.findViewById(R.id.create_event_cancel).setOnClickListener(clickedView -> {
             this.dismiss();
         });
 
-        /**
-         * If the "submit" button is clicked, create the event
-         */
+        // Submit the information if submit is selected
         view.findViewById(R.id.create_event_submit).setOnClickListener(clickedView -> {
-
-            String startFull = startDate.getText().toString() + "-" + startTime.getText().toString();
-            String endFull = endDate.getText().toString() + "-" + endTime.getText().toString();
-
-
-            java.util.Calendar calStart = java.util.Calendar.getInstance();
-            java.util.Calendar calEnd = java.util.Calendar.getInstance();
-
-            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy-HH:mm");
-
-            try {
-                calStart.setTime(df.parse(startFull, new ParsePosition(0)));
-                calEnd.setTime(df.parse(endFull, new ParsePosition(0)));
-            }
-            catch (NullPointerException e) {
-                ErrorDialog.show(R.string.error_incorrect_format);
-                this.dismiss();
+            String name = desc.getText().toString().trim();
+            if (name.isEmpty()) {
+                ErrorDialog.show("Please enter a name for the event.");
+                return;
+            } else if (startTimestamp == 0) {
+                ErrorDialog.show("Please select a start time.");
+                return;
+            } else if (endTimestamp == 0) {
+                ErrorDialog.show("Please select an end time.");
+                return;
             }
 
-            /**
-             * Users cannot automatically create events unless the group's settings allow it
-             * **/
-            calendar.sendEvent(desc.getText().toString(), calStart.getTimeInMillis(), calEnd.getTimeInMillis());
+            calendar.sendEvent(name, startTimestamp, endTimestamp);
             this.dismiss();
         });
 
