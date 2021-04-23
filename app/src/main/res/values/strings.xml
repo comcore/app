@@ -199,6 +199,7 @@
     <string name="pin_event_title">Pin event to the bulletin board</string>
 
     <string name="remove_event">Remove Event</string>
+    <string name="modify_event">Modify Event</string>
     <string name="view_events">View Events</string>
 
     <!-- Polling -->
