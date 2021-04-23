@@ -14,6 +14,7 @@ import com.gmail.comcorecrew.comcore.caching.CustomItem;
 import com.gmail.comcorecrew.comcore.caching.MessageItem;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.helpers.PinnedMessageAdapter;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
@@ -59,13 +60,19 @@ public class PinnedMessages extends CustomChat {
         for (Group group : AppData.getGroups()) {
             if (group.getGroupId().equals(groupID)) {
                 for (Module module : group.getModules()) {
-                    if ((module instanceof PinnedMessages) &&
-                            (((PinnedMessages) module).chatId.equals(chatID.id))) {
-                        if (((PinnedMessages) module).pinMessage(message)) {
-                            return 1;
+                    if (module instanceof PinnedMessages) {
+                        if (((PinnedMessages) module).chatId == null) {
+                            ErrorDialog.show(R.string.error_cannot_connect);
+                            (((PinnedMessages) module)).refreshChatID();
+                            return -2;
                         }
-                        else {
-                            return 0;
+                        else if (((PinnedMessages) module).chatId.equals(chatID.id)) {
+                            if (((PinnedMessages) module).pinMessage(message)) {
+                                return 1;
+                            }
+                            else {
+                                return 0;
+                            }
                         }
                     }
                 }
