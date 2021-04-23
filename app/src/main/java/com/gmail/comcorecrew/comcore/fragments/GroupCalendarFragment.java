@@ -5,11 +5,15 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,16 +21,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.CreateEventDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
+import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
+import com.gmail.comcorecrew.comcore.server.id.ChatID;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,11 +51,10 @@ import java.util.List;
 public class GroupCalendarFragment extends Fragment {
 
     public static Calendar calendar;
-
     private CalendarView calendarView;
     private Toolbar toolBar;
     private CustomAdapter adapter;
-    private List<EventEntry> eventEntries = calendar.getEntriesByDay(null);
+    private List<EventEntry> eventEntries;
     private TextView textView;
     private RecyclerView rvGroups;
     private java.util.Calendar currentDay;
@@ -94,6 +106,9 @@ public class GroupCalendarFragment extends Fragment {
 
         textView = (TextView) view.findViewById(R.id.group_calendar_titleText);
 
+        java.util.Calendar currentDate1 = java.util.Calendar.getInstance();
+        currentDate1.setTime(new Date());
+
         rvGroups = (RecyclerView) view.findViewById(R.id.group_calendar_recyclerview);
         rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new CustomAdapter();
@@ -101,40 +116,48 @@ public class GroupCalendarFragment extends Fragment {
         rvGroups.setItemAnimator(new DefaultItemAnimator());
         calendar.setCallback(this::refresh);
 
+        if (calendar.getEntriesByDay(currentDate1, true).size() > 0) {
+            textView.setText("Here are your events for " + (currentDate1.get(java.util.Calendar.MONTH) + 1) + "/" + currentDate1.get(java.util.Calendar.DATE) + "/" + currentDate1.get(java.util.Calendar.YEAR));
+            eventEntries = calendar.getEntriesByDay(currentDate1, true);
+            refresh();
+        } else {
+            eventEntries = calendar.getEntriesByDay(currentDate1, false);
+            textView.setText("Here are all your upcoming events");
+            refresh();
+        }
+
+        refresh();
+
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
-                currentDay = java.util.Calendar.getInstance();
-                currentDay.clear();
-                currentDay.set(year, month, day);
-                pending = false;
-                refresh();
+                java.util.Calendar currentDate = java.util.Calendar.getInstance();
+                currentDate.set(java.util.Calendar.YEAR, year);
+                currentDate.set(java.util.Calendar.MONTH, month);
+                currentDate.set(java.util.Calendar.DATE, day);
+                currentDate.set(java.util.Calendar.HOUR, 0);
+
+                java.util.Calendar currentDate1 = java.util.Calendar.getInstance();
+                currentDate1.setTime(new Date());
+
+                if (calendar.getEntriesByDay(currentDate, true).size() > 0) {
+                    textView.setText("Here are your events for " + (currentDate.get(java.util.Calendar.MONTH) + 1) + "/" + currentDate.get(java.util.Calendar.DATE) + "/" + currentDate.get(java.util.Calendar.YEAR));
+                    eventEntries = calendar.getEntriesByDay(currentDate, true);
+                    refresh();
+                } else {
+                    eventEntries = calendar.getEntriesByDay(currentDate1, false);
+                    textView.setText("Here are all your upcoming events");
+                    refresh();
+                }
             }
         });
     }
 
-    private void refresh() {
-        if (pending) {
-            eventEntries = calendar.getUnapproved();
-            textView.setText("Pending Events");
-            adapter.notifyDataSetChanged();
-            return;
-        }
-
-        eventEntries = calendar.getEntriesByDay(currentDay);
-        if (eventEntries.isEmpty() && currentDay != null) {
-            currentDay = null;
-            eventEntries = calendar.getEntriesByDay(null);
-        }
-
-        if (currentDay == null) {
-            textView.setText("Upcoming Events");
-        } else {
-            String currentDate = EventEntry.dateFormat.format(new Date(currentDay.getTimeInMillis()));
-            textView.setText("Events on " + currentDate);
-        }
-
-        adapter.notifyDataSetChanged();
+    public void refresh(){
+        adapter = new CustomAdapter();
+        rvGroups.setAdapter(adapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
@@ -158,13 +181,17 @@ public class GroupCalendarFragment extends Fragment {
 
             case R.id.create_event:
                 /** Handle creating an event **/
-                new CreateEventDialog(this, calendar, null)
-                        .show(getParentFragmentManager(), null);
+                new CreateEventDialog(this, calendar, null).show(getParentFragmentManager(), null);
                 return true;
-            case R.id.view_events:
-                /** Handle viewing all calendar events**/
-                new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
+            case R.id.group_calendar_back_button:
+                NavHostFragment.findNavController(this).popBackStack();
                 return true;
+            case R.id.group_calendar_view_all_events:
+                eventEntries = calendar.getApproved();
+                textView.setText("Here are all your events");
+                refresh();
+                return true;
+                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
             case R.id.modify_event:
                 /* Handle deleting calendar events*/
                 new ViewEventsDialog(calendar, null, 3).show(getParentFragmentManager(), null);
@@ -173,11 +200,23 @@ public class GroupCalendarFragment extends Fragment {
                 /** Handle deleting calendar events**/
                 new ViewEventsDialog(calendar, null, 1).show(getParentFragmentManager(), null);
                 return true;
+            case R.id.group_calendar_view_upcoming_events:
+                java.util.Calendar currentDate = java.util.Calendar.getInstance();
+                currentDate.setTime(new Date());
+
+                textView.setText("Here are all your upcoming events");
+                eventEntries = calendar.getEntriesByDay(currentDay, false);
+                refresh();
+                return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
-                currentDay = null;
-                pending = true;
+                eventEntries = calendar.getUnapproved();
+                textView.setText("Here are all your pending events");
                 refresh();
+                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+//                currentDay = null;
+//                pending = true;
+//                refresh();
                 return true;
             case R.id.pin_event:
                 /** Handle pinning event to the bulletin board **/
