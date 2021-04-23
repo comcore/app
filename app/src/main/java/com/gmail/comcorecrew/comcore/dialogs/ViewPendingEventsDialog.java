@@ -78,11 +78,13 @@ public class ViewPendingEventsDialog extends DialogFragment {
 
                     currentCalendar.approve(currentEventEntry.id);
                     notifyDataSetChanged();
+                    dismiss();
                 });
 
                 view.findViewById(R.id.reject_invite_button).setOnClickListener(clickedView -> {
                     currentCalendar.disapprove(currentEventEntry.id);
                     notifyDataSetChanged();
+                    dismiss();
                 });
             }
 

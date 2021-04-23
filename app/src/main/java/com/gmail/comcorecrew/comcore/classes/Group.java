@@ -392,6 +392,12 @@ public class Group implements NotificationListener, Comparable<Group> {
             }
 
             this.requireApproval = requireApproval;
+            if (!requireApproval) {
+                ErrorDialog.show(R.string.event_approval_not_needed);
+            }
+            else {
+                ErrorDialog.show(R.string.event_approval_needed);
+            }
 
             try {
                 GroupStorage.storeGroup(this);
