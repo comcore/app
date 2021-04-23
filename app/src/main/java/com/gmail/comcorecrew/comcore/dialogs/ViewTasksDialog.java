@@ -28,12 +28,14 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.fragments.MainFragment;
 import com.gmail.comcorecrew.comcore.fragments.TaskListFragment;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
 import com.gmail.comcorecrew.comcore.server.id.TaskID;
 import com.gmail.comcorecrew.comcore.server.id.TaskListID;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ViewTasksDialog extends DialogFragment {
 
@@ -160,7 +162,7 @@ public class ViewTasksDialog extends DialogFragment {
             dataText.setText(task.description);
             completedText.setText(task.getStatusDescription());
             if (task.hasDeadline()) {
-                String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();
+                String parsedDate = "Deadline: " + EventEntry.dateTimeFormat.format(new Date(task.deadline));
                 deadlineText.setText(parsedDate);
             }
             else {

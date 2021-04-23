@@ -28,6 +28,7 @@ import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SharedCalendarFragment2 extends Fragment {
@@ -74,7 +75,7 @@ public class SharedCalendarFragment2 extends Fragment {
         calendarView = (CalendarView) view.findViewById(R.id.calendarView);
 
         textView = (TextView) view.findViewById(R.id.group_calendar_titleText);
-        textView.setText("Here are all your upcoming events");
+        textView.setText("Upcoming Events");
 
         ServerConnector.getGroups(result -> {
             for (int i = 0; i < result.data.length; i++) {
@@ -103,22 +104,18 @@ public class SharedCalendarFragment2 extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
                 java.util.Calendar currentDate = java.util.Calendar.getInstance();
-                currentDate.set(java.util.Calendar.YEAR, year);
-                currentDate.set(java.util.Calendar.MONTH, month);
-                currentDate.set(java.util.Calendar.DATE, day);
-                currentDate.set(java.util.Calendar.HOUR, 0);
-
-
+                currentDate.clear();
+                currentDate.set(year, month, day);
 
                 if (getEvents(currentDate, eventEntries).size() > 0) {
-                    textView.setText("Here are your event(s) for " + currentDate.get(java.util.Calendar.MONTH) + "/" + currentDate.get(java.util.Calendar.DATE) + "/" + currentDate.get(java.util.Calendar.YEAR));
+                    textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
                     eventEntries1 = getEvents(currentDate, eventEntries);
                     adapter = new CustomAdapter();
                     rvGroups.setAdapter(adapter);
                     rvGroups.setItemAnimator(new DefaultItemAnimator());
                     //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);
                 } else {
-                    textView.setText("Here are all your upcoming events");
+                    textView.setText("Upcoming Events");
                     eventEntries1 = eventEntries;
                     adapter = new CustomAdapter();
                     rvGroups.setAdapter(adapter);
@@ -218,12 +215,11 @@ public class SharedCalendarFragment2 extends Fragment {
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
 
-            eventDesc.setText(eventEntries1.get(position).description);
-            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries1.get(position).start).toString() +
-                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries1.get(position).end).toString();
-            eventDate.setText(parsedDate);
+            EventEntry event = eventEntries1.get(position);
+            eventDesc.setText(event.description);
+            eventDate.setText(event.format(true));
 
-            viewHolder.setCurrentEventEntry(eventEntries1.get(position));
+            viewHolder.setCurrentEventEntry(event);
 
         }
 

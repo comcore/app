@@ -112,12 +112,11 @@ public class ViewPendingEventsDialog extends DialogFragment {
             TextView eventDesc = viewHolder.itemView.findViewById(R.id.pending_event_desc);
             TextView eventDate = viewHolder.itemView.findViewById(R.id.pending_event_date);
 
-            eventDesc.setText(unapprovedEventList.get(position).description);
-            String parsedDate = DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).start).toString() +
-                    " - " + DateFormat.format("dd-MM-yyyy HH:mm", unapprovedEventList.get(position).end).toString();
-            eventDate.setText(parsedDate);
+            EventEntry event = unapprovedEventList.get(position);
+            eventDesc.setText(event.description);
+            eventDate.setText(event.format(true));
 
-            viewHolder.setCurrentEventEntry(unapprovedEventList.get(position));
+            viewHolder.setCurrentEventEntry(event);
 
         }
 

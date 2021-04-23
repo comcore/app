@@ -44,7 +44,19 @@ public class PickDateTimeDialog extends DialogFragment
         this.fragment = fragment;
         this.callback = callback;
         this.allowPast = allowPast;
-        this.initialTime = initialTime == 0 ? System.currentTimeMillis() : initialTime;
+
+        // Drop off any seconds on the time
+        initialTime = initialTime / 60_000 * 60_000;
+        if (initialTime != 0) {
+            this.initialTime = initialTime;
+            return;
+        }
+
+        // Round to the next hour
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        calendar.set(Calendar.MINUTE, 0);
+        this.initialTime = calendar.getTimeInMillis();
     }
 
     @Override
@@ -61,12 +73,12 @@ public class PickDateTimeDialog extends DialogFragment
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
-        calendar.clear();
+        calendar.setTimeInMillis(initialTime);
         calendar.set(year, month, day);
 
         if (!allowPast) {
             // Make sure the date is not in the past
-            if (calendar.getTimeInMillis() + 24 * 60 * 60 * 1000 < initialTime) {
+            if (calendar.getTimeInMillis() + 24 * 60 * 60 * 1000 < System.currentTimeMillis()) {
                 ErrorDialog.show(R.string.error_datetime_past);
                 return;
             }
@@ -91,9 +103,8 @@ public class PickDateTimeDialog extends DialogFragment
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
@@ -106,7 +117,7 @@ public class PickDateTimeDialog extends DialogFragment
             long timestamp = calendar.getTimeInMillis();
             if (!parent.allowPast) {
                 // Make sure the timestamp is not in the past
-                if (timestamp < parent.initialTime) {
+                if (timestamp < System.currentTimeMillis()) {
                     ErrorDialog.show(R.string.error_datetime_past);
                     return;
                 }
