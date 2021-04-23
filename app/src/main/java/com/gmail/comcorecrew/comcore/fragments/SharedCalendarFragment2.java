@@ -134,7 +134,6 @@ public class SharedCalendarFragment2 extends Fragment {
 
         for (int i = 0; i < eventEntries.size(); i++) {
             startDay.setTimeInMillis(eventEntries.get(i).start);
-            System.out.println(eventEntries.get(i).description);
 
             /* Currently gets entries based on their starting day
               TODO match entries as long as the currentDay overlaps with its time range */

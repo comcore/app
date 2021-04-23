@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
 import java.text.SimpleDateFormat;
@@ -93,10 +92,10 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
         SentMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
-            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
+            messageText = (TextView) itemView.findViewById(R.id.me_message_text);
+            timeText = (TextView) itemView.findViewById(R.id.me_message_timestamp);
+            nameText = (TextView) itemView.findViewById(R.id.me_username);
+            dateText = (TextView) itemView.findViewById(R.id.me_message_date);
         }
 
         void bind(MessageEntry message) {
@@ -132,10 +131,10 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
             ReceivedMessageHolder(View itemView) {
                 super(itemView);
 
-                messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
-                timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
-                nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
-                dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
+                messageText = (TextView) itemView.findViewById(R.id.other_message_text);
+                timeText = (TextView) itemView.findViewById(R.id.other_message_timestamp);
+                nameText = (TextView) itemView.findViewById(R.id.other_username);
+                dateText = (TextView) itemView.findViewById(R.id.other_message_date);
             }
 
             void bind(MessageEntry message) {

@@ -122,7 +122,6 @@ public class MainFragment extends Fragment {
                 NavHostFragment.findNavController(MainFragment.this).navigate(action);
                 return true;
             case R.id.viewSharedCalendar:
-                System.out.println("Viewing calendar");
                 NavHostFragment.findNavController(this).navigate(R.id.action_mainFragment_to_sharedCalendarFragment23);
                 return true;
             case R.id.settingsFragment:

@@ -37,7 +37,6 @@ public class UserActionDialog extends DialogFragment {
 
                 // Create a default chat for the group if possible
                 ServerConnector.createChat(result.data, "Direct Message", null);
-
                 // Return to the main menu
                 LoginFragment.navigateBackTo(R.id.mainFragment);
                 dismiss.run();

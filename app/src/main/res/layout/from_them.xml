@@ -7,7 +7,7 @@
     android:layout_marginTop="16dp">
 
     <TextView
-        android:id="@+id/text_gchat_date_other"
+        android:id="@+id/other_message_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="8dp"
@@ -21,27 +21,27 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/image_gchat_profile_other"
+        android:id="@+id/other_profile_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:src="@drawable/other"
         android:contentDescription="User Icon"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_gchat_date_other" />
+        app:layout_constraintTop_toBottomOf="@+id/other_message_date" />
 
     <TextView
-        android:id="@+id/text_gchat_user_other"
+        android:id="@+id/other_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="John Grady Cole"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/image_gchat_profile_other"
-        app:layout_constraintTop_toBottomOf="@+id/text_gchat_date_other" />
+        app:layout_constraintStart_toEndOf="@+id/other_profile_image"
+        app:layout_constraintTop_toBottomOf="@+id/other_message_date" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/card_gchat_message_other"
+        android:id="@+id/other_message_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/primary_l2"
@@ -49,17 +49,17 @@
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
-        app:layout_constraintStart_toEndOf="@+id/image_gchat_profile_other"
-        app:layout_constraintTop_toBottomOf="@+id/text_gchat_user_other">
+        app:layout_constraintStart_toEndOf="@+id/other_profile_image"
+        app:layout_constraintTop_toBottomOf="@+id/other_username">
 
         <LinearLayout
-            android:id="@+id/layout_gchat_container_other"
+            android:id="@+id/layout_other_message_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/text_gchat_message_other"
+                android:id="@+id/other_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -67,7 +67,6 @@
                 android:paddingLeft="12dp"
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
-                android:text="Message"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -76,34 +75,33 @@
 
 
     <TextView
-        android:id="@+id/text_gchat_timestamp_other"
+        android:id="@+id/other_message_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="8:00"
         android:textColor="#C0C0C0"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/card_gchat_message_other"
-        app:layout_constraintStart_toEndOf="@+id/card_gchat_message_other" />
+        app:layout_constraintBottom_toBottomOf="@+id/other_message_card"
+        app:layout_constraintStart_toEndOf="@+id/other_message_card" />
 
     <ImageView
-        android:id="@+id/message_reaction_like_them"
+        android:id="@+id/other_reaction_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="@+id/card_gchat_message_other"
-        app:layout_constraintTop_toBottomOf="@+id/card_gchat_message_other"
+        app:layout_constraintLeft_toLeftOf="@+id/other_message_card"
+        app:layout_constraintTop_toBottomOf="@+id/other_message_card"
         android:src="@drawable/thumb_up"/>
 
     <ImageView
-        android:id="@+id/message_reaction_dislike_them"
+        android:id="@+id/other_reaction_dislike"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="28dp"
         android:visibility="gone"
         android:src="@drawable/thumb_down"
-        app:layout_constraintLeft_toLeftOf="@+id/message_reaction_like_them"
-        app:layout_constraintTop_toBottomOf="@+id/card_gchat_message_other" />
-
+        app:layout_constraintLeft_toLeftOf="@+id/other_reaction_like"
+        app:layout_constraintTop_toBottomOf="@+id/other_message_card" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

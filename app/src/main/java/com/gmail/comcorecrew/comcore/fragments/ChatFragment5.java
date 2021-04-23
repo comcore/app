@@ -5,16 +5,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,7 +33,6 @@ import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.dialogs.AddReactionDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
-import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -47,7 +43,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -64,8 +59,8 @@ public class ChatFragment5 extends Fragment {
     public static final int ID_REACT_BUTTON = 124;
 
 
-    private static final int MY_REQUEST_CODE_PERMISSION = 1000;
-    private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
+    private static final int PERMISSION_CODE = 1000;
+    private static final int FILECHOOSER_CODE = 2000;
     private Uri filePath;
 
     public static Messaging messaging;
@@ -217,9 +212,9 @@ public class ChatFragment5 extends Fragment {
         toolBar = (Toolbar) view.findViewById(R.id.toolbar_gchannel);
         toolBar.setTitle(((ChatID) messaging.getId()).id);
         getActivity().setTitle(messaging.getName());
-        sendButton = (Button) view.findViewById(R.id.button_gchat_send);
-        messageToBeSent = (EditText) view.findViewById(R.id.edit_gchat_message);
-        messageRecycler = (RecyclerView) view.findViewById(R.id.recycler_gchat);
+        sendButton = (Button) view.findViewById(R.id.button_chat_send);
+        messageToBeSent = (EditText) view.findViewById(R.id.chat_sendmessage_text);
+        messageRecycler = (RecyclerView) view.findViewById(R.id.chat_recycler);
     }
 
     // Sends message to the server and updates the view.
@@ -287,7 +282,6 @@ public class ChatFragment5 extends Fragment {
     private void pinMessage(MenuItem item) {
         messageEntry = messaging.getEntry(item.getGroupId());
         int x = PinnedMessages.pinUnpinMessage(messageEntry);
-        System.out.println(x);
     }
 
     private void reactMessage(MenuItem item) {
@@ -298,67 +292,62 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void uploadFile() {
-        askPermissionAndBrowseFile();
+        getPermission();
     }
 
-    private void askPermissionAndBrowseFile()  {
-        // With Android Level >= 23, you have to ask the user
-        // for permission to access External Storage.
+    private void getPermission()  {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // Level 23
-
-            // Check if we have Call permission
-            int permisson = ActivityCompat.checkSelfPermission(this.getContext(),
+            int permission = ActivityCompat.checkSelfPermission(this.getContext(),
                     Manifest.permission.READ_EXTERNAL_STORAGE);
 
-            if (permisson != PackageManager.PERMISSION_GRANTED) {
-                // If don't have permission so prompt the user.
+            if (permission != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_REQUEST_CODE_PERMISSION
+                        PERMISSION_CODE
                 );
                 return;
             }
         }
-        this.doBrowseFile();
+        this.findFile();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // Browse files automatically after requesting permission
-        if (requestCode == MY_REQUEST_CODE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            doBrowseFile();
+        if (requestCode == PERMISSION_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            findFile();
         }
     }
 
-    private void doBrowseFile()  {
-        Intent chooseFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseFileIntent.setType("*/*");
+    private void findFile()  {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
         // Only return URIs that can be opened with ContentResolver
-        chooseFileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        chooseFileIntent = Intent.createChooser(chooseFileIntent, "Choose a file");
-        startActivityForResult(chooseFileIntent, MY_RESULT_CODE_FILECHOOSER);
+        intent = Intent.createChooser(intent, "Choose a file");
+        startActivityForResult(intent, FILECHOOSER_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == MY_RESULT_CODE_FILECHOOSER && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == FILECHOOSER_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             filePath = data.getData();
 
-            InputStream iStream = null;
+            InputStream inputStream = null;
             try {
-                iStream = getContext().getContentResolver().openInputStream(filePath);
+                inputStream = getContext().getContentResolver().openInputStream(filePath);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+
             try {
-                byte[] inputData = getBytes(iStream);
+                byte[] fileAsBytes = getBytes(inputStream);
                 String x = getFileName(filePath);
-                System.out.println(x);
-                ServerConnector.uploadFile(x, inputData, result -> {
+                ServerConnector.uploadFile(x, fileAsBytes, result -> {
                     if (result.isFailure()) {
                         ErrorDialog.show(result.errorMessage);
                         return;
@@ -372,37 +361,37 @@ public class ChatFragment5 extends Fragment {
         }
     }
 
-    public byte[] getBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
+    public byte[] getBytes(InputStream iStream) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int buffer = 1024;
+        byte[] bufferArray = new byte[buffer];
 
         int len = 0;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
+        while ((len = iStream.read(bufferArray)) != -1) {
+            byteArrayOutputStream.write(bufferArray, 0, len);
         }
-        return byteBuffer.toByteArray();
+        return byteArrayOutputStream.toByteArray();
     }
 
     public String getFileName(Uri uri) {
-        String result = null;
+        String fileName = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+            Cursor mousePointer = getContext().getContentResolver().query(uri, null, null, null, null);
             try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                if (mousePointer != null && mousePointer.moveToFirst()) {
+                    fileName = mousePointer.getString(mousePointer.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } finally {
-                cursor.close();
+                mousePointer.close();
             }
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
+        if (fileName == null) {
+            fileName = uri.getPath();
+            int cut = fileName.lastIndexOf('/');
             if (cut != -1) {
-                result = result.substring(cut + 1);
+                fileName = fileName.substring(cut + 1);
             }
         }
-        return result;
+        return fileName;
     }
 }

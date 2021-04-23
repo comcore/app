@@ -21,10 +21,8 @@ import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
-import com.gmail.comcorecrew.comcore.server.ServerConnector;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
@@ -98,13 +96,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         SentMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
+            messageText = (TextView) itemView.findViewById(R.id.me_message_text);
             messageText.setMovementMethod(LinkMovementMethod.getInstance());
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
-            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
-            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
-            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction_like_me);
-            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction_dislike_me);
+            timeText = (TextView) itemView.findViewById(R.id.me_message_timestamp);
+            nameText = (TextView) itemView.findViewById(R.id.me_username);
+            dateText = (TextView) itemView.findViewById(R.id.me_message_date);
+            thumbs_up = (ImageView) itemView.findViewById(R.id.me_reaction_like);
+            thumbs_down = (ImageView) itemView.findViewById(R.id.me_reaction_dislike);
         }
 
         void bind(MessageItem message) {
@@ -144,7 +142,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (v.getId() == R.id.text_gchat_message_me || v.getId() == R.id.text_gchat_message_other) {
+            if (v.getId() == R.id.me_message_text || v.getId() == R.id.other_message_text) {
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
@@ -154,14 +152,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             }
 
             int x = 0;
-            if (v.getId() == R.id.message_reaction_like_them || v.getId() == R.id.message_reaction_like_me) {
+            if (v.getId() == R.id.other_reaction_like || v.getId() == R.id.me_reaction_like) {
                 menu.add(this.getAdapterPosition(), 225, 0, "Username");
                 x = menu.getItem(0).getGroupId();
                 menu.removeItem(225);
                 menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " + messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
             }
 
-            if (v.getId() == R.id.message_reaction_dislike_them || v.getId() == R.id.message_reaction_dislike_me) {
+            if (v.getId() == R.id.other_reaction_dislike || v.getId() == R.id.me_reaction_dislike) {
                 menu.add(this.getAdapterPosition(), 325, 0, "Username");
                 x = menu.getItem(0).getGroupId();
                 menu.removeItem(325);
@@ -172,6 +170,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     public String format(long miliseconds) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+//        SimpleDateFormat.getDateInstance();
+//        new SimpleDateFormat(SimpleDateFormat.getDateInstance().format(new Date()));
         return sdf.format(new Date(miliseconds));
     }
 
@@ -194,13 +194,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         ReceivedMessageHolder(View itemView) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
+            messageText = (TextView) itemView.findViewById(R.id.other_message_text);
             messageText.setMovementMethod(LinkMovementMethod.getInstance());
-            timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
-            nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
-            dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
-            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction_like_them);
-            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction_dislike_them);
+            timeText = (TextView) itemView.findViewById(R.id.other_message_timestamp);
+            nameText = (TextView) itemView.findViewById(R.id.other_username);
+            dateText = (TextView) itemView.findViewById(R.id.other_message_date);
+            thumbs_up = (ImageView) itemView.findViewById(R.id.other_reaction_like);
+            thumbs_down = (ImageView) itemView.findViewById(R.id.other_reaction_dislike);
         }
 
         void bind(MessageItem message) {
@@ -241,7 +241,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         // Creates menu for each message with 3 options
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (v.getId() == R.id.text_gchat_message_me || v.getId() == R.id.text_gchat_message_other) {
+            if (v.getId() == R.id.me_message_text || v.getId() == R.id.other_message_text) {
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
                 menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
@@ -251,14 +251,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             }
 
             int x = 0;
-            if (v.getId() == R.id.message_reaction_like_them || v.getId() == R.id.message_reaction_like_me) {
+            if (v.getId() == R.id.other_reaction_like || v.getId() == R.id.me_reaction_like) {
                 menu.add(this.getAdapterPosition(), 225, 0, "Username");
                 x = menu.getItem(0).getGroupId();
                 menu.removeItem(225);
                 menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " +  messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
             }
 
-            if (v.getId() == R.id.message_reaction_dislike_them || v.getId() == R.id.message_reaction_dislike_me) {
+            if (v.getId() == R.id.other_reaction_dislike || v.getId() == R.id.me_reaction_dislike) {
                 menu.add(this.getAdapterPosition(), 325, 0, "Username");
                 x = menu.getItem(0).getGroupId();
                 menu.removeItem(325);
