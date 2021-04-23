@@ -16,15 +16,6 @@
         android:id="@+id/group_calendar_view_upcoming_events"
         android:title="View Upcoming Events"
         app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/modify_event"
-        android:title="@string/modify_events"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/remove_event"
-        android:title="@string/remove_event"
-        app:showAsAction="never" />
     <group android:id="@+id/menu_group_moderator_actions">
         <item
             android:id="@+id/view_pending_events"
@@ -37,7 +28,20 @@
         <item
             android:id="@+id/require_approval"
             android:title="@string/update_event_approval" />
+        <item
+            android:id="@+id/remove_event"
+            android:title="@string/remove_event"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/modify_event"
+            android:title="@string/modify_events"
+            app:showAsAction="never"/>
     </group>
+
+    <item
+        android:id="@+id/group_calendar_refresh"
+        android:title="Refresh"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/group_calendar_back_button"
