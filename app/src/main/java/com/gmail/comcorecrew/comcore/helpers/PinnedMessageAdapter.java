@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.helpers;
 
 import android.content.Context;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
@@ -21,6 +23,7 @@ import java.util.Date;
 
 public class PinnedMessageAdapter extends RecyclerView.Adapter {
     private Context context;
+    private Group group;
     private ArrayList<MessageEntry> messageEntry;
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
@@ -30,8 +33,9 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
     public String[] semanticMonths = {"January", "February", "March", "April", "May", "June", "July",
             "August", "September", "October", "November", "December"};
 
-    public PinnedMessageAdapter(Context context, ArrayList<MessageEntry> messageEntry) {
+    public PinnedMessageAdapter(Context context, Group group, ArrayList<MessageEntry> messageEntry) {
         this.context = context;
+        this.group = group;
         this.messageEntry = messageEntry;
     }
 
@@ -94,18 +98,17 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
             super(itemView);
 
             messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_me);
+            messageText.setMovementMethod(LinkMovementMethod.getInstance());
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
         }
 
         void bind(MessageEntry message) {
-            messageText.setText(message.contents);
+            messageText.setText(ChatMention.formatMentions(message.contents, group, null));
             timeText.setText(format(message.timestamp));
             dateText.setText(format2(message.timestamp));
-            UserStorage.lookup(message.sender, user -> {
-                nameText.setText(user.getName());
-            });
+            nameText.setText(UserStorage.getUser(message.sender).getName());
         }
     }
 
@@ -133,18 +136,17 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
                 super(itemView);
 
                 messageText = (TextView) itemView.findViewById(R.id.text_gchat_message_other);
+                messageText.setMovementMethod(LinkMovementMethod.getInstance());
                 timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
                 nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
                 dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
             }
 
             void bind(MessageEntry message) {
-                messageText.setText(message.contents);
+                messageText.setText(ChatMention.formatMentions(message.contents, group, null));
                 timeText.setText(format(message.timestamp));
                 dateText.setText(format2(message.timestamp));
-                UserStorage.lookup(message.sender, user -> {
-                    nameText.setText(user.getName());
-                });
+                nameText.setText(UserStorage.getUser(message.sender).getName());
             }
         }
 }

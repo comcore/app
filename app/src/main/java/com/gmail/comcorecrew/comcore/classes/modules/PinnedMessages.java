@@ -162,7 +162,7 @@ public class PinnedMessages extends CustomChat {
 
         pinnedRecycler = (RecyclerView) view.findViewById(R.id.recycler_pinned_messages);
         manager = new LinearLayoutManager(current.getContext());
-        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), readPinned());
+        pinnedAdapter = new PinnedMessageAdapter(current.getContext(), getGroup(), readPinned());
 
         manager.setStackFromEnd(true);
         pinnedRecycler.setLayoutManager(manager);
