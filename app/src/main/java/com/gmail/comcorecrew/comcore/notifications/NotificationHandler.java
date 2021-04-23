@@ -16,6 +16,9 @@ import com.gmail.comcorecrew.comcore.caching.GroupStorage;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
 import com.gmail.comcorecrew.comcore.classes.Group;
+import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
+import com.gmail.comcorecrew.comcore.classes.modules.Polling;
+import com.gmail.comcorecrew.comcore.classes.modules.TaskList;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
@@ -135,7 +138,7 @@ public final class NotificationHandler implements NotificationListener {
     @Override
     public void onReceiveMessage(MessageEntry message) {
         Module module = GroupStorage.getModule(message.id.module);
-        if (module == null) {
+        if (!(module instanceof Messaging)) {
             return;
         }
 
@@ -175,7 +178,7 @@ public final class NotificationHandler implements NotificationListener {
     @Override
     public void onTaskAdded(TaskEntry task) {
         Module module = GroupStorage.getModule(task.id.module);
-        if (module == null || module.isMuted()) {
+        if (!(module instanceof TaskList) || module.isMuted()) {
             return;
         }
 
@@ -196,7 +199,7 @@ public final class NotificationHandler implements NotificationListener {
         }
 
         Module module = GroupStorage.getModule(task.id.module);
-        if (module == null || module.isMuted()) {
+        if (!(module instanceof TaskList) || module.isMuted()) {
             return;
         }
 
@@ -212,7 +215,7 @@ public final class NotificationHandler implements NotificationListener {
     @Override
     public void onPollAdded(PollEntry poll) {
         Module module = GroupStorage.getModule(poll.id.module);
-        if (module == null || module.isMuted()) {
+        if (!(module instanceof Polling) || module.isMuted()) {
             return;
         }
 

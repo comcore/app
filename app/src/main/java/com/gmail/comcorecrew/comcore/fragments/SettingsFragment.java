@@ -9,6 +9,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Switch;
 
 import com.gmail.comcorecrew.comcore.R;
@@ -35,6 +36,9 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
