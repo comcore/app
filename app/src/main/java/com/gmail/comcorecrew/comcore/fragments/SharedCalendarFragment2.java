@@ -23,6 +23,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog2;
+import com.gmail.comcorecrew.comcore.server.ServerConnector;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
+import com.gmail.comcorecrew.comcore.server.id.CalendarID;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SharedCalendarFragment2 extends Fragment {
     public static Calendar calendar;
