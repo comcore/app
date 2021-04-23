@@ -41,6 +41,7 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
 
     public void setMessageEntry(ArrayList<MessageEntry> messageEntry) {
         this.messageEntry = messageEntry;
+        notifyDataSetChanged();
     }
 
     @Override

@@ -86,7 +86,7 @@ public class GroupCalendarFragment extends Fragment {
                 currentDate.set(java.util.Calendar.HOUR, 0);
 
                 if (calendar.getEntriesByDay(currentDate).size() > 0) {
-                    new ViewEventsDialog(calendar, currentDate, 0).show(getParentFragmentManager(), null);
+                    new ViewEventsDialog(GroupCalendarFragment.this, calendar, currentDate, 0).show(getParentFragmentManager(), null);
                 }
             }
         });
@@ -112,24 +112,24 @@ public class GroupCalendarFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.create_event:
-                /** Handle creating an event **/
-                new CreateEventDialog(this, calendar).show(getParentFragmentManager(), null);
+                /* Handle creating an event */
+                new CreateEventDialog(GroupCalendarFragment.this, calendar, null).show(getParentFragmentManager(), null);
                 return true;
-            case R.id.view_events:
-                /** Handle viewing all calendar events**/
-                new ViewEventsDialog(calendar, null, 0).show(getParentFragmentManager(), null);
+            case R.id.view_all_events:
+                /* Handle viewing all calendar events*/
+                new ViewEventsDialog(GroupCalendarFragment.this, calendar, null, 0).show(getParentFragmentManager(), null);
                 return true;
-            case R.id.remove_event:
-                /** Handle deleting calendar events**/
-                new ViewEventsDialog(calendar, null, 1).show(getParentFragmentManager(), null);
-                return true;
-            case R.id.view_pending_events:
-                /** Handle view pending events **/
-                new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+            case R.id.delete_events:
+                /* Handle deleting calendar events*/
+                new ViewEventsDialog(GroupCalendarFragment.this, calendar, null, 1).show(getParentFragmentManager(), null);
                 return true;
             case R.id.pin_event:
                 /** Handle pinning event to the bulletin board **/
-                new ViewEventsDialog(calendar, null, 2).show(getParentFragmentManager(), null);
+                new ViewEventsDialog(GroupCalendarFragment.this, calendar, null, 2).show(getParentFragmentManager(), null);
+                return true;
+            case R.id.modify_event:
+                /** Handle modifying event **/
+                new ViewEventsDialog(GroupCalendarFragment.this, calendar, null, 3).show(getParentFragmentManager(), null);
                 return true;
             case R.id.require_approval:
                 /** Handle updating event approval settings **/

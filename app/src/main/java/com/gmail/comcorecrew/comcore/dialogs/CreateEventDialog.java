@@ -28,6 +28,7 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.GroupID;
+import com.gmail.comcorecrew.comcore.server.id.PollListID;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -36,10 +37,13 @@ import java.util.Date;
 public class CreateEventDialog extends DialogFragment {
     private final Fragment fragment;
     private final Calendar calendar;
+    private final EventEntry oldEvent;
 
-    public CreateEventDialog(Fragment fragment, Calendar calendar) {
+
+    public CreateEventDialog(Fragment fragment, Calendar calendar, EventEntry event) {
         this.fragment = fragment;
         this.calendar = calendar;
+        this.oldEvent = event;
     }
 
     @Override
@@ -58,6 +62,10 @@ public class CreateEventDialog extends DialogFragment {
         EditText endDate = view.findViewById(R.id.editEndDate);
         EditText startTime = view.findViewById(R.id.editStartTime);
         EditText endTime = view.findViewById(R.id.editEndTime);
+
+        if (oldEvent != null) {
+            desc.setText(oldEvent.description);
+        }
 
 
         /**
@@ -88,6 +96,14 @@ public class CreateEventDialog extends DialogFragment {
             catch (NullPointerException e) {
                 ErrorDialog.show(R.string.error_incorrect_format);
                 this.dismiss();
+            }
+
+            /**
+             * If an event was passed to the dialog, delete the old event and create a new one
+             * to replace it
+             */
+            if (oldEvent != null) {
+                calendar.deleteEvent(oldEvent.id);
             }
 
             /**
