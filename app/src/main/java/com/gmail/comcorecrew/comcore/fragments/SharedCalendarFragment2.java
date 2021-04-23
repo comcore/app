@@ -98,7 +98,7 @@ public class SharedCalendarFragment2 extends Fragment {
                                 eventEntries1 = eventEntries;
 
                                 if (getEvents(currentDate, eventEntries, true).size() > 0) {
-                                    textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate.getTimeInMillis())));
+                                    textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
                                     eventEntries1 = getEvents(currentDate, eventEntries, true);
                                     refresh();
                                     //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);
@@ -127,7 +127,7 @@ public class SharedCalendarFragment2 extends Fragment {
                 currentDate1.setTime(new Date());
 
                 if (getEvents(currentDate, eventEntries, true).size() > 0) {
-                    textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate.getTimeInMillis())));
+                    textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
                     eventEntries1 = getEvents(currentDate, eventEntries, true);
                     refresh();
                     //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);

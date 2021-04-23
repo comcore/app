@@ -117,7 +117,7 @@ public class GroupCalendarFragment extends Fragment {
         calendar.setCallback(this::refresh);
 
         if (calendar.getEntriesByDay(currentDate1, true).size() > 0) {
-            textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate1.getTimeInMillis())));
+            textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate1.getTimeInMillis())));
             eventEntries = calendar.getEntriesByDay(currentDate1, true);
             refresh();
         } else {
@@ -142,7 +142,7 @@ public class GroupCalendarFragment extends Fragment {
                 currentDate1.setTime(new Date());
 
                 if (calendar.getEntriesByDay(currentDate, true).size() > 0) {
-                    textView.setText("Events on " + EventEntry.dateTimeFormat.format(new Date(currentDate.getTimeInMillis())));
+                    textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
                     eventEntries = calendar.getEntriesByDay(currentDate, true);
                     refresh();
                 } else {
@@ -204,14 +204,14 @@ public class GroupCalendarFragment extends Fragment {
                 java.util.Calendar currentDate = java.util.Calendar.getInstance();
                 currentDate.setTime(new Date());
 
-                textView.setText("Here are all your upcoming events");
+                textView.setText("Upcoming Events");
                 eventEntries = calendar.getEntriesByDay(currentDay, false);
                 refresh();
                 return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
                 eventEntries = calendar.getUnapproved();
-                textView.setText("Here are all your pending events");
+                textView.setText("Pending Events");
                 refresh();
                 //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
 //                currentDay = null;
