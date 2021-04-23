@@ -27,9 +27,6 @@
         app:showAsAction="never" />
     <group android:id="@+id/menu_group_moderator_actions">
         <item
-            android:id="@+id/approve"
-            android:title="Approve Event" />
-        <item
             android:id="@+id/view_pending_events"
             android:title="@string/view_pending_events"
             app:showAsAction="never" />

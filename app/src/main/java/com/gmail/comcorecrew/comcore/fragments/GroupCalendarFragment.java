@@ -210,10 +210,10 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
-                eventEntries = calendar.getUnapproved();
-                textView.setText("Pending Events");
-                refresh();
-                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+//                eventEntries = calendar.getUnapproved();
+//                textView.setText("Pending Events");
+//                refresh();
+                new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
 //                currentDay = null;
 //                pending = true;
 //                refresh();
@@ -225,10 +225,6 @@ public class GroupCalendarFragment extends Fragment {
             case R.id.require_approval:
                 /** Handle updating event approval settings **/
                 calendar.getGroup().updateRequireApproval(!calendar.getGroup().isRequireApproval());
-                return true;
-            case R.id.approve:
-                /** Handle updating event approval settings **/
-                new ViewEventsDialog(calendar, null, 4).show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
