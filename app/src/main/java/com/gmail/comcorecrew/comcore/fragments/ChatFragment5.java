@@ -361,7 +361,7 @@ public class ChatFragment5 extends Fragment {
                         ErrorDialog.show(result.errorMessage);
                         return;
                     }
-                    messageToBeSent.setText(AppData.self.getName() + "shared: " + result.data);
+                    messageToBeSent.setText(AppData.self.getName() + " shared: " + result.data);
                     sendMessage();
                 });
             } catch (IOException e) {
