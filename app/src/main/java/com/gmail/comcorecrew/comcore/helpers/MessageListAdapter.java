@@ -7,12 +7,10 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
@@ -24,7 +22,6 @@ import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
-import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -106,8 +103,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_me);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_me);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_me);
-            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction1);
-            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction2);
+            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction_like_me);
+            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction_dislike_me);
         }
 
         void bind(MessageItem message) {
@@ -116,22 +113,59 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText.setText(format2(message.getTimestamp()));
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
-            int[] reactions = message.getReactions().getReactions();
             if (message.getReactions().getReactionCount(Reaction.DISLIKE) > 0) {
                 thumbs_down.setVisibility(View.VISIBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_down.onVisibilityAggregated(true);
+                }
+                thumbs_down.setOnCreateContextMenuListener(this);
+
+            } else {
+                thumbs_down.setVisibility(View.GONE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_down.onVisibilityAggregated(false);
+                }
             }
+
+
             if (message.getReactions().getReactionCount(Reaction.LIKE) > 0) {
                 thumbs_up.setVisibility(View.VISIBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_up.onVisibilityAggregated(true);
+                }
+                thumbs_up.setOnCreateContextMenuListener(this);
+            } else {
+                thumbs_up.setVisibility(View.GONE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_up.onVisibilityAggregated(false);
+                }
             }
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
-            menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
-            menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
-            if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
+            if (v.getId() == R.id.text_gchat_message_me || v.getId() == R.id.text_gchat_message_other) {
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
+                if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
+                    menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
+                }
+            }
+
+            int x = 0;
+            if (v.getId() == R.id.message_reaction_like_them || v.getId() == R.id.message_reaction_like_me) {
+                menu.add(this.getAdapterPosition(), 225, 0, "Username");
+                x = menu.getItem(0).getGroupId();
+                menu.removeItem(225);
+                menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " + messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
+            }
+
+            if (v.getId() == R.id.message_reaction_dislike_them || v.getId() == R.id.message_reaction_dislike_me) {
+                menu.add(this.getAdapterPosition(), 325, 0, "Username");
+                x = menu.getItem(0).getGroupId();
+                menu.removeItem(325);
+                menu.add(this.getAdapterPosition(), 201, 0, "Number of users who dislike: " + messaging.get(x).getReactions().getReactionCount(Reaction.DISLIKE));
             }
         }
     }
@@ -155,6 +189,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         TextView messageText, timeText, nameText, dateText;
+        ImageView thumbs_up, thumbs_down;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
@@ -164,6 +199,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             timeText = (TextView) itemView.findViewById(R.id.text_gchat_timestamp_other);
             nameText = (TextView) itemView.findViewById(R.id.text_gchat_user_other);
             dateText = (TextView) itemView.findViewById(R.id.text_gchat_date_other);
+            thumbs_up = (ImageView) itemView.findViewById(R.id.message_reaction_like_them);
+            thumbs_down = (ImageView) itemView.findViewById(R.id.message_reaction_dislike_them);
         }
 
         void bind(MessageItem message) {
@@ -172,20 +209,61 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             dateText.setText(format2(message.getTimestamp()));
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
-            int[] reactions = message.getReactions().getReactions();
-            for (int i = 0; i < message.getReactions().getReactions().length; i++) {
-                System.out.println(reactions[i]);
+            if (message.getReactions().getReactionCount(Reaction.DISLIKE) > 0) {
+                thumbs_down.setVisibility(View.VISIBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_down.onVisibilityAggregated(true);
+                }
+                thumbs_down.setOnCreateContextMenuListener(this);
+
+            } else {
+                thumbs_down.setVisibility(View.GONE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_down.onVisibilityAggregated(false);
+                }
+            }
+
+
+            if (message.getReactions().getReactionCount(Reaction.LIKE) > 0) {
+                thumbs_up.setVisibility(View.VISIBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_up.onVisibilityAggregated(true);
+                }
+                thumbs_up.setOnCreateContextMenuListener(this);
+            } else {
+                thumbs_up.setVisibility(View.GONE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    thumbs_up.onVisibilityAggregated(false);
+                }
             }
         }
 
         // Creates menu for each message with 3 options
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 0, "Delete");
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 1, "Pin");
+            if (v.getId() == R.id.text_gchat_message_me || v.getId() == R.id.text_gchat_message_other) {
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
+                menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
+                if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
+                    menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
+                }
             }
-            menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
+
+            int x = 0;
+            if (v.getId() == R.id.message_reaction_like_them || v.getId() == R.id.message_reaction_like_me) {
+                menu.add(this.getAdapterPosition(), 225, 0, "Username");
+                x = menu.getItem(0).getGroupId();
+                menu.removeItem(225);
+                menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " +  messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
+            }
+
+            if (v.getId() == R.id.message_reaction_dislike_them || v.getId() == R.id.message_reaction_dislike_me) {
+                menu.add(this.getAdapterPosition(), 325, 0, "Username");
+                x = menu.getItem(0).getGroupId();
+                menu.removeItem(325);
+                menu.add(this.getAdapterPosition(), 201, 0, "Number of users who dislike: " + messaging.get(x).getReactions().getReactionCount(Reaction.DISLIKE));
+            }
         }
     }
 }
