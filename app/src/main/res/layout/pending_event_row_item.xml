@@ -13,31 +13,37 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingEnd="5dp">
 
         <TextView
             android:id="@+id/pending_event_desc"
             style="@style/RowItemBackground"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="14dp"
-            android:gravity="center"
+            android:layout_marginEnd="16dp"
+            android:gravity="left"
             android:text="@string/error_unknown"
             android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/pending_event_date"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="74dp"
+            android:soundEffectsEnabled="false"
             android:text="@string/error_unknown"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pending_event_desc" />
 
@@ -45,7 +51,7 @@
             android:id="@+id/accept_invite_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="9dp"
             android:layout_marginBottom="4dp"
             android:text="@string/accept"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -55,7 +61,7 @@
             android:id="@+id/reject_invite_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="9dp"
             android:layout_marginBottom="4dp"
             android:text="@string/reject"
             app:layout_constraintBottom_toBottomOf="parent"

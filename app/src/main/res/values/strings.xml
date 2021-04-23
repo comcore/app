@@ -141,8 +141,8 @@
     <string name="not_completed">Not Completed</string>
     <string name="completed">Completed!</string>
     <string name="delete_task">Delete A Task</string>
-    <string name="complete_task">Set (or Unset) A Task As Completed</string>
-    <string name="in_progress_task">Set (or Unset) A Task As Assigned</string>
+    <string name="complete_task">Choose A Task To Complete</string>
+    <string name="in_progress_task">Choose A Task To Claim</string>
     <string name="complete_task_short">Complete A Task</string>
     <string name="in_progress_task_short">Claim A Task</string>
     <string name="no_deadline">No Deadline</string>
@@ -171,7 +171,7 @@
 
     <!-- Pin Groups -->
     <string name="pin_group">Pin a Group</string>
-    <string name="pin_group_desc">Choose a group to pin (or unpin)</string>
+    <string name="pin_group_desc">Choose A Group To Pin</string>
 
     <!-- Pin Messages -->
     <string name="pin_message">Pin a Message</string>

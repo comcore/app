@@ -141,7 +141,7 @@ public class MainFragment extends Fragment {
      * The shape of the image tag can be changed in group_row_item.xml
      * The colors can be changed in colors.xml
      */
-    public static void setRoleIndicator(ImageView tag, GroupRole role) {
+    public static void setRoleIndicator(ImageView tag, GroupRole role, boolean isDirect) {
         switch (role) {
             case OWNER:
                 tag.setVisibility(View.VISIBLE);
@@ -149,7 +149,11 @@ public class MainFragment extends Fragment {
                 break;
             case MODERATOR:
                 tag.setVisibility(View.VISIBLE);
-                tag.setColorFilter(tag.getResources().getColor(R.color.moderator_color));
+                if (isDirect) {
+                    tag.setColorFilter(tag.getResources().getColor(R.color.direct_color));
+                } else {
+                    tag.setColorFilter(tag.getResources().getColor(R.color.moderator_color));
+                }
                 break;
             case USER:
                 tag.setVisibility(View.INVISIBLE);
@@ -211,12 +215,7 @@ public class MainFragment extends Fragment {
             viewHolder.getTextView().setText(group.getDisplayName());
             viewHolder.setGroup(group);
 
-            if (group.isDirect()) {
-                viewHolder.viewTag.setVisibility(View.VISIBLE);
-                viewHolder.viewTag.setColorFilter(getResources().getColor(R.color.primary_d1));
-            } else {
-                setRoleIndicator(viewHolder.viewTag, group.getGroupRole());
-            }
+            setRoleIndicator(viewHolder.viewTag, group.getGroupRole(), group.isDirect());
 
             if (group.isPinned()) {
                 viewHolder.textView.setTextColor(getResources().getColor(R.color.primary));
