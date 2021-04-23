@@ -226,6 +226,10 @@ public class GroupCalendarFragment extends Fragment {
                 /** Handle updating event approval settings **/
                 calendar.getGroup().updateRequireApproval(!calendar.getGroup().isRequireApproval());
                 return true;
+            case R.id.approve:
+                /** Handle updating event approval settings **/
+                new ViewEventsDialog(calendar, null, 4).show(getParentFragmentManager(), null);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

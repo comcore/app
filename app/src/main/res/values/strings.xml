@@ -184,7 +184,7 @@
     <!-- Create Event -->
     <string name="create_event_label">Create an Event</string>
     <string name="pick_date_label">Choose a Date</string>
-    <string name="update_event_approval">Approve Event</string>
+    <string name="update_event_approval">Toggle Approval Required</string>
     <string name="create_event">Create Event</string>
     <string name="select_start_time">Select the Start Time</string>
     <string name="select_end_time">Select the End Time</string>

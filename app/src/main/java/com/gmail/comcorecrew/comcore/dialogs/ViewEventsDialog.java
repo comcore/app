@@ -33,6 +33,7 @@ public class ViewEventsDialog extends DialogFragment {
      * 1 - Delete events
      * 2 - Add event to bulletin board
      * 3 - Modify events
+     * 4 - Approve events
      */
     private int flag;
 
@@ -86,6 +87,12 @@ public class ViewEventsDialog extends DialogFragment {
         else if (flag == 2) {
             title.setText(R.string.pin_event);
         }
+        else if (flag == 3) {
+            title.setText("Modify Event");
+        }
+        else if (flag == 4) {
+            title.setText("Approve Event");
+        }
 
         /**
          * If the "back" button is clicked, close the dialog box
@@ -128,6 +135,9 @@ public class ViewEventsDialog extends DialogFragment {
                 } else if (flag == 3) {
                     new CreateEventDialog(getParentFragment(), currentCalendar, currentEventEntry)
                             .show(getParentFragmentManager(), null);
+                    dismiss();
+                } else if (flag == 4) {
+                    currentCalendar.approve(currentEventEntry.id);
                     dismiss();
                 }
             }
