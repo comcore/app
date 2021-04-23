@@ -75,8 +75,10 @@ public class MainFragment extends Fragment {
     }
 
     public void refresh() {
-        InviteLinkDialog.showIfPossible(this);
-        GroupStorage.refresh(groupAdapter::notifyDataSetChanged);
+        GroupStorage.refresh(() -> {
+            InviteLinkDialog.showIfPossible(this);
+            groupAdapter.notifyDataSetChanged();
+        });
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
