@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,18 +27,21 @@ public class ViewEventsDialog extends DialogFragment {
     private List<EventEntry> eventList = new ArrayList<>();
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
+    private Fragment fragment;
 
     /**
      * 0 - View events
      * 1 - Delete events
      * 2 - Add event to bulletin board
+     * 3 - Modify event
      */
     private int flag;
 
-    public ViewEventsDialog (Calendar currentCalendar, java.util.Calendar currentDate, int flag) {
+    public ViewEventsDialog (Fragment fragment, Calendar currentCalendar, java.util.Calendar currentDate, int flag) {
         this.currentCalendar = currentCalendar;
         this.currentDate = currentDate;
         this.flag = flag;
+        this.fragment = fragment;
     }
 
     @Override
@@ -78,6 +82,9 @@ public class ViewEventsDialog extends DialogFragment {
         else if (flag == 2) {
             title.setText(R.string.pin_event);
         }
+        else if (flag == 3) {
+            title.setText(R.string.modify_event);
+        }
 
         /**
          * If the "back" button is clicked, close the dialog box
@@ -117,6 +124,11 @@ public class ViewEventsDialog extends DialogFragment {
                 else if (flag == 2) {
                     /** Pin event to the bulletin board */
                     currentCalendar.addToBulletin(currentEventEntry.id, true);
+                    dismiss();
+                }
+                else if (flag == 3) {
+                    /** Pass the event to be deleted to CreateEventDialog **/
+                    new CreateEventDialog(fragment, currentCalendar, currentEventEntry).show(getParentFragmentManager(), null);
                     dismiss();
                 }
             }
