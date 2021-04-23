@@ -14,6 +14,11 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/shared_calendar_refresh"
+        android:title="Refresh"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/shared_calendar_back_button"
         android:title="@string/back"
         app:showAsAction="never" />

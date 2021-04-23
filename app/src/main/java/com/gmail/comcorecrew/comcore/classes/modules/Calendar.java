@@ -219,37 +219,17 @@ public class Calendar extends Module {
         java.util.Calendar endDay = java.util.Calendar.getInstance();
 
 
-//        for (int i = 0; i < getApproved().size(); i++) {
-//            EventEntry event = approved.get(i);
-//            if (event.end < startOfDay) {
-//                continue;
-//            }
-//
-//            if (checkEnd && event.start >= endOfDay) {
-//                continue;
-//            }
-//
-//            eventList.add(approved.get(i));
-//        }
-
         for (int i = 0; i < getApproved().size(); i++) {
             EventEntry event = approved.get(i);
-            startDay.setTimeInMillis(event.start);
-            endDay.setTimeInMillis(event.end);
-
-            if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
-                    currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
-                    currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
-
-                eventList.add(approved.get(i));
-
-            } else if (currentDay.get(java.util.Calendar.YEAR) <= endDay.get(java.util.Calendar.YEAR) &&
-                    currentDay.get(java.util.Calendar.MONTH) <= endDay.get(java.util.Calendar.MONTH) &&
-                    currentDay.get(java.util.Calendar.DATE) >= startDay.get(java.util.Calendar.DATE) &&
-                    currentDay.get(java.util.Calendar.DATE) <= endDay.get(java.util.Calendar.DATE)) {
-
-                eventList.add(approved.get(i));
+            if (event.end < startOfDay) {
+                continue;
             }
+
+            if (checkEnd && event.start >= endOfDay) {
+                continue;
+            }
+
+            eventList.add(approved.get(i));
         }
 
         // Sort the returned list in chronological order

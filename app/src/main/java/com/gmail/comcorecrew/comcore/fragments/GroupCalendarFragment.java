@@ -141,12 +141,12 @@ public class GroupCalendarFragment extends Fragment {
                 java.util.Calendar currentDate1 = java.util.Calendar.getInstance();
                 currentDate1.setTime(new Date());
 
-                if (calendar.getEntriesByDay(currentDate, true).size() > 0) {
+                if (calendar.getEntriesByDay(currentDate).size() > 0) {
                     textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
-                    eventEntries = calendar.getEntriesByDay(currentDate, true);
+                    eventEntries = calendar.getEntriesByDay(currentDate);
                     refresh();
                 } else {
-                    eventEntries = calendar.getEntriesByDay(currentDate1, false);
+                    eventEntries = calendar.getEntriesByDay(currentDate1);
                     textView.setText("Upcoming Events");
                     refresh();
                 }
@@ -192,6 +192,10 @@ public class GroupCalendarFragment extends Fragment {
                 refresh();
                 return true;
                 //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+            case R.id.group_calendar_refresh:
+                calendar.refresh();
+                refresh();
+                return true;
             case R.id.modify_event:
                 /* Handle deleting calendar events*/
                 new ViewEventsDialog(calendar, null, 3).show(getParentFragmentManager(), null);
@@ -214,9 +218,16 @@ public class GroupCalendarFragment extends Fragment {
 //                textView.setText("Pending Events");
 //                refresh();
                 new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
 //                currentDay = null;
 //                pending = true;
+//                eventEntries = calendar.getUnapproved();
+//                textView.setText("Here are all your pending events");
 //                refresh();
+                new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+                currentDay = null;
+                pending = true;
+                refresh();
                 return true;
             case R.id.pin_event:
                 /** Handle pinning event to the bulletin board **/

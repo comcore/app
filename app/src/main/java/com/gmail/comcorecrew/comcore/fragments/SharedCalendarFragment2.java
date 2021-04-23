@@ -126,6 +126,8 @@ public class SharedCalendarFragment2 extends Fragment {
                 java.util.Calendar currentDate1 = java.util.Calendar.getInstance();
                 currentDate1.setTime(new Date());
 
+
+
                 if (getEvents(currentDate, eventEntries, true).size() > 0) {
                     textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
                     eventEntries1 = getEvents(currentDate, eventEntries, true);
@@ -270,6 +272,10 @@ public class SharedCalendarFragment2 extends Fragment {
                 textView.setText("All Events");
                 eventEntries1 = eventEntries;
                 refresh();
+                return true;
+            case R.id.shared_calendar_refresh:
+                refresh();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
