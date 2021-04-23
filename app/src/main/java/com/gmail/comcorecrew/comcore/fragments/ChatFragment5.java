@@ -1,6 +1,9 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -17,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.OpenableColumns;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,9 +32,11 @@ import android.widget.EditText;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.classes.Group;
 import com.gmail.comcorecrew.comcore.classes.modules.PinnedMessages;
 import com.gmail.comcorecrew.comcore.dialogs.AddReactionDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
+import com.gmail.comcorecrew.comcore.helpers.ChatMention;
 import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
@@ -57,7 +61,7 @@ public class ChatFragment5 extends Fragment {
     public static final int ID_DELETE_BUTTON = 122;
     public static final int ID_PIN_BUTTON = 123;
     public static final int ID_REACT_BUTTON = 124;
-
+    public static final int ID_COPY_BUTTON = 125;
 
     private static final int PERMISSION_CODE = 1000;
     private static final int FILECHOOSER_CODE = 2000;
@@ -195,8 +199,11 @@ public class ChatFragment5 extends Fragment {
             case ID_REACT_BUTTON:
                 reactMessage(item);
                 return true;
-            default:
+            case ID_COPY_BUTTON:
+                copyMessage(item);
                 return true;
+            default:
+                return false;
         }
     }
 
@@ -282,6 +289,17 @@ public class ChatFragment5 extends Fragment {
         messageEntry = messaging.getEntry(item.getGroupId());
         AddReactionDialog addReactionDialog = new AddReactionDialog(messageEntry, messageEntry.id, item.getGroupId(), x, this);
         addReactionDialog.show(getParentFragmentManager(), null);
+    }
+
+    private void copyMessage(MenuItem item) {
+        String message = messaging.get(item.getGroupId()).getData();
+        Group group = messaging.getGroup();
+        CharSequence formatted = ChatMention.formatMentions(message, group, null);
+
+        Context context = getContext();
+        ClipboardManager clipboard = (ClipboardManager)
+                context.getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(ClipData.newPlainText(null, formatted.toString()));
     }
 
     private void uploadFile() {

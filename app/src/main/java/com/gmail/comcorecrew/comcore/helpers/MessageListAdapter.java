@@ -152,11 +152,28 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             if (v.getId() == R.id.me_message_text || v.getId() == R.id.other_message_text) {
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
-                if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
-                    menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
+                boolean mine = v.getId() == R.id.me_message_text;
+                GroupRole role = messaging.getGroup().getGroupRole();
+
+                // Add the copy button for all users
+                menu.add(getAdapterPosition(), ChatFragment5.ID_COPY_BUTTON, 0, "Copy Text");
+
+                // Add the react button for all users
+                menu.add(getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 1, "React to Message");
+
+                // Only add the edit button if the message was sent by the user
+                if (mine) {
+                    menu.add(getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 2, "Edit Message");
+                }
+
+                // Add the delete button if the message was sent by the user or they are a moderator
+                if (mine || role != GroupRole.USER) {
+                    menu.add(getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 3, "Delete Message");
+                }
+
+                // Only add the pin button for moderators
+                if (role != GroupRole.USER) {
+                    menu.add(getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 4, "Pin Message");
                 }
             }
 
