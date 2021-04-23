@@ -76,11 +76,11 @@ public abstract class CustomChat extends CustomModule {
     }
 
     private MessageID latestMessageId() {
-        if (!isEmpty()) {
-            return new MessageID(getChatID(), getLastItem().getItemId());
-        } else {
+        if (shouldClearCache || isEmpty()) {
             return null;
         }
+
+        return new MessageID(getChatID(), getLastItem().getItemId());
     }
 
     @Override
