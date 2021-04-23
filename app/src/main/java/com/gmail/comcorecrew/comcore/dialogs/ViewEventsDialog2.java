@@ -2,6 +2,7 @@ package com.gmail.comcorecrew.comcore.dialogs;
 
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.EventLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class ViewEventsDialog2 extends DialogFragment {
     private Calendar currentCalendar;
     private java.util.Calendar currentDate;
     private List<EventEntry> eventEntries = new ArrayList<>();
+    private List<EventEntry> eventEntries1 = new ArrayList<>();
 
     /**
      * 0 - View events
@@ -37,8 +39,9 @@ public class ViewEventsDialog2 extends DialogFragment {
      */
     private int flag;
 
-    public ViewEventsDialog2 (java.util.Calendar currentDate) {
+    public ViewEventsDialog2 (java.util.Calendar currentDate, List<EventEntry> eventEntries) {
         this.currentDate = currentDate;
+        this.eventEntries1 = eventEntries;
     }
 
     @Override
@@ -46,31 +49,40 @@ public class ViewEventsDialog2 extends DialogFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.dialog_with_title, container, false);
 
-        System.out.println("We creating the view");
+        if (eventEntries1 == null) {
 
-        ServerConnector.getGroups(result -> {
-            for (int i = 0; i < result.data.length; i++) {
-                ServerConnector.getModules(result.data[i], result1 -> {
-                    for (int j = 0; j < result1.data.length; j++) {
-                        if (result1.data[j].id instanceof CalendarID) {
-                            ServerConnector.getEvents((CalendarID) result1.data[j].id, result2 -> {
-                                for (int k = 0; k < result2.data.length; k++) {
-                                    System.out.println(result2.data[k].description);
-                                    eventEntries.add(result2.data[k]);
-                                    System.out.println(eventEntries.get(k).start);
-                                }
+            ServerConnector.getGroups(result -> {
+                for (int i = 0; i < result.data.length; i++) {
+                    ServerConnector.getModules(result.data[i], result1 -> {
+                        for (int j = 0; j < result1.data.length; j++) {
+                            if (result1.data[j].id instanceof CalendarID) {
+                                ServerConnector.getEvents((CalendarID) result1.data[j].id, result2 -> {
+                                    for (int k = 0; k < result2.data.length; k++) {
+                                        eventEntries.add(result2.data[k]);
+                                    }
 
-                                RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
-                                rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                adapter = new CustomAdapter2();
-                                rvGroups.setAdapter(adapter);
-                                rvGroups.setItemAnimator(new DefaultItemAnimator());
-                            });
+                                    RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
+                                    rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    adapter = new CustomAdapter2();
+                                    rvGroups.setAdapter(adapter);
+                                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            });
+        } else {
+            for (int i = 0; i < eventEntries1.size(); i++) {
+                eventEntries.add(eventEntries1.get(i));
             }
-        });
+
+            RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.dialog_with_title_recycler);
+            rvGroups.setLayoutManager(new LinearLayoutManager(getActivity()));
+            adapter = new CustomAdapter2();
+            rvGroups.setAdapter(adapter);
+            rvGroups.setItemAnimator(new DefaultItemAnimator());
+        }
 
         return rootView;
     }
@@ -99,7 +111,6 @@ public class ViewEventsDialog2 extends DialogFragment {
 
             public ViewHolder(View view) {
                 super(view);
-                System.out.println("Inside ViewHolder");
                 view.setOnClickListener(this);
                 textView = (TextView) view.findViewById(R.id.label_invite);
             }
@@ -127,9 +138,6 @@ public class ViewEventsDialog2 extends DialogFragment {
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.subtitle_row_item, viewGroup, false);
-
-            System.out.println("HEYO");
-
             return new ViewHolder(view);
         }
 
@@ -144,10 +152,7 @@ public class ViewEventsDialog2 extends DialogFragment {
                     " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).end).toString();
             eventDate.setText(parsedDate);
 
-            System.out.println("HEYO: " + eventEntries.get(position).description);
-
             viewHolder.setCurrentEventEntry(eventEntries.get(position));
-
         }
 
         @Override

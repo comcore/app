@@ -1,5 +1,6 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -27,6 +28,8 @@ import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
+
+import java.util.Calendar;
 
 public class TaskListFragment extends Fragment {
     public static TaskList taskList;
@@ -179,6 +182,9 @@ public class TaskListFragment extends Fragment {
             if (task.hasDeadline()) {
                 String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();
                 deadlineText.setText(parsedDate);
+                if(task.deadline - Calendar.getInstance().getTimeInMillis() < 86400000) {
+                    deadlineText.setTextColor(Color.RED);
+                }
             }
             else {
                 deadlineText.setText(R.string.no_deadline);

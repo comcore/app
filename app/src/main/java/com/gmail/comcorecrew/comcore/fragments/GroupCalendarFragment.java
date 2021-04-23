@@ -7,7 +7,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
@@ -26,10 +31,16 @@ import com.gmail.comcorecrew.comcore.dialogs.ErrorDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewEventsDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewPendingEventsDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
+import com.gmail.comcorecrew.comcore.helpers.MessageListAdapter;
 import com.gmail.comcorecrew.comcore.server.ServerConnector;
 import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.id.CalendarID;
 import com.gmail.comcorecrew.comcore.server.id.ChatID;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +52,11 @@ public class GroupCalendarFragment extends Fragment {
     public static Calendar calendar;
     private CalendarView calendarView;
     private Toolbar toolBar;
+    private CustomAdapter adapter;
+    private List<EventEntry> eventEntries = calendar.getApproved();
+    private TextView textView;
+    private RecyclerView rvGroups;
+
 
     private  static final String TAG = "CalendarActivity";
 
@@ -64,7 +80,19 @@ public class GroupCalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-        return inflater.inflate(R.layout.fragment_group_calendar, container, false);
+
+        View rootView = inflater.inflate(R.layout.fragment_group_calendar, container, false);
+
+
+//        RecyclerView rvGroups = (RecyclerView) rootView.findViewById(R.id.group_calendar_recyclerview);
+//        rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+//        adapter = new CustomAdapter();
+//        rvGroups.setAdapter(adapter);
+//        rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+
+        return rootView;
+        //return inflater.inflate(R.layout.fragment_group_calendar, container, false);
     }
 
     @Override
@@ -74,8 +102,17 @@ public class GroupCalendarFragment extends Fragment {
         toolBar = (Toolbar) view.findViewById(R.id.toolbar_group_calendar);
         toolBar.setTitle(calendar.getName());
         getActivity().setTitle(calendar.getName());
-
         calendarView = (CalendarView) view.findViewById(R.id.calendarView);
+
+        textView = (TextView) view.findViewById(R.id.group_calendar_titleText);
+
+        rvGroups = (RecyclerView) view.findViewById(R.id.group_calendar_recyclerview);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new CustomAdapter();
+        rvGroups.setAdapter(adapter);
+        rvGroups.setItemAnimator(new DefaultItemAnimator());
+
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
@@ -85,8 +122,25 @@ public class GroupCalendarFragment extends Fragment {
                 currentDate.set(java.util.Calendar.DATE, day);
                 currentDate.set(java.util.Calendar.HOUR, 0);
 
+                System.out.println(currentDate.get(java.util.Calendar.YEAR));
+                System.out.println(currentDate.get(java.util.Calendar.MONTH));
+                System.out.println(currentDate.get(java.util.Calendar.DATE));
+                System.out.println(currentDate.get(java.util.Calendar.HOUR));
+
+                System.out.println(currentDate.getTime().toString());
+
                 if (calendar.getEntriesByDay(currentDate).size() > 0) {
-                    new ViewEventsDialog(calendar, currentDate, 0).show(getParentFragmentManager(), null);
+                    textView.setText("Here are your event(s) for " + currentDate.get(java.util.Calendar.MONTH) + "/" + currentDate.get(java.util.Calendar.DATE) + "/" + currentDate.get(java.util.Calendar.YEAR));
+                    eventEntries = calendar.getEntriesByDay(currentDate);
+                    adapter = new CustomAdapter();
+                    rvGroups.setAdapter(adapter);
+                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                } else {
+                    eventEntries = calendar.getApproved();
+                    textView.setText("Here are all your upcoming events");
+                    adapter = new CustomAdapter();
+                    rvGroups.setAdapter(adapter);
+                    rvGroups.setItemAnimator(new DefaultItemAnimator());
                 }
             }
         });
@@ -125,7 +179,12 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             case R.id.view_pending_events:
                 /** Handle view pending events **/
-                new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
+                eventEntries = calendar.getUnapproved();
+                textView.setText("Here are all your pending events");
+                adapter = new CustomAdapter();
+                rvGroups.setAdapter(adapter);
+                rvGroups.setItemAnimator(new DefaultItemAnimator());
+                //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);
                 return true;
             case R.id.pin_event:
                 /** Handle pinning event to the bulletin board **/
@@ -137,6 +196,59 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+
+    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            //private final TextView textView;
+            private EventEntry currentEventEntry;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                itemView.setOnClickListener(this);
+            }
+
+            public void setCurrentEventEntry(EventEntry eventEntry) {
+                this.currentEventEntry = eventEntry;
+            }
+
+            @Override
+            public void onClick(View v) {
+
+            }
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.subtitle_row_item, parent, false);
+
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
+
+            eventDesc.setText(eventEntries.get(position).description);
+            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).start).toString() +
+                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries.get(position).end).toString();
+            eventDate.setText(parsedDate);
+
+            viewHolder.setCurrentEventEntry(eventEntries.get(position));
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return eventEntries.size();
         }
     }
 }

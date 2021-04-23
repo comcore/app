@@ -1,6 +1,7 @@
 package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,11 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CalendarView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.classes.modules.Calendar;
@@ -23,6 +28,11 @@ public class SharedCalendarFragment2 extends Fragment {
     public static Calendar calendar;
     private CalendarView calendarView;
     private Toolbar toolBar;
+    List<EventEntry> eventEntries = new ArrayList<>();
+    private List<EventEntry> eventEntries1 = new ArrayList<>();
+    private CustomAdapter adapter;
+    private TextView textView;
+    private RecyclerView rvGroups;
 
 
     public SharedCalendarFragment2() {
@@ -57,6 +67,32 @@ public class SharedCalendarFragment2 extends Fragment {
         getActivity().setTitle("Shared Calendar");
         calendarView = (CalendarView) view.findViewById(R.id.calendarView);
 
+        textView = (TextView) view.findViewById(R.id.group_calendar_titleText);
+        textView.setText("Here are all your upcoming events");
+
+        ServerConnector.getGroups(result -> {
+            for (int i = 0; i < result.data.length; i++) {
+                ServerConnector.getModules(result.data[i], result1 -> {
+                    for (int j = 0; j < result1.data.length; j++) {
+                        if (result1.data[j].id instanceof CalendarID) {
+                            ServerConnector.getEvents((CalendarID) result1.data[j].id, result2 -> {
+                                for (int k = 0; k < result2.data.length; k++) {
+                                    eventEntries.add(result2.data[k]);
+                                }
+                                eventEntries1 = eventEntries;
+
+                                rvGroups = (RecyclerView) view.findViewById(R.id.group_calendar_recyclerview);
+                                rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+                                adapter = new CustomAdapter();
+                                rvGroups.setAdapter(adapter);
+                                rvGroups.setItemAnimator(new DefaultItemAnimator());
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
@@ -66,17 +102,55 @@ public class SharedCalendarFragment2 extends Fragment {
                 currentDate.set(java.util.Calendar.DATE, day);
                 currentDate.set(java.util.Calendar.HOUR, 0);
 
-//                if (calendar.getEntriesByDay(currentDate).size() > 0) {
-//                    new ViewEventsDialog2(currentDate).show(getParentFragmentManager(), null);
-//                }
+
+
+                if (getEvents(currentDate, eventEntries).size() > 0) {
+                    textView.setText("Here are your event(s) for " + currentDate.get(java.util.Calendar.MONTH) + "/" + currentDate.get(java.util.Calendar.DATE) + "/" + currentDate.get(java.util.Calendar.YEAR));
+                    eventEntries1 = getEvents(currentDate, eventEntries);
+                    adapter = new CustomAdapter();
+                    rvGroups.setAdapter(adapter);
+                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                    //new ViewEventsDialog2(currentDate, getEvents(currentDate, eventEntries)).show(getParentFragmentManager(), null);
+                } else {
+                    textView.setText("Here are all your upcoming events");
+                    eventEntries1 = eventEntries;
+                    adapter = new CustomAdapter();
+                    rvGroups.setAdapter(adapter);
+                    rvGroups.setItemAnimator(new DefaultItemAnimator());
+                }
             }
+
         });
+    }
+
+    public List<EventEntry> getEvents(java.util.Calendar currentDay, List<EventEntry> eventEntries) {
+        if (currentDay == null) {
+            return null;
+        }
+
+        ArrayList<EventEntry> eventList = new ArrayList<>();
+
+        java.util.Calendar startDay = java.util.Calendar.getInstance();
+
+        for (int i = 0; i < eventEntries.size(); i++) {
+            startDay.setTimeInMillis(eventEntries.get(i).start);
+            System.out.println(eventEntries.get(i).description);
+
+            /* Currently gets entries based on their starting day
+              TODO match entries as long as the currentDay overlaps with its time range */
+            if (currentDay.get(java.util.Calendar.YEAR) == startDay.get(java.util.Calendar.YEAR) &&
+                    currentDay.get(java.util.Calendar.MONTH) == startDay.get(java.util.Calendar.MONTH) &&
+                    currentDay.get(java.util.Calendar.DATE) == startDay.get(java.util.Calendar.DATE)) {
+
+                eventList.add(eventEntries.get(i));
+            }
+        }
+        return eventList;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.sharedchatmenu, menu);
-
     }
 
     @Override
@@ -90,12 +164,67 @@ public class SharedCalendarFragment2 extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.view_events:
-                System.out.println("Why wont this work?");
                 /** Handle viewing all calendar events**/
-                new ViewEventsDialog2(null).show(getParentFragmentManager(), null);
+                new ViewEventsDialog2(null, null).show(getParentFragmentManager(), null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            //private final TextView textView;
+            private EventEntry currentEventEntry;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                itemView.setOnClickListener(this);
+                //textView = (TextView) itemView.findViewById(R.id.label_invite);
+            }
+
+//            public TextView getTextView() {
+//                return textView;
+//            }
+
+            public void setCurrentEventEntry(EventEntry eventEntry) {
+                this.currentEventEntry = eventEntry;
+            }
+
+            @Override
+            public void onClick(View v) {
+
+            }
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.subtitle_row_item, parent, false);
+
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+
+            TextView eventDesc = viewHolder.itemView.findViewById(R.id.row_title);
+            TextView eventDate = viewHolder.itemView.findViewById(R.id.row_subtitle);
+
+            eventDesc.setText(eventEntries1.get(position).description);
+            String parsedDate = DateFormat.format("MM-dd-yyyy HH:mm", eventEntries1.get(position).start).toString() +
+                    " - " + DateFormat.format("MM-dd-yyyy HH:mm", eventEntries1.get(position).end).toString();
+            eventDate.setText(parsedDate);
+
+            viewHolder.setCurrentEventEntry(eventEntries1.get(position));
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return eventEntries1.size();
         }
     }
 }
