@@ -167,7 +167,7 @@ public class PinnedMessages extends CustomChat {
         manager.setStackFromEnd(true);
         pinnedRecycler.setLayoutManager(manager);
         pinnedRecycler.setAdapter(pinnedAdapter);
-        pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
+        pinnedRecycler.scrollToPosition(pinnedAdapter.getItemCount() - 1);
         refresh();
     }
 
@@ -178,7 +178,7 @@ public class PinnedMessages extends CustomChat {
         manager.setStackFromEnd(true);
         pinnedRecycler.setLayoutManager(manager);
         pinnedRecycler.setAdapter(pinnedAdapter);
-        pinnedRecycler.smoothScrollToPosition(pinnedAdapter.getItemCount());
+        pinnedRecycler.scrollToPosition(pinnedAdapter.getItemCount() - 1);
         refresh();
     }
 

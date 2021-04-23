@@ -121,7 +121,7 @@ public class ChatFragment5 extends Fragment {
         messageRecycler.setLayoutManager(manager);
         messageAdapter = new MessageListAdapter(messaging);
         messageRecycler.setAdapter(messageAdapter);
-        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
+        messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
         messaging.setCallback(this::refresh);
         messaging.refresh();
 
@@ -145,7 +145,7 @@ public class ChatFragment5 extends Fragment {
 
     public void refresh() {
         messageAdapter.notifyDataSetChanged();
-        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
+        messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
     }
 
     @Override
@@ -177,13 +177,6 @@ public class ChatFragment5 extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-        messageAdapter.notifyDataSetChanged();
-        messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
-
     }
 
     // Listens for selection of an item in the ContextMenu in messageAdapter
