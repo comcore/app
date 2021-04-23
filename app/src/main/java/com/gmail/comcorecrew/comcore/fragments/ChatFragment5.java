@@ -119,7 +119,7 @@ public class ChatFragment5 extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setStackFromEnd(true);
         messageRecycler.setLayoutManager(manager);
-        messageAdapter = new MessageListAdapter(getContext(), messaging);
+        messageAdapter = new MessageListAdapter(messaging);
         messageRecycler.setAdapter(messageAdapter);
         messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
         messaging.setCallback(this::refresh);

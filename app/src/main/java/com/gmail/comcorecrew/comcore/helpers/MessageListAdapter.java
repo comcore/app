@@ -1,6 +1,5 @@
 package com.gmail.comcorecrew.comcore.helpers;
 
-import android.content.Context;
 import android.os.Build;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
@@ -21,23 +20,17 @@ import com.gmail.comcorecrew.comcore.classes.modules.Messaging;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.Reaction;
 import com.gmail.comcorecrew.comcore.fragments.ChatFragment5;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
-    private Context context;
     public Messaging messaging;
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
-    public String[] numericMonths = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-    public String[] semanticMonths = {"January", "February", "March", "April", "May", "June", "July",
-                                        "August", "September", "October", "November", "December"};
-
-    public MessageListAdapter(Context context, Messaging messaging) {
-        this.context = context;
+    public MessageListAdapter(Messaging messaging) {
         this.messaging = messaging;
     }
 
@@ -61,16 +54,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
-
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
-            view = LayoutInflater.from(parent.getContext())
+            View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.from_me, parent, false);
-            return new SentMessageHolder(view);
+            return new MessageHolder(view, true);
         } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
-            view = LayoutInflater.from(parent.getContext())
+            View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.from_them, parent, false);
-            return new ReceivedMessageHolder(view);
+            return new MessageHolder(view, false);
         }
 
         return null;
@@ -79,36 +70,54 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MessageItem message = messaging.get(position);
-
-        switch (holder.getItemViewType()) {
-            case VIEW_TYPE_MESSAGE_SENT:
-                ((SentMessageHolder) holder).bind(message);
-                break;
-            case VIEW_TYPE_MESSAGE_RECEIVED:
-                ((ReceivedMessageHolder) holder).bind(message);
-        }
+        MessageItem previousMessage = position > 0 ? messaging.get(position - 1) : null;
+        ((MessageHolder) holder).bind(message, previousMessage);
     }
 
-    private class SentMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    private class MessageHolder extends RecyclerView.ViewHolder
+            implements View.OnCreateContextMenuListener {
         TextView messageText, timeText, nameText, dateText;
         ImageView thumbs_up, thumbs_down;
 
-        SentMessageHolder(View itemView) {
+        MessageHolder(View itemView, boolean fromMe) {
             super(itemView);
 
-            messageText = (TextView) itemView.findViewById(R.id.me_message_text);
+            if (fromMe) {
+                messageText = itemView.findViewById(R.id.me_message_text);
+                timeText = itemView.findViewById(R.id.me_message_timestamp);
+                nameText = itemView.findViewById(R.id.me_username);
+                dateText = itemView.findViewById(R.id.me_message_date);
+                thumbs_up = itemView.findViewById(R.id.me_reaction_like);
+                thumbs_down = itemView.findViewById(R.id.me_reaction_dislike);
+            } else {
+                messageText = itemView.findViewById(R.id.other_message_text);
+                timeText = itemView.findViewById(R.id.other_message_timestamp);
+                nameText = itemView.findViewById(R.id.other_username);
+                dateText = itemView.findViewById(R.id.other_message_date);
+                thumbs_up = itemView.findViewById(R.id.other_reaction_like);
+                thumbs_down = itemView.findViewById(R.id.other_reaction_dislike);
+            }
+
             messageText.setMovementMethod(LinkMovementMethod.getInstance());
-            timeText = (TextView) itemView.findViewById(R.id.me_message_timestamp);
-            nameText = (TextView) itemView.findViewById(R.id.me_username);
-            dateText = (TextView) itemView.findViewById(R.id.me_message_date);
-            thumbs_up = (ImageView) itemView.findViewById(R.id.me_reaction_like);
-            thumbs_down = (ImageView) itemView.findViewById(R.id.me_reaction_dislike);
         }
 
-        void bind(MessageItem message) {
+        void bind(MessageItem message, MessageItem previousMessage) {
+            String todayDate = EventEntry.dateFormat.format(new Date(message.getTimestamp()));
+            if (previousMessage == null) {
+                dateText.setVisibility(View.VISIBLE);
+                dateText.setText(todayDate);
+            } else {
+                String prevDate = EventEntry.dateFormat.format(new Date(previousMessage.getTimestamp()));
+                if (prevDate.equals(todayDate)) {
+                    dateText.setVisibility(View.GONE);
+                } else {
+                    dateText.setVisibility(View.VISIBLE);
+                    dateText.setText(todayDate);
+                }
+            }
+
             messageText.setText(ChatMention.formatMentions(message.getData(), messaging.getGroup(), null));
-            timeText.setText(format(message.getTimestamp()));
-            dateText.setText(format2(message.getTimestamp()));
+            timeText.setText(EventEntry.timeFormat.format(new Date(message.getTimestamp())));
             nameText.setText(UserStorage.getUser(message.getId()).getName());
             messageText.setOnCreateContextMenuListener(this);
             if (message.getReactions().getReactionCount(Reaction.DISLIKE) > 0) {
@@ -157,105 +166,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 x = menu.getItem(0).getGroupId();
                 menu.removeItem(225);
                 menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " + messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
-            }
-
-            if (v.getId() == R.id.other_reaction_dislike || v.getId() == R.id.me_reaction_dislike) {
-                menu.add(this.getAdapterPosition(), 325, 0, "Username");
-                x = menu.getItem(0).getGroupId();
-                menu.removeItem(325);
-                menu.add(this.getAdapterPosition(), 201, 0, "Number of users who dislike: " + messaging.get(x).getReactions().getReactionCount(Reaction.DISLIKE));
-            }
-        }
-    }
-
-    public String format(long miliseconds) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-//        SimpleDateFormat.getDateInstance();
-//        new SimpleDateFormat(SimpleDateFormat.getDateInstance().format(new Date()));
-        return sdf.format(new Date(miliseconds));
-    }
-
-    public String format2(long miliseconds) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
-        String x = sdf.format(new Date(miliseconds));
-        for (int i = 0; i < numericMonths.length; i++) {
-            if (x.substring(0, 2).equals(numericMonths[i])) {
-                return semanticMonths[i] + " " + x.substring(3, 5);
-            }
-        }
-
-        return sdf.format(new Date(miliseconds));
-    }
-
-    private class ReceivedMessageHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        TextView messageText, timeText, nameText, dateText;
-        ImageView thumbs_up, thumbs_down;
-
-        ReceivedMessageHolder(View itemView) {
-            super(itemView);
-
-            messageText = (TextView) itemView.findViewById(R.id.other_message_text);
-            messageText.setMovementMethod(LinkMovementMethod.getInstance());
-            timeText = (TextView) itemView.findViewById(R.id.other_message_timestamp);
-            nameText = (TextView) itemView.findViewById(R.id.other_username);
-            dateText = (TextView) itemView.findViewById(R.id.other_message_date);
-            thumbs_up = (ImageView) itemView.findViewById(R.id.other_reaction_like);
-            thumbs_down = (ImageView) itemView.findViewById(R.id.other_reaction_dislike);
-        }
-
-        void bind(MessageItem message) {
-            messageText.setText(ChatMention.formatMentions(message.getData(), messaging.getGroup(), null));
-            timeText.setText(format(message.getTimestamp()));
-            dateText.setText(format2(message.getTimestamp()));
-            nameText.setText(UserStorage.getUser(message.getId()).getName());
-            messageText.setOnCreateContextMenuListener(this);
-            if (message.getReactions().getReactionCount(Reaction.DISLIKE) > 0) {
-                thumbs_down.setVisibility(View.VISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    thumbs_down.onVisibilityAggregated(true);
-                }
-                thumbs_down.setOnCreateContextMenuListener(this);
-
-            } else {
-                thumbs_down.setVisibility(View.GONE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    thumbs_down.onVisibilityAggregated(false);
-                }
-            }
-
-
-            if (message.getReactions().getReactionCount(Reaction.LIKE) > 0) {
-                thumbs_up.setVisibility(View.VISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    thumbs_up.onVisibilityAggregated(true);
-                }
-                thumbs_up.setOnCreateContextMenuListener(this);
-            } else {
-                thumbs_up.setVisibility(View.GONE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    thumbs_up.onVisibilityAggregated(false);
-                }
-            }
-        }
-
-        // Creates menu for each message with 3 options
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (v.getId() == R.id.me_message_text || v.getId() == R.id.other_message_text) {
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_EDIT_BUTTON, 0, "Edit");
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_DELETE_BUTTON, 1, "Delete");
-                menu.add(this.getAdapterPosition(), ChatFragment5.ID_REACT_BUTTON, 3, "React");
-                if (messaging.getGroup().getGroupRole() != GroupRole.USER) {
-                    menu.add(this.getAdapterPosition(), ChatFragment5.ID_PIN_BUTTON, 2, "Pin");
-                }
-            }
-
-            int x = 0;
-            if (v.getId() == R.id.other_reaction_like || v.getId() == R.id.me_reaction_like) {
-                menu.add(this.getAdapterPosition(), 225, 0, "Username");
-                x = menu.getItem(0).getGroupId();
-                menu.removeItem(225);
-                menu.add(this.getAdapterPosition(), 200, 0, "Number of users who liked: " +  messaging.get(x).getReactions().getReactionCount(Reaction.LIKE));
             }
 
             if (v.getId() == R.id.other_reaction_dislike || v.getId() == R.id.me_reaction_dislike) {
