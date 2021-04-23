@@ -15,7 +15,6 @@
         android:paddingEnd="8dp"
         android:paddingBottom="4dp"
         android:text="June 10"
-        android:textColor="#707070"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
