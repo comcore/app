@@ -174,12 +174,8 @@ public class PinnedMessages extends CustomChat {
     @Override
     public void refreshView() {
         pinnedAdapter.setMessageEntry(readPinned());
-
-        manager.setStackFromEnd(true);
-        pinnedRecycler.setLayoutManager(manager);
-        pinnedRecycler.setAdapter(pinnedAdapter);
+        pinnedAdapter.notifyDataSetChanged();
         pinnedRecycler.scrollToPosition(pinnedAdapter.getItemCount() - 1);
-        refresh();
     }
 
     @Override
