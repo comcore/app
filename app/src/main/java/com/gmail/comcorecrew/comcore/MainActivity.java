@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // The link is valid, so store it for after logging in
                 InviteLinkDialog.setLink(inviteLink);
-                InviteLinkDialog.checkExpired(getSupportFragmentManager());
+                InviteLinkDialog.checkExpired();
             });
         }
 

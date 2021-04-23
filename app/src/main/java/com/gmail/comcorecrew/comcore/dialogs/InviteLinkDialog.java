@@ -28,7 +28,7 @@ public class InviteLinkDialog extends DialogFragment {
         pendingLink = link;
     }
 
-    public static void checkExpired(FragmentManager fragmentManager) {
+    public static void checkExpired() {
         if (pendingLink == null) {
             return;
         }
@@ -41,7 +41,7 @@ public class InviteLinkDialog extends DialogFragment {
 
     public static void showIfPossible(MainFragment mainFragment) {
         // First make sure the link hasn't expired
-        checkExpired(mainFragment.getParentFragmentManager());
+        checkExpired();
         if (pendingLink == null) {
             return;
         }

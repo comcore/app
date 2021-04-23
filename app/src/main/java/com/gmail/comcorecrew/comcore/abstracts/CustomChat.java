@@ -73,18 +73,17 @@ public abstract class CustomChat extends CustomModule {
         addItems(items);
     }
 
+    private MessageID latestMessageId() {
+        if (!isEmpty()) {
+            return new MessageID(getChatID(), getLastItem().getItemId());
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public void refresh() {
-        ChatID chatID = getChatID();
-        MessageID lastMessage;
-        if (!isEmpty()) {
-            lastMessage = new MessageID(chatID, getLastItem().getItemId());
-        } else {
-            lastMessage = null;
-        }
-
-        ServerConnector.getMessages(chatID, lastMessage,
-                null, result -> {
+        ServerConnector.getMessages(getChatID(), latestMessageId(), null, result -> {
             if (result.isFailure()) {
                 return;
             }
@@ -96,7 +95,7 @@ public abstract class CustomChat extends CustomModule {
             }
 
             // If the message isn't immediately after the existing messages, clear the cache
-            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(lastMessage)) {
+            if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
                 setItems(items);
             } else {
                 addItems(items);

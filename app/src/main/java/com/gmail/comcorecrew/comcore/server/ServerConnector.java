@@ -797,9 +797,9 @@ public final class ServerConnector {
                                    ResultHandler<MessageEntry[]> handler) {
         if (chat == null) {
             throw new IllegalArgumentException("ChatID cannot be null");
-        } else if (after != null && after.module != chat) {
+        } else if (after != null && !after.module.equals(chat)) {
             throw new IllegalArgumentException("'after' message must be in the same chat");
-        } else if (before != null && before.module != chat) {
+        } else if (before != null && !before.module.equals(chat)) {
             throw new IllegalArgumentException("'before' message must be in the same chat");
         }
 
