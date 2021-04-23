@@ -276,7 +276,7 @@ public final class ServerConnector {
     }
 
     /**
-     * Checks if two-factor authentication is enabled for the current user. If two-factor
+     * Checks if two-factor authentication is d for the current user. If two-factor
      * authentication is enabled, all login requests will return LoginStatus.ENTER_CODE rather than
      * LoginStatus.SUCCESS, and the user will only be able to log in after entering the code.
      *

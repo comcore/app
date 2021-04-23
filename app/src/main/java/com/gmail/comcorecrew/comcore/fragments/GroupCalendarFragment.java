@@ -125,19 +125,7 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             case R.id.require_approval:
                 /** Handle updating event approval settings **/
-                ServerConnector.setRequireApproval(calendar.getGroup().getGroupId(), !calendar.getGroup().isRequireApproval(), result -> {
-                    if (result.isFailure()) {
-                        ErrorDialog.show(R.string.error_cannot_connect);
-                    }
-                    else {
-                        if (calendar.getGroup().isRequireApproval()) {
-                            ErrorDialog.show(R.string.event_approval_not_needed);
-                        }
-                        else {
-                            ErrorDialog.show(R.string.event_approval_needed);
-                        }
-                    }
-                });
+                calendar.getGroup().updateRequireApproval(!calendar.getGroup().isRequireApproval());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
