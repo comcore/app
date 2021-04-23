@@ -140,6 +140,12 @@ public class ChatFragment5 extends Fragment {
         });
     }
 
+    public void reSet() {
+        messageRecycler.setAdapter(messageAdapter);
+        messaging.refresh();
+        refresh();
+    }
+
     public void refresh() {
         messageAdapter.notifyDataSetChanged();
         messageRecycler.smoothScrollToPosition(messageAdapter.getItemCount());
@@ -283,8 +289,10 @@ public class ChatFragment5 extends Fragment {
     }
 
     private void reactMessage(MenuItem item) {
+        int x = 2;
         messageEntry = messaging.getEntry(item.getGroupId());
-        new AddReactionDialog(messageEntry, messageEntry.id, 0).show(getParentFragmentManager(), null);
+        AddReactionDialog addReactionDialog = new AddReactionDialog(messageEntry, messageEntry.id, item.getGroupId(), x, this);
+        addReactionDialog.show(getParentFragmentManager(), null);
     }
 
     private void uploadFile() {
@@ -353,7 +361,7 @@ public class ChatFragment5 extends Fragment {
                         ErrorDialog.show(result.errorMessage);
                         return;
                     }
-                    messageToBeSent.setText(result.data);
+                    messageToBeSent.setText(AppData.self.getName() + "shared: " + result.data);
                     sendMessage();
                 });
             } catch (IOException e) {

@@ -91,6 +91,12 @@ public class GroupCalendarFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        getActivity().setTitle("Comcore");
+        super.onDestroy();
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.groupcalendarmenu, menu);
 

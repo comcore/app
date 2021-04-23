@@ -77,6 +77,12 @@ public class SharedCalendarFragment2 extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        getActivity().setTitle("Comcore");
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {

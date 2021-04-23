@@ -86,7 +86,7 @@
         app:layout_constraintStart_toEndOf="@+id/card_gchat_message_other" />
 
     <ImageView
-        android:id="@+id/message_reaction1"
+        android:id="@+id/message_reaction_like_them"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
@@ -96,13 +96,13 @@
         android:src="@drawable/thumb_up"/>
 
     <ImageView
-        android:id="@+id/message_reaction2"
+        android:id="@+id/message_reaction_dislike_them"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="28dp"
         android:visibility="gone"
         android:src="@drawable/thumb_down"
-        app:layout_constraintLeft_toLeftOf="@+id/message_reaction1"
+        app:layout_constraintLeft_toLeftOf="@+id/message_reaction_like_them"
         app:layout_constraintTop_toBottomOf="@+id/card_gchat_message_other" />
 
 
