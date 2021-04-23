@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 public abstract class CustomChat extends CustomModule {
 
+    private transient boolean shouldClearCache = false;
+
     public CustomChat(String name, CustomModuleID id, Group group) {
         super(name, id, group);
     }
@@ -94,6 +96,11 @@ public abstract class CustomChat extends CustomModule {
                 items.add(new CustomItem(entry));
             }
 
+            if (shouldClearCache) {
+                shouldClearCache = false;
+                items.clear();
+            }
+
             // If the message isn't immediately after the existing messages, clear the cache
             if (result.data.length > 0 && !result.data[0].id.immediatelyAfter(latestMessageId())) {
                 setItems(items);
@@ -106,7 +113,7 @@ public abstract class CustomChat extends CustomModule {
 
     @Override
     public void clearCache() {
-        getItems().clear();
+        shouldClearCache = true;
     }
 
     @Override
