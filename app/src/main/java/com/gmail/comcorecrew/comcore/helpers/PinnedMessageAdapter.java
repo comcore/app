@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gmail.comcorecrew.comcore.R;
 import com.gmail.comcorecrew.comcore.caching.UserStorage;
 import com.gmail.comcorecrew.comcore.classes.AppData;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.MessageEntry;
 
 import java.text.SimpleDateFormat;
@@ -24,10 +25,6 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
-
-    public String[] numericMonths = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-    public String[] semanticMonths = {"January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December"};
 
     public PinnedMessageAdapter(Context context, ArrayList<MessageEntry> messageEntry) {
         this.context = context;
@@ -100,30 +97,13 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
 
         void bind(MessageEntry message) {
             messageText.setText(message.contents);
-            timeText.setText(format(message.timestamp));
-            dateText.setText(format2(message.timestamp));
+            timeText.setText(EventEntry.timeFormat.format(new Date(message.timestamp)));
+            dateText.setText(EventEntry.dateFormat.format(new Date(message.timestamp)));
             UserStorage.lookup(message.sender, user -> {
                 nameText.setText(user.getName());
             });
         }
     }
-
-        public String format(long miliseconds) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-            return sdf.format(new Date(miliseconds));
-        }
-
-        public String format2(long miliseconds) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
-            String x = sdf.format(new Date(miliseconds));
-            for (int i = 0; i < numericMonths.length; i++) {
-                if (x.substring(0, 2).equals(numericMonths[i])) {
-                    return semanticMonths[i] + " " + x.substring(3, 5);
-                }
-            }
-
-            return sdf.format(new Date(miliseconds));
-        }
 
         private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
             TextView messageText, timeText, nameText, dateText;
@@ -139,8 +119,8 @@ public class PinnedMessageAdapter extends RecyclerView.Adapter {
 
             void bind(MessageEntry message) {
                 messageText.setText(message.contents);
-                timeText.setText(format(message.timestamp));
-                dateText.setText(format2(message.timestamp));
+                timeText.setText(EventEntry.timeFormat.format(new Date(message.timestamp)));
+                dateText.setText(EventEntry.dateFormat.format(new Date(message.timestamp)));
                 UserStorage.lookup(message.sender, user -> {
                     nameText.setText(user.getName());
                 });

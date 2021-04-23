@@ -147,7 +147,7 @@ public class GroupCalendarFragment extends Fragment {
                     refresh();
                 } else {
                     eventEntries = calendar.getEntriesByDay(currentDate1, false);
-                    textView.setText("Here are all your upcoming events");
+                    textView.setText("Upcoming Events");
                     refresh();
                 }
             }
@@ -188,7 +188,7 @@ public class GroupCalendarFragment extends Fragment {
                 return true;
             case R.id.group_calendar_view_all_events:
                 eventEntries = calendar.getApproved();
-                textView.setText("Here are all your events");
+                textView.setText("All Events");
                 refresh();
                 return true;
                 //new ViewPendingEventsDialog(calendar).show(getParentFragmentManager(), null);

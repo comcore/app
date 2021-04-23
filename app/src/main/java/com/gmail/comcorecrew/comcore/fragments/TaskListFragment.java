@@ -27,9 +27,11 @@ import com.gmail.comcorecrew.comcore.dialogs.CreateTaskDialog;
 import com.gmail.comcorecrew.comcore.dialogs.ViewTasksDialog;
 import com.gmail.comcorecrew.comcore.enums.GroupRole;
 import com.gmail.comcorecrew.comcore.enums.TaskStatus;
+import com.gmail.comcorecrew.comcore.server.entry.EventEntry;
 import com.gmail.comcorecrew.comcore.server.entry.TaskEntry;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class TaskListFragment extends Fragment {
     public static TaskList taskList;
@@ -180,7 +182,7 @@ public class TaskListFragment extends Fragment {
             }
 
             if (task.hasDeadline()) {
-                String parsedDate = "Deadline: " + DateFormat.format("MM-dd-yyyy HH:mm", task.deadline).toString();
+                String parsedDate = "Deadline: " + EventEntry.dateTimeFormat.format(new Date(task.deadline));
                 deadlineText.setText(parsedDate);
                 if(task.deadline - Calendar.getInstance().getTimeInMillis() < 86400000) {
                     deadlineText.setTextColor(Color.RED);

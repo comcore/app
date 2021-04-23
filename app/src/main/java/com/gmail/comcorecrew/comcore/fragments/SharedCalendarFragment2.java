@@ -262,12 +262,12 @@ public class SharedCalendarFragment2 extends Fragment {
                 java.util.Calendar currentDate = java.util.Calendar.getInstance();
                 currentDate.setTime(new Date());
 
-                textView.setText("Here are all your upcoming events");
+                textView.setText("Upcoming Events");
                 eventEntries1 = getEvents(currentDate, eventEntries, false);
                 refresh();
                 return true;
             case R.id.shared_calendar_view_all_events:
-                textView.setText("Here are all of your events");
+                textView.setText("All Events");
                 eventEntries1 = eventEntries;
                 refresh();
             default:
