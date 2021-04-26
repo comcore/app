@@ -112,10 +112,18 @@ public class Calendar extends Module {
                 startDay.setTimeInMillis(event.start);
                 endDay.setTimeInMillis(event.end);
 
-                if (currentDay.get(java.util.Calendar.YEAR) >= endDay.get(java.util.Calendar.YEAR) &&
-                        currentDay.get(java.util.Calendar.MONTH) >= endDay.get(java.util.Calendar.MONTH) &&
-                        currentDay.get(java.util.Calendar.DATE) >= endDay.get(java.util.Calendar.DATE)) {
-                } else {
+//                if (currentDay.get(java.util.Calendar.YEAR) >= endDay.get(java.util.Calendar.YEAR) &&
+//                        currentDay.get(java.util.Calendar.MONTH) >= endDay.get(java.util.Calendar.MONTH) &&
+//                        currentDay.get(java.util.Calendar.DATE) != endDay.get(java.util.Calendar.DATE)) {
+//                } else if (currentDay.getTimeInMillis() >= startDay.getTimeInMillis() && currentDay.getTimeInMillis() <= endDay.getTimeInMillis()) {
+//                    eventList.add(approved.get(i));
+//                }
+//
+//                else {
+//                    eventList.add(approved.get(i));
+//                }
+
+                if (currentDay.getTimeInMillis() <= endDay.getTimeInMillis()) {
                     eventList.add(approved.get(i));
                 }
 

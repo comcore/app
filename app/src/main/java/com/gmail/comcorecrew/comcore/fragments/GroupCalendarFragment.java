@@ -143,10 +143,10 @@ public class GroupCalendarFragment extends Fragment {
 
                 if (calendar.getEntriesByDay(currentDate).size() > 0) {
                     textView.setText("Events on " + EventEntry.dateFormat.format(new Date(currentDate.getTimeInMillis())));
-                    eventEntries = calendar.getEntriesByDay(currentDate);
+                    eventEntries = calendar.getEntriesByDay(currentDate, true);
                     refresh();
                 } else {
-                    eventEntries = calendar.getEntriesByDay(currentDate1);
+                    eventEntries = calendar.getEntriesByDay(currentDate1, false);
                     textView.setText("Upcoming Events");
                     refresh();
                 }

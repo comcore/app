@@ -1,4 +1,4 @@
-package com.gmail.comcorecrew.comcore.fragments;
+ package com.gmail.comcorecrew.comcore.fragments;
 
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -168,10 +168,7 @@ public class SharedCalendarFragment2 extends Fragment {
 
                 /* Currently gets entries based on their starting day
              TODO match entries as long as the currentDay overlaps with its time range */
-                if (currentDay.get(java.util.Calendar.YEAR) >= endDay.get(java.util.Calendar.YEAR) &&
-                        currentDay.get(java.util.Calendar.MONTH) >= endDay.get(java.util.Calendar.MONTH) &&
-                        currentDay.get(java.util.Calendar.DATE) >= endDay.get(java.util.Calendar.DATE)) {
-                } else {
+                if (currentDay.getTimeInMillis() <= endDay.getTimeInMillis()) {
                     eventList.add(eventEntries.get(i));
                 }
 
